@@ -1,7 +1,7 @@
 name: devaloop_form_builder
-description: "A new Flutter package project."
+description: "Form Builder : Consists of, input with text type, input with email type, input with date type, input with option type, input with more than one option type, input with number type, and input with text type with multiple lines"
 version: 0.0.1
-homepage:
+homepage: https://github.com/devaloop/form_builder
 
 environment:
   sdk: '>=3.2.0 <4.0.0'

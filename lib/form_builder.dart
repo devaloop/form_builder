@@ -19,8 +19,6 @@ class FormBulder extends StatefulWidget {
     this.submitButtonSettings,
   });
 
-  //TODO set additional validation
-
   final String formName;
   final List<InputField> inputFields;
   final void Function(
