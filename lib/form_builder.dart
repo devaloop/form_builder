@@ -1,0 +1,523 @@
+library devaloop_form_builder;
+
+import 'package:flutter/material.dart';
+import 'package:devaloop_form_builder/input_field_date_time.dart';
+import 'package:devaloop_form_builder/input_field_number.dart';
+import 'package:devaloop_form_builder/input_field_option.dart';
+import 'package:devaloop_form_builder/input_field_text.dart';
+import 'package:intl/intl.dart';
+
+class FormBulder extends StatefulWidget {
+  const FormBulder({
+    super.key,
+    required this.formName,
+    required this.inputFields,
+    this.onInitial,
+    this.onBeforeValidation,
+    this.onAfterValidation,
+    required this.onSubmit,
+    this.submitButtonSettings,
+  });
+
+  //TODO set additional validation
+
+  final String formName;
+  final List<InputField> inputFields;
+  final void Function(
+      BuildContext context, Map<String, InputValue> inputValues)? onInitial;
+  final void Function(
+          BuildContext context, Map<String, InputValue> inputValues)?
+      onBeforeValidation;
+  final void Function(BuildContext context, Map<String, InputValue> inputValues,
+      bool isValid, Map<String, String?> errorsMessages)? onAfterValidation;
+  final void Function(BuildContext context, Map<String, InputValue> inputValues)
+      onSubmit;
+  final SubmitButtonSettings? submitButtonSettings;
+
+  @override
+  State<FormBulder> createState() => _FormBulderState();
+}
+
+class _FormBulderState extends State<FormBulder> {
+  final List<dynamic> _controllers = [];
+  late Map<InputField, String?> _errors = {};
+  late Map<String, String?> _additionalErrorOnAfterValidation = {};
+  final _formKey = GlobalKey<FormState>();
+  late Map<String, InputValue> _inputValues;
+
+  @override
+  void initState() {
+    for (var e in widget.inputFields) {
+      if (e.inputFieldType == InputFieldType.dateTime) {
+        _controllers.add(TextEditingController());
+      } else if (e.inputFieldType == InputFieldType.number) {
+        _controllers.add(TextEditingController());
+      } else if (e.inputFieldType == InputFieldType.option) {
+        _controllers.add(InputFieldOptionController());
+      } else if (e.inputFieldType == InputFieldType.text) {
+        _controllers.add(TextEditingController());
+      } else {
+        throw Exception('Unsupported InputFieldType ');
+      }
+    }
+    _inputValues = {
+      for (int i = 0; i < widget.inputFields.length; i++)
+        widget.inputFields[i].name: InputValue(
+          controller: _controllers[i],
+          inputFieldType: widget.inputFields[i].inputFieldType,
+        )
+    };
+
+    if (widget.onInitial != null) {
+      widget.onInitial!.call(context, _inputValues);
+    }
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            widget.formName,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+            ),
+          ),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: widget.inputFields.map(
+              (e) {
+                if (e.inputFieldType == InputFieldType.dateTime) {
+                  return InputFieldDateTime(
+                    controller: _controllers[widget.inputFields
+                        .indexWhere((element) => element == e)],
+                    label: e.label,
+                    helperText: e.helperText,
+                    isRequired: !(e.isOptional ?? false),
+                    inputDateTimeMode:
+                        e.inputDateTimeSettings?.inputDateTimeMode,
+                    onValidating: (errorMessage) {
+                      _errors[e] = errorMessage;
+
+                      var additionalErrorMessage =
+                          _additionalErrorOnAfterValidation.entries
+                              .where((element) => element.key == e.name)
+                              .map((e) => e.value ?? '')
+                              .toList()
+                              .join(', ');
+                      if (additionalErrorMessage.isEmpty &&
+                          errorMessage == null) {
+                        return null;
+                      }
+                      if (additionalErrorMessage.isNotEmpty) {
+                        additionalErrorMessage = ', $additionalErrorMessage';
+                      }
+                      return (errorMessage ?? '') + additionalErrorMessage;
+                    },
+                  );
+                } else if (e.inputFieldType == InputFieldType.number) {
+                  return InputFieldNumber(
+                    controller: _controllers[widget.inputFields
+                        .indexWhere((element) => element == e)],
+                    label: e.label,
+                    helperText: e.helperText,
+                    isRequired: !(e.isOptional ?? false),
+                    inputFieldNumberMode:
+                        e.inputNumberSettings?.inputNumberMode,
+                    onValidating: (errorMessage) {
+                      _errors[e] = errorMessage;
+
+                      var additionalErrorMessage =
+                          _additionalErrorOnAfterValidation.entries
+                              .where((element) => element.key == e.name)
+                              .map((e) => e.value ?? '')
+                              .toList()
+                              .join(', ');
+                      if (additionalErrorMessage.isEmpty &&
+                          errorMessage == null) {
+                        return null;
+                      }
+                      if (additionalErrorMessage.isNotEmpty) {
+                        additionalErrorMessage = ', $additionalErrorMessage';
+                      }
+                      return (errorMessage ?? '') + additionalErrorMessage;
+                    },
+                  );
+                } else if (e.inputFieldType == InputFieldType.option) {
+                  if (e.inputOptionSettings != null) {
+                    return InputFieldOption(
+                      controller: _controllers[widget.inputFields
+                          .indexWhere((element) => element == e)],
+                      label: e.label,
+                      helperText: e.helperText,
+                      isRequired: !(e.isOptional ?? false),
+                      optionData: e.inputOptionSettings!.optionData,
+                      dataHeaders: e.inputOptionSettings!.dataHeaders,
+                      searchFields:
+                          e.inputOptionSettings?.optionSearchForm?.searchFields,
+                      searchProcess: e
+                          .inputOptionSettings?.optionSearchForm?.searchProcess,
+                      isMultiSelection: e.inputOptionSettings!.isMultiSelection,
+                      onValidating: (errorMessage) {
+                        _errors[e] = errorMessage;
+
+                        var additionalErrorMessage =
+                            _additionalErrorOnAfterValidation.entries
+                                .where((element) => element.key == e.name)
+                                .map((e) => e.value ?? '')
+                                .toList()
+                                .join(', ');
+                        if (additionalErrorMessage.isEmpty &&
+                            errorMessage == null) {
+                          return null;
+                        }
+                        if (additionalErrorMessage.isNotEmpty) {
+                          additionalErrorMessage = ', $additionalErrorMessage';
+                        }
+                        return (errorMessage ?? '') + additionalErrorMessage;
+                      },
+                    );
+                  } else {
+                    throw Exception(
+                        'optionSettings must be provided for InputFieldType.option');
+                  }
+                } else if (e.inputFieldType == InputFieldType.text) {
+                  return InputFieldText(
+                    controller: _controllers[widget.inputFields
+                        .indexWhere((element) => element == e)],
+                    label: e.label,
+                    helperText: e.helperText,
+                    isRequired: !(e.isOptional ?? false),
+                    isMultilines: e.inputTextSettings?.isMultilines,
+                    inputTextMode: e.inputTextSettings?.inputTextMode,
+                    onValidating: (errorMessage) {
+                      _errors[e] = errorMessage;
+
+                      var additionalErrorMessage =
+                          _additionalErrorOnAfterValidation.entries
+                              .where((element) => element.key == e.name)
+                              .map((e) => e.value ?? '')
+                              .toList()
+                              .join(', ');
+                      if (additionalErrorMessage.isEmpty &&
+                          errorMessage == null) {
+                        return null;
+                      }
+                      if (additionalErrorMessage.isNotEmpty) {
+                        additionalErrorMessage = ', $additionalErrorMessage';
+                      }
+                      return (errorMessage ?? '') + additionalErrorMessage;
+                    },
+                  );
+                } else {
+                  throw Exception('Unsupported InputFieldType ');
+                }
+              },
+            ).toList(),
+          ),
+          const SizedBox(
+            height: 15,
+          ),
+          widget.submitButtonSettings?.icon == null
+              ? FilledButton(
+                  onPressed: () => onSubmit(),
+                  child: Text(widget.submitButtonSettings?.label ?? 'Submit'),
+                )
+              : FilledButton.icon(
+                  onPressed: () => onSubmit(),
+                  label: Text(widget.submitButtonSettings?.label ?? 'Submit'),
+                  icon: widget.submitButtonSettings!.icon!,
+                ),
+        ],
+      ),
+    );
+  }
+
+  void onSubmit() {
+    if (widget.onBeforeValidation != null) {
+      widget.onBeforeValidation!.call(context, _inputValues);
+    }
+    _errors = {};
+    _formKey.currentState!.validate();
+
+    int errorMessagesIndex = 0;
+    Map<int, MapEntry<InputField, String?>> errorMessages = {};
+    _errors.entries
+        .where((element) => element.value != null)
+        .toList()
+        .forEach((element) {
+      errorMessages[errorMessagesIndex] = element;
+      errorMessagesIndex++;
+    });
+    _additionalErrorOnAfterValidation = {};
+
+    if (widget.onAfterValidation != null) {
+      widget.onAfterValidation!.call(context, _inputValues,
+          errorMessages.isEmpty, _additionalErrorOnAfterValidation);
+
+      for (var element in _additionalErrorOnAfterValidation.entries) {
+        if (element.value != null) {
+          errorMessages[errorMessagesIndex] = MapEntry(
+              widget.inputFields.where((e) => e.name == element.key).first,
+              element.value);
+          errorMessagesIndex++;
+        }
+      }
+      _formKey.currentState!.validate();
+    }
+
+    if (errorMessages.isEmpty) {
+      widget.onSubmit.call(context, _inputValues);
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+                'There are ${errorMessages.length} failed input validations'),
+            content: SizedBox(
+              width: 340,
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemBuilder: (context, index) => ListTile(
+                  title: Text(
+                    errorMessages[index]!.key.label,
+                    style: TextStyle(
+                      color: Colors.red.shade900,
+                    ),
+                  ),
+                  subtitle: Text(
+                    errorMessages[index]!.value!,
+                    style: TextStyle(
+                      color: Colors.red.shade900,
+                    ),
+                  ),
+                ),
+                itemCount: errorMessages.length,
+                separatorBuilder: (context, index) => const Divider(),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+}
+
+class InputField {
+  const InputField({
+    required this.name,
+    required this.inputFieldType,
+    required this.label,
+    this.helperText,
+    this.isOptional,
+    this.inputOptionSettings,
+    this.inputTextSettings,
+    this.inputDateTimeSettings,
+    this.inputNumberSettings,
+  });
+
+  final String name;
+  final InputFieldType inputFieldType;
+  final String label;
+  final String? helperText;
+  final bool? isOptional;
+  final InputOptionSettings? inputOptionSettings;
+  final InputTextSettings? inputTextSettings;
+  final InputDateTimeSettings? inputDateTimeSettings;
+  final InputNumberSettings? inputNumberSettings;
+}
+
+class InputNumberSettings {
+  const InputNumberSettings({
+    this.inputNumberMode,
+  });
+
+  final InputNumberMode? inputNumberMode;
+}
+
+class InputDateTimeSettings {
+  const InputDateTimeSettings({
+    this.inputDateTimeMode,
+  });
+
+  final InputDateTimeMode? inputDateTimeMode;
+}
+
+class InputTextSettings {
+  const InputTextSettings({
+    this.isMultilines,
+    this.inputTextMode,
+  });
+
+  final bool? isMultilines;
+  final InputTextMode? inputTextMode;
+}
+
+class InputOptionSettings {
+  const InputOptionSettings({
+    required this.optionData,
+    required this.optionTotalData,
+    this.dataHeaders,
+    this.isMultiSelection,
+    this.optionSearchForm,
+  });
+
+  final Future<OptionData> optionData;
+  final Future<int> optionTotalData;
+  final List<String>? dataHeaders;
+  final bool? isMultiSelection;
+  final OptionSearchForm? optionSearchForm;
+}
+
+class SubmitButtonSettings {
+  const SubmitButtonSettings({
+    required this.label,
+    this.icon,
+  });
+
+  final String label;
+  final Widget? icon;
+}
+
+class InputValue {
+  const InputValue({
+    required this.controller,
+    required this.inputFieldType,
+  });
+
+  final dynamic controller;
+  final InputFieldType inputFieldType;
+
+  void setString(String? value) {
+    if (inputFieldType == InputFieldType.text) {
+      (controller as TextEditingController).text = value ?? '';
+    } else {
+      throw Exception(
+          'Unsupported getString for this input type $inputFieldType');
+    }
+  }
+
+  String? getString() {
+    if (inputFieldType == InputFieldType.text) {
+      if ((controller as TextEditingController).text.isEmpty) {
+        return null;
+      }
+
+      return (controller as TextEditingController).text;
+    } else {
+      throw Exception(
+          'Unsupported setString for this input type $inputFieldType');
+    }
+  }
+
+  void setDateTime(DateTime? value) {
+    if (inputFieldType == InputFieldType.dateTime) {
+      if (value == null) {
+        (controller as TextEditingController).text = '';
+      } else {
+        try {
+          (controller as TextEditingController).text =
+              DateFormat('yyyy-MM-dd hh:mm:ss').format(value);
+        } catch (e) {
+          try {
+            (controller as TextEditingController).text =
+                DateFormat('yyyy-MM-dd').format(value);
+          } catch (e) {
+            (controller as TextEditingController).text =
+                DateFormat('hh:mm').format(value);
+          }
+        }
+      }
+    } else {
+      throw Exception(
+          'Unsupported setDateTime for this input type $inputFieldType');
+    }
+  }
+
+  DateTime? getDateTime() {
+    if (inputFieldType == InputFieldType.dateTime) {
+      if ((controller as TextEditingController).text.isEmpty) {
+        return null;
+      }
+      try {
+        return DateFormat('yyyy-MM-dd hh:mm:ss')
+            .parse((controller as TextEditingController).text);
+      } catch (e) {
+        try {
+          return DateFormat('yyyy-MM-dd')
+              .parse((controller as TextEditingController).text);
+        } catch (e) {
+          return DateFormat('hh:mm')
+              .parse((controller as TextEditingController).text);
+        }
+      }
+    } else {
+      throw Exception(
+          'Unsupported getDateTime for this input type $inputFieldType');
+    }
+  }
+
+  void setListOptionValues(List<OptionItem> value) {
+    if (inputFieldType == InputFieldType.option) {
+      (controller as InputFieldOptionController).clear();
+      for (var e in value) {
+        (controller as InputFieldOptionController).add(e);
+      }
+    } else {
+      throw Exception(
+          'Unsupported setListOptionValues for this input type $inputFieldType');
+    }
+  }
+
+  List<OptionItem> getListOptionValues() {
+    if (inputFieldType == InputFieldType.option) {
+      return (controller as InputFieldOptionController).getData();
+    } else {
+      throw Exception(
+          'Unsupported getListOptionValues for this input type $inputFieldType');
+    }
+  }
+
+  void setNumber(double? value) {
+    if (inputFieldType == InputFieldType.number) {
+      (controller as TextEditingController).text =
+          value == null ? '' : value.toString();
+    } else {
+      throw Exception(
+          'Unsupported getString for this input type $inputFieldType');
+    }
+  }
+
+  double? getNumber() {
+    if (inputFieldType == InputFieldType.number) {
+      if ((controller as TextEditingController).text.isEmpty) {
+        return null;
+      }
+      return double.parse((controller as TextEditingController).text);
+    } else {
+      throw Exception(
+          'Unsupported setString for this input type $inputFieldType');
+    }
+  }
+}
+
+enum InputFieldType {
+  dateTime,
+  number,
+  option,
+  text,
+}
