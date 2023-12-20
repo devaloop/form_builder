@@ -17,6 +17,7 @@ class FormBulder extends StatefulWidget {
     this.onAfterValidation,
     required this.onSubmit,
     this.submitButtonSettings,
+    this.additionalButtons,
   });
 
   final String formName;
@@ -32,6 +33,8 @@ class FormBulder extends StatefulWidget {
       onSubmit;
   final SubmitButtonSettings? submitButtonSettings;
 
+  final List<FilledButton>? additionalButtons;
+
   @override
   State<FormBulder> createState() => _FormBulderState();
 }
@@ -42,6 +45,7 @@ class _FormBulderState extends State<FormBulder> {
   late Map<String, String?> _additionalErrorOnAfterValidation = {};
   final _formKey = GlobalKey<FormState>();
   late Map<String, InputValue> _inputValues;
+  late List<FilledButton> _buttons = [];
 
   @override
   void initState() {
@@ -69,12 +73,27 @@ class _FormBulderState extends State<FormBulder> {
     if (widget.onInitial != null) {
       widget.onInitial!.call(context, _inputValues);
     }
-
+    if (widget.additionalButtons != null) {
+      _buttons.addAll(widget.additionalButtons!);
+    }
+    _buttons.add(widget.submitButtonSettings?.icon == null
+        ? FilledButton(
+            onPressed: () => onSubmit(),
+            child: Text(widget.submitButtonSettings?.label ?? 'Submit'),
+          )
+        : FilledButton.icon(
+            onPressed: () => onSubmit(),
+            label: Text(widget.submitButtonSettings?.label ?? 'Submit'),
+            icon: widget.submitButtonSettings!.icon!,
+          ));
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isPortrait =
+        MediaQuery.of(context).orientation == Orientation.portrait;
+
     return Form(
       key: _formKey,
       child: Column(
@@ -88,154 +107,177 @@ class _FormBulderState extends State<FormBulder> {
               fontSize: 18,
             ),
           ),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            children: widget.inputFields.map(
-              (e) {
-                if (e.inputFieldType == InputFieldType.dateTime) {
-                  return InputFieldDateTime(
-                    controller: _controllers[widget.inputFields
-                        .indexWhere((element) => element == e)],
-                    label: e.label,
-                    helperText: e.helperText,
-                    isRequired: !(e.isOptional ?? false),
-                    inputDateTimeMode:
-                        e.inputDateTimeSettings?.inputDateTimeMode,
-                    onValidating: (errorMessage) {
-                      _errors[e] = errorMessage;
-
-                      var additionalErrorMessage =
-                          _additionalErrorOnAfterValidation.entries
-                              .where((element) => element.key == e.name)
-                              .map((e) => e.value ?? '')
-                              .toList()
-                              .join(', ');
-                      if (additionalErrorMessage.isEmpty &&
-                          errorMessage == null) {
-                        return null;
-                      }
-                      if (additionalErrorMessage.isNotEmpty) {
-                        additionalErrorMessage = ', $additionalErrorMessage';
-                      }
-                      return (errorMessage ?? '') + additionalErrorMessage;
-                    },
-                  );
-                } else if (e.inputFieldType == InputFieldType.number) {
-                  return InputFieldNumber(
-                    controller: _controllers[widget.inputFields
-                        .indexWhere((element) => element == e)],
-                    label: e.label,
-                    helperText: e.helperText,
-                    isRequired: !(e.isOptional ?? false),
-                    inputFieldNumberMode:
-                        e.inputNumberSettings?.inputNumberMode,
-                    onValidating: (errorMessage) {
-                      _errors[e] = errorMessage;
-
-                      var additionalErrorMessage =
-                          _additionalErrorOnAfterValidation.entries
-                              .where((element) => element.key == e.name)
-                              .map((e) => e.value ?? '')
-                              .toList()
-                              .join(', ');
-                      if (additionalErrorMessage.isEmpty &&
-                          errorMessage == null) {
-                        return null;
-                      }
-                      if (additionalErrorMessage.isNotEmpty) {
-                        additionalErrorMessage = ', $additionalErrorMessage';
-                      }
-                      return (errorMessage ?? '') + additionalErrorMessage;
-                    },
-                  );
-                } else if (e.inputFieldType == InputFieldType.option) {
-                  if (e.inputOptionSettings != null) {
-                    return InputFieldOption(
-                      controller: _controllers[widget.inputFields
-                          .indexWhere((element) => element == e)],
-                      label: e.label,
-                      helperText: e.helperText,
-                      isRequired: !(e.isOptional ?? false),
-                      optionData: e.inputOptionSettings!.optionData,
-                      dataHeaders: e.inputOptionSettings!.dataHeaders,
-                      searchFields:
-                          e.inputOptionSettings?.optionSearchForm?.searchFields,
-                      searchProcess: e
-                          .inputOptionSettings?.optionSearchForm?.searchProcess,
-                      isMultiSelection: e.inputOptionSettings!.isMultiSelection,
-                      onValidating: (errorMessage) {
-                        _errors[e] = errorMessage;
-
-                        var additionalErrorMessage =
-                            _additionalErrorOnAfterValidation.entries
-                                .where((element) => element.key == e.name)
-                                .map((e) => e.value ?? '')
-                                .toList()
-                                .join(', ');
-                        if (additionalErrorMessage.isEmpty &&
-                            errorMessage == null) {
-                          return null;
-                        }
-                        if (additionalErrorMessage.isNotEmpty) {
-                          additionalErrorMessage = ', $additionalErrorMessage';
-                        }
-                        return (errorMessage ?? '') + additionalErrorMessage;
-                      },
-                    );
-                  } else {
-                    throw Exception(
-                        'optionSettings must be provided for InputFieldType.option');
-                  }
-                } else if (e.inputFieldType == InputFieldType.text) {
-                  return InputFieldText(
-                    controller: _controllers[widget.inputFields
-                        .indexWhere((element) => element == e)],
-                    label: e.label,
-                    helperText: e.helperText,
-                    isRequired: !(e.isOptional ?? false),
-                    isMultilines: e.inputTextSettings?.isMultilines,
-                    inputTextMode: e.inputTextSettings?.inputTextMode,
-                    onValidating: (errorMessage) {
-                      _errors[e] = errorMessage;
-
-                      var additionalErrorMessage =
-                          _additionalErrorOnAfterValidation.entries
-                              .where((element) => element.key == e.name)
-                              .map((e) => e.value ?? '')
-                              .toList()
-                              .join(', ');
-                      if (additionalErrorMessage.isEmpty &&
-                          errorMessage == null) {
-                        return null;
-                      }
-                      if (additionalErrorMessage.isNotEmpty) {
-                        additionalErrorMessage = ', $additionalErrorMessage';
-                      }
-                      return (errorMessage ?? '') + additionalErrorMessage;
-                    },
-                  );
-                } else {
-                  throw Exception('Unsupported InputFieldType ');
-                }
-              },
-            ).toList(),
-          ),
-          const SizedBox(
-            height: 15,
-          ),
-          widget.submitButtonSettings?.icon == null
-              ? FilledButton(
-                  onPressed: () => onSubmit(),
-                  child: Text(widget.submitButtonSettings?.label ?? 'Submit'),
+          isPortrait
+              ? Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: widget.inputFields.map((e) => getField(e)).toList(),
                 )
-              : FilledButton.icon(
-                  onPressed: () => onSubmit(),
-                  label: Text(widget.submitButtonSettings?.label ?? 'Submit'),
-                  icon: widget.submitButtonSettings!.icon!,
+              : Row(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: widget.inputFields
+                            .take((widget.inputFields.length / 2).round())
+                            .map((e) => getField(e))
+                            .toList(),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 7.5,
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: widget.inputFields
+                            .skip((widget.inputFields.length / 2).round())
+                            .map((e) => getField(e))
+                            .toList(),
+                      ),
+                    ),
+                  ],
                 ),
+          const SizedBox(
+            height: 7.5,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Flexible(
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  direction: Axis.horizontal,
+                  crossAxisAlignment: WrapCrossAlignment.end,
+                  runAlignment: WrapAlignment.end,
+                  runSpacing: 7.5,
+                  spacing: 7.5,
+                  children: _buttons,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
+  }
+
+  Widget getField(InputField e) {
+    if (e.inputFieldType == InputFieldType.dateTime) {
+      return InputFieldDateTime(
+        controller: _controllers[
+            widget.inputFields.indexWhere((element) => element == e)],
+        label: e.label,
+        helperText: e.helperText,
+        isRequired: !(e.isOptional ?? false),
+        inputDateTimeMode: e.inputDateTimeSettings?.inputDateTimeMode,
+        onValidating: (errorMessage) {
+          _errors[e] = errorMessage;
+
+          var additionalErrorMessage = _additionalErrorOnAfterValidation.entries
+              .where((element) => element.key == e.name)
+              .map((e) => e.value ?? '')
+              .toList()
+              .join(', ');
+          if (additionalErrorMessage.isEmpty && errorMessage == null) {
+            return null;
+          }
+          if (additionalErrorMessage.isNotEmpty) {
+            additionalErrorMessage = ', $additionalErrorMessage';
+          }
+          return (errorMessage ?? '') + additionalErrorMessage;
+        },
+      );
+    } else if (e.inputFieldType == InputFieldType.number) {
+      return InputFieldNumber(
+        controller: _controllers[
+            widget.inputFields.indexWhere((element) => element == e)],
+        label: e.label,
+        helperText: e.helperText,
+        isRequired: !(e.isOptional ?? false),
+        inputFieldNumberMode: e.inputNumberSettings?.inputNumberMode,
+        onValidating: (errorMessage) {
+          _errors[e] = errorMessage;
+
+          var additionalErrorMessage = _additionalErrorOnAfterValidation.entries
+              .where((element) => element.key == e.name)
+              .map((e) => e.value ?? '')
+              .toList()
+              .join(', ');
+          if (additionalErrorMessage.isEmpty && errorMessage == null) {
+            return null;
+          }
+          if (additionalErrorMessage.isNotEmpty) {
+            additionalErrorMessage = ', $additionalErrorMessage';
+          }
+          return (errorMessage ?? '') + additionalErrorMessage;
+        },
+      );
+    } else if (e.inputFieldType == InputFieldType.option) {
+      if (e.inputOptionSettings != null) {
+        return InputFieldOption(
+          controller: _controllers[
+              widget.inputFields.indexWhere((element) => element == e)],
+          label: e.label,
+          helperText: e.helperText,
+          isRequired: !(e.isOptional ?? false),
+          optionData: e.inputOptionSettings!.optionData,
+          dataHeaders: e.inputOptionSettings!.dataHeaders,
+          searchFields: e.inputOptionSettings?.optionSearchForm?.searchFields,
+          searchProcess: e.inputOptionSettings?.optionSearchForm?.searchProcess,
+          isMultiSelection: e.inputOptionSettings!.isMultiSelection,
+          onValidating: (errorMessage) {
+            _errors[e] = errorMessage;
+
+            var additionalErrorMessage = _additionalErrorOnAfterValidation
+                .entries
+                .where((element) => element.key == e.name)
+                .map((e) => e.value ?? '')
+                .toList()
+                .join(', ');
+            if (additionalErrorMessage.isEmpty && errorMessage == null) {
+              return null;
+            }
+            if (additionalErrorMessage.isNotEmpty) {
+              additionalErrorMessage = ', $additionalErrorMessage';
+            }
+            return (errorMessage ?? '') + additionalErrorMessage;
+          },
+        );
+      } else {
+        throw Exception(
+            'optionSettings must be provided for InputFieldType.option');
+      }
+    } else if (e.inputFieldType == InputFieldType.text) {
+      return InputFieldText(
+        controller: _controllers[
+            widget.inputFields.indexWhere((element) => element == e)],
+        label: e.label,
+        helperText: e.helperText,
+        isRequired: !(e.isOptional ?? false),
+        isMultilines: e.inputTextSettings?.isMultilines,
+        inputTextMode: e.inputTextSettings?.inputTextMode,
+        onValidating: (errorMessage) {
+          _errors[e] = errorMessage;
+
+          var additionalErrorMessage = _additionalErrorOnAfterValidation.entries
+              .where((element) => element.key == e.name)
+              .map((e) => e.value ?? '')
+              .toList()
+              .join(', ');
+          if (additionalErrorMessage.isEmpty && errorMessage == null) {
+            return null;
+          }
+          if (additionalErrorMessage.isNotEmpty) {
+            additionalErrorMessage = ', $additionalErrorMessage';
+          }
+          return (errorMessage ?? '') + additionalErrorMessage;
+        },
+      );
+    } else {
+      throw Exception('Unsupported InputFieldType ');
+    }
   }
 
   void onSubmit() {

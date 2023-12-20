@@ -173,6 +173,13 @@ class MyApp extends StatelessWidget {
               label: 'Add Member',
               icon: Icon(Icons.add),
             ),
+            additionalButtons: [
+              FilledButton.icon(
+                onPressed: () {},
+                label: const Text('Cancel'),
+                icon: const Icon(Icons.cancel),
+              ),
+            ],
           ),
         ),
       ),
