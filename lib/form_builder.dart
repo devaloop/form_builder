@@ -24,16 +24,19 @@ class FormBulder extends StatefulWidget {
   final List<InputField> inputFields;
   final void Function(
       BuildContext context, Map<String, InputValue> inputValues)? onInitial;
-  final void Function(
+  final dynamic Function(
           BuildContext context, Map<String, InputValue> inputValues)?
       onBeforeValidation;
-  final void Function(BuildContext context, Map<String, InputValue> inputValues,
-      bool isValid, Map<String, String?> errorsMessages)? onAfterValidation;
-  final void Function(BuildContext context, Map<String, InputValue> inputValues)
-      onSubmit;
+  final dynamic Function(
+      BuildContext context,
+      Map<String, InputValue> inputValues,
+      bool isValid,
+      Map<String, String?> errorsMessages)? onAfterValidation;
+  final dynamic Function(
+      BuildContext context, Map<String, InputValue> inputValues) onSubmit;
   final SubmitButtonSettings? submitButtonSettings;
 
-  final List<FilledButton>? additionalButtons;
+  final List<AdditionalButton>? additionalButtons;
 
   @override
   State<FormBulder> createState() => _FormBulderState();
@@ -45,7 +48,7 @@ class _FormBulderState extends State<FormBulder> {
   late Map<String, String?> _additionalErrorOnAfterValidation = {};
   final _formKey = GlobalKey<FormState>();
   late Map<String, InputValue> _inputValues;
-  late List<FilledButton> _buttons = [];
+  late List<bool> _isSubmittings;
 
   @override
   void initState() {
@@ -73,19 +76,9 @@ class _FormBulderState extends State<FormBulder> {
     if (widget.onInitial != null) {
       widget.onInitial!.call(context, _inputValues);
     }
-    if (widget.additionalButtons != null) {
-      _buttons.addAll(widget.additionalButtons!);
-    }
-    _buttons.add(widget.submitButtonSettings?.icon == null
-        ? FilledButton(
-            onPressed: () => onSubmit(),
-            child: Text(widget.submitButtonSettings?.label ?? 'Submit'),
-          )
-        : FilledButton.icon(
-            onPressed: () => onSubmit(),
-            label: Text(widget.submitButtonSettings?.label ?? 'Submit'),
-            icon: widget.submitButtonSettings!.icon!,
-          ));
+
+    _isSubmittings = List.generate(
+        (widget.additionalButtons?.length ?? 0) + 1, (index) => false);
     super.initState();
   }
 
@@ -93,6 +86,63 @@ class _FormBulderState extends State<FormBulder> {
   Widget build(BuildContext context) {
     bool isPortrait =
         MediaQuery.of(context).orientation == Orientation.portrait;
+    List<FilledButton> listAdditionalButtons = [];
+    for (var i = 0; i < _isSubmittings.length; i++) {
+      if (i == _isSubmittings.length - 1) {
+        listAdditionalButtons.add(FilledButton.icon(
+          onPressed:
+              _isSubmittings.where((element) => element == true).isNotEmpty
+                  ? null
+                  : () async {
+                      setState(() {
+                        _isSubmittings[i] = true;
+                      });
+                      await onSubmit(context);
+                      setState(() {
+                        _isSubmittings[i] = false;
+                      });
+                    },
+          label: Text(widget.submitButtonSettings?.label ?? 'Submit'),
+          icon: _isSubmittings[i] == true
+              ? const SizedBox(
+                  height: 16,
+                  width: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.grey,
+                  ),
+                )
+              : widget.submitButtonSettings!.icon,
+        ));
+      } else {
+        AdditionalButton additionalButton = widget.additionalButtons![i];
+        listAdditionalButtons.add(FilledButton.icon(
+          onPressed:
+              _isSubmittings.where((element) => element == true).isNotEmpty
+                  ? null
+                  : () async {
+                      setState(() {
+                        _isSubmittings[0] = true;
+                      });
+                      await additionalButton.onTap.call();
+                      setState(() {
+                        _isSubmittings[0] = false;
+                      });
+                    },
+          label: Text(additionalButton.label),
+          icon: _isSubmittings[0] == true
+              ? const SizedBox(
+                  height: 16,
+                  width: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.grey,
+                  ),
+                )
+              : additionalButton.icon,
+        ));
+      }
+    }
 
     return Form(
       key: _formKey,
@@ -153,7 +203,7 @@ class _FormBulderState extends State<FormBulder> {
                   runAlignment: WrapAlignment.end,
                   runSpacing: 7.5,
                   spacing: 7.5,
-                  children: _buttons,
+                  children: listAdditionalButtons,
                 ),
               ),
             ],
@@ -280,9 +330,11 @@ class _FormBulderState extends State<FormBulder> {
     }
   }
 
-  void onSubmit() {
+  Future<void> onSubmit(BuildContext context) async {
+    await Future.delayed(const Duration(seconds: 2));
     if (widget.onBeforeValidation != null) {
-      widget.onBeforeValidation!.call(context, _inputValues);
+      if (!context.mounted) return;
+      await widget.onBeforeValidation!.call(context, _inputValues);
     }
     _errors = {};
     _formKey.currentState!.validate();
@@ -299,7 +351,8 @@ class _FormBulderState extends State<FormBulder> {
     _additionalErrorOnAfterValidation = {};
 
     if (widget.onAfterValidation != null) {
-      widget.onAfterValidation!.call(context, _inputValues,
+      if (!context.mounted) return;
+      await widget.onAfterValidation!.call(context, _inputValues,
           errorMessages.isEmpty, _additionalErrorOnAfterValidation);
 
       for (var element in _additionalErrorOnAfterValidation.entries) {
@@ -314,9 +367,11 @@ class _FormBulderState extends State<FormBulder> {
     }
 
     if (errorMessages.isEmpty) {
-      widget.onSubmit.call(context, _inputValues);
+      if (!context.mounted) return;
+      await widget.onSubmit.call(context, _inputValues);
     } else {
-      showDialog(
+      if (!context.mounted) return;
+      await showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -426,11 +481,11 @@ class InputOptionSettings {
 class SubmitButtonSettings {
   const SubmitButtonSettings({
     required this.label,
-    this.icon,
+    required this.icon,
   });
 
   final String label;
-  final Widget? icon;
+  final Widget icon;
 }
 
 class InputValue {
@@ -560,4 +615,16 @@ enum InputFieldType {
   number,
   option,
   text,
+}
+
+class AdditionalButton {
+  final String label;
+  final Widget icon;
+  final Function() onTap;
+
+  AdditionalButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
 }

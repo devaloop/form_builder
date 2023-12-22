@@ -174,9 +174,11 @@ class MyApp extends StatelessWidget {
               icon: Icon(Icons.add),
             ),
             additionalButtons: [
-              FilledButton.icon(
-                onPressed: () {},
-                label: const Text('Cancel'),
+              AdditionalButton(
+                onTap: () async {
+                  await Future.delayed(const Duration(seconds: 2));
+                },
+                label: 'Cancel',
                 icon: const Icon(Icons.cancel),
               ),
             ],
