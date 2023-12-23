@@ -1,5 +1,6 @@
 library devaloop_form_builder;
 
+import 'package:devaloop_form_builder/input_field_form.dart';
 import 'package:flutter/material.dart';
 import 'package:devaloop_form_builder/input_field_date_time.dart';
 import 'package:devaloop_form_builder/input_field_number.dart';
@@ -8,6 +9,8 @@ import 'package:devaloop_form_builder/input_field_text.dart';
 import 'package:intl/intl.dart';
 
 class FormBulder extends StatefulWidget {
+  //TODO Input Type Form
+
   const FormBulder({
     super.key,
     required this.formName,
@@ -18,6 +21,7 @@ class FormBulder extends StatefulWidget {
     required this.onSubmit,
     this.submitButtonSettings,
     this.additionalButtons,
+    this.isFormEditable,
   });
 
   final String formName;
@@ -35,8 +39,8 @@ class FormBulder extends StatefulWidget {
   final dynamic Function(
       BuildContext context, Map<String, InputValue> inputValues) onSubmit;
   final SubmitButtonSettings? submitButtonSettings;
-
   final List<AdditionalButton>? additionalButtons;
+  final bool? isFormEditable;
 
   @override
   State<FormBulder> createState() => _FormBulderState();
@@ -49,6 +53,7 @@ class _FormBulderState extends State<FormBulder> {
   final _formKey = GlobalKey<FormState>();
   late Map<String, InputValue> _inputValues;
   late List<bool> _isSubmittings;
+  bool? _isEditable;
 
   @override
   void initState() {
@@ -61,6 +66,8 @@ class _FormBulderState extends State<FormBulder> {
         _controllers.add(InputFieldOptionController());
       } else if (e.inputFieldType == InputFieldType.text) {
         _controllers.add(TextEditingController());
+      } else if (e.inputFieldType == InputFieldType.form) {
+        _controllers.add(<String, InputValue>{});
       } else {
         throw Exception('Unsupported InputFieldType ');
       }
@@ -96,10 +103,12 @@ class _FormBulderState extends State<FormBulder> {
                   : () async {
                       setState(() {
                         _isSubmittings[i] = true;
+                        _isEditable = false;
                       });
                       await onSubmit(context);
                       setState(() {
                         _isSubmittings[i] = false;
+                        _isEditable = null;
                       });
                     },
           label: Text(widget.submitButtonSettings?.label ?? 'Submit'),
@@ -123,10 +132,12 @@ class _FormBulderState extends State<FormBulder> {
                   : () async {
                       setState(() {
                         _isSubmittings[0] = true;
+                        _isEditable = false;
                       });
                       await additionalButton.onTap.call();
                       setState(() {
                         _isSubmittings[0] = false;
+                        _isEditable = null;
                       });
                     },
           label: Text(additionalButton.label),
@@ -238,6 +249,7 @@ class _FormBulderState extends State<FormBulder> {
           }
           return (errorMessage ?? '') + additionalErrorMessage;
         },
+        isEditable: _isEditable ?? widget.isFormEditable ?? true,
       );
     } else if (e.inputFieldType == InputFieldType.number) {
       return InputFieldNumber(
@@ -263,6 +275,7 @@ class _FormBulderState extends State<FormBulder> {
           }
           return (errorMessage ?? '') + additionalErrorMessage;
         },
+        isEditable: _isEditable ?? widget.isFormEditable ?? true,
       );
     } else if (e.inputFieldType == InputFieldType.option) {
       if (e.inputOptionSettings != null) {
@@ -294,6 +307,7 @@ class _FormBulderState extends State<FormBulder> {
             }
             return (errorMessage ?? '') + additionalErrorMessage;
           },
+          isEditable: _isEditable ?? widget.isFormEditable ?? true,
         );
       } else {
         throw Exception(
@@ -324,6 +338,39 @@ class _FormBulderState extends State<FormBulder> {
           }
           return (errorMessage ?? '') + additionalErrorMessage;
         },
+        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+      );
+    } else if (e.inputFieldType == InputFieldType.form) {
+      return InputFieldForm(
+        controller: _controllers[
+            widget.inputFields.indexWhere((element) => element == e)],
+        label: e.label,
+        helperText: e.helperText,
+        isRequired: !(e.isOptional ?? false),
+        onValidating: (errorMessage) {
+          _errors[e] = errorMessage;
+
+          var additionalErrorMessage = _additionalErrorOnAfterValidation.entries
+              .where((element) => element.key == e.name)
+              .map((e) => e.value ?? '')
+              .toList()
+              .join(', ');
+          if (additionalErrorMessage.isEmpty && errorMessage == null) {
+            return null;
+          }
+          if (additionalErrorMessage.isNotEmpty) {
+            additionalErrorMessage = ', $additionalErrorMessage';
+          }
+          return (errorMessage ?? '') + additionalErrorMessage;
+        },
+        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        formName: e.label,
+        inputFields: e.inputFormSettings!.inputFields,
+        additionalButtons: e.inputFormSettings!.additionalButtons,
+        isFormEditable: e.inputFormSettings!.isFormEditable,
+        onAfterValidation: e.inputFormSettings!.onAfterValidation,
+        onBeforeValidation: e.inputFormSettings!.onBeforeValidation,
+        onInitial: e.inputFormSettings!.onInitial,
       );
     } else {
       throw Exception('Unsupported InputFieldType ');
@@ -331,7 +378,6 @@ class _FormBulderState extends State<FormBulder> {
   }
 
   Future<void> onSubmit(BuildContext context) async {
-    await Future.delayed(const Duration(seconds: 2));
     if (widget.onBeforeValidation != null) {
       if (!context.mounted) return;
       await widget.onBeforeValidation!.call(context, _inputValues);
@@ -423,6 +469,7 @@ class InputField {
     this.inputTextSettings,
     this.inputDateTimeSettings,
     this.inputNumberSettings,
+    this.inputFormSettings,
   });
 
   final String name;
@@ -434,6 +481,36 @@ class InputField {
   final InputTextSettings? inputTextSettings;
   final InputDateTimeSettings? inputDateTimeSettings;
   final InputNumberSettings? inputNumberSettings;
+  final InputFormSettings? inputFormSettings;
+}
+
+class InputFormSettings {
+  final String? Function(String? errorMessage)? onValidating;
+  final String formName;
+  final List<InputField> inputFields;
+  final void Function(
+      BuildContext context, Map<String, InputValue> inputValues)? onInitial;
+  final dynamic Function(
+          BuildContext context, Map<String, InputValue> inputValues)?
+      onBeforeValidation;
+  final dynamic Function(
+      BuildContext context,
+      Map<String, InputValue> inputValues,
+      bool isValid,
+      Map<String, String?> errorsMessages)? onAfterValidation;
+  final List<AdditionalButton>? additionalButtons;
+  final bool? isFormEditable;
+
+  const InputFormSettings({
+    this.onValidating,
+    required this.formName,
+    required this.inputFields,
+    this.onInitial,
+    this.onBeforeValidation,
+    this.onAfterValidation,
+    this.additionalButtons,
+    this.isFormEditable,
+  });
 }
 
 class InputNumberSettings {
@@ -497,12 +574,32 @@ class InputValue {
   final dynamic controller;
   final InputFieldType inputFieldType;
 
+  void setForm(Map<String, InputValue> value) {
+    if (inputFieldType == InputFieldType.form) {
+      for (var e in value.entries) {
+        (controller as Map<String, InputValue>)[e.key] = e.value;
+      }
+    } else {
+      throw Exception(
+          'Unsupported setForm for this input type $inputFieldType');
+    }
+  }
+
+  Map<String, InputValue> getForm() {
+    if (inputFieldType == InputFieldType.form) {
+      return (controller as Map<String, InputValue>);
+    } else {
+      throw Exception(
+          'Unsupported setForm for this input type $inputFieldType');
+    }
+  }
+
   void setString(String? value) {
     if (inputFieldType == InputFieldType.text) {
       (controller as TextEditingController).text = value ?? '';
     } else {
       throw Exception(
-          'Unsupported getString for this input type $inputFieldType');
+          'Unsupported setString for this input type $inputFieldType');
     }
   }
 
@@ -515,7 +612,7 @@ class InputValue {
       return (controller as TextEditingController).text;
     } else {
       throw Exception(
-          'Unsupported setString for this input type $inputFieldType');
+          'Unsupported getString for this input type $inputFieldType');
     }
   }
 
@@ -610,12 +707,7 @@ class InputValue {
   }
 }
 
-enum InputFieldType {
-  dateTime,
-  number,
-  option,
-  text,
-}
+enum InputFieldType { dateTime, number, option, text, form }
 
 class AdditionalButton {
   final String label;

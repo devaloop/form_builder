@@ -10,6 +10,7 @@ class InputFieldNumber extends StatelessWidget {
   final String? helperText;
   final InputNumberMode? inputFieldNumberMode;
   final String? Function(String? errorMessage)? onValidating;
+  final bool? isEditable;
 
   const InputFieldNumber({
     super.key,
@@ -19,6 +20,7 @@ class InputFieldNumber extends StatelessWidget {
     this.helperText,
     this.inputFieldNumberMode,
     this.onValidating,
+    this.isEditable,
   });
 
   @override
@@ -61,6 +63,7 @@ class InputFieldNumber extends StatelessWidget {
     ];
     return TextFormField(
       controller: controller,
+      readOnly: !(isEditable ?? true),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       keyboardType:
           const TextInputType.numberWithOptions(signed: true, decimal: true),

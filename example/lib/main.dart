@@ -35,6 +35,23 @@ class MyApp extends StatelessWidget {
                 label: 'Name',
               ),
               const InputField(
+                  name: 'fullName',
+                  inputFieldType: InputFieldType.form,
+                  label: 'Full Name',
+                  inputFormSettings:
+                      InputFormSettings(formName: 'Full Name', inputFields: [
+                    InputField(
+                      name: 'first',
+                      inputFieldType: InputFieldType.text,
+                      label: 'First',
+                    ),
+                    InputField(
+                      name: 'last',
+                      inputFieldType: InputFieldType.text,
+                      label: 'Last',
+                    ),
+                  ])),
+              const InputField(
                 name: 'email',
                 inputFieldType: InputFieldType.text,
                 label: 'Email',
@@ -176,7 +193,7 @@ class MyApp extends StatelessWidget {
             additionalButtons: [
               AdditionalButton(
                 onTap: () async {
-                  await Future.delayed(const Duration(seconds: 2));
+                  await Future.delayed(const Duration(seconds: 12));
                 },
                 label: 'Cancel',
                 icon: const Icon(Icons.cancel),

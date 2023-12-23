@@ -18,6 +18,7 @@ class InputFieldOption extends StatefulWidget {
   final List<InputField>? searchFields;
   final bool? isMultiSelection;
   final String? Function(String? errorMessage)? onValidating;
+  final bool? isEditable;
 
   const InputFieldOption({
     super.key,
@@ -31,6 +32,7 @@ class InputFieldOption extends StatefulWidget {
     this.searchFields,
     this.isMultiSelection,
     this.onValidating,
+    this.isEditable,
   });
 
   @override
@@ -77,43 +79,46 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                     icon: _isMultiSelection
                         ? const Icon(Icons.add)
                         : const Icon(Icons.navigate_next),
-                    onPressed: () {
-                      Future<void> navigateToInputFieldOptionSearchFormPage(
-                          BuildContext context) async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                InputFiledOptionSearchFormPage(
-                              title: widget.label,
-                              optionData: widget.optionData,
-                              dataHeaders: widget.dataHeaders,
-                              searchFields: widget.searchFields,
-                              searchProcess: widget.searchProcess,
-                            ),
-                          ),
-                        );
+                    onPressed: widget.isEditable ?? false
+                        ? () {
+                            Future<void>
+                                navigateToInputFieldOptionSearchFormPage(
+                                    BuildContext context) async {
+                              final result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      InputFiledOptionSearchFormPage(
+                                    title: widget.label,
+                                    optionData: widget.optionData,
+                                    dataHeaders: widget.dataHeaders,
+                                    searchFields: widget.searchFields,
+                                    searchProcess: widget.searchProcess,
+                                  ),
+                                ),
+                              );
 
-                        if (!mounted) return;
+                              if (!mounted) return;
 
-                        if (result != null) {
-                          setState(() {
-                            if (!_isMultiSelection) {
-                              widget.controller.clear();
+                              if (result != null) {
+                                setState(() {
+                                  if (!_isMultiSelection) {
+                                    widget.controller.clear();
+                                  }
+                                  widget.controller.add(result);
+                                  if (widget.controller.getData().isEmpty) {
+                                    _controller.clear();
+                                  } else {
+                                    _controller.text =
+                                        '${widget.controller.getData().length} Option Selected';
+                                  }
+                                });
+                              }
                             }
-                            widget.controller.add(result);
-                            if (widget.controller.getData().isEmpty) {
-                              _controller.clear();
-                            } else {
-                              _controller.text =
-                                  '${widget.controller.getData().length} Option Selected';
-                            }
-                          });
-                        }
-                      }
 
-                      navigateToInputFieldOptionSearchFormPage(context);
-                    },
+                            navigateToInputFieldOptionSearchFormPage(context);
+                          }
+                        : null,
                   ),
                 ],
               ),
@@ -219,17 +224,19 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                             widget.controller.getData()[index].value.first),
                         leading: IconButton(
                           icon: const Icon(Icons.remove),
-                          onPressed: () {
-                            setState(() {
-                              widget.controller.getData().removeAt(index);
-                              if (widget.controller.getData().isEmpty) {
-                                _controller.clear();
-                              } else {
-                                _controller.text =
-                                    '${widget.controller.getData().length} Option Selected';
-                              }
-                            });
-                          },
+                          onPressed: widget.isEditable ?? false
+                              ? () {
+                                  setState(() {
+                                    widget.controller.getData().removeAt(index);
+                                    if (widget.controller.getData().isEmpty) {
+                                      _controller.clear();
+                                    } else {
+                                      _controller.text =
+                                          '${widget.controller.getData().length} Option Selected';
+                                    }
+                                  });
+                                }
+                              : null,
                         ),
                       );
                     }
@@ -290,17 +297,19 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                       ),
                       leading: IconButton(
                         icon: const Icon(Icons.remove),
-                        onPressed: () {
-                          setState(() {
-                            widget.controller.getData().removeAt(index);
-                            if (widget.controller.getData().isEmpty) {
-                              _controller.clear();
-                            } else {
-                              _controller.text =
-                                  '${widget.controller.getData().length} Option Selected';
-                            }
-                          });
-                        },
+                        onPressed: widget.isEditable ?? false
+                            ? () {
+                                setState(() {
+                                  widget.controller.getData().removeAt(index);
+                                  if (widget.controller.getData().isEmpty) {
+                                    _controller.clear();
+                                  } else {
+                                    _controller.text =
+                                        '${widget.controller.getData().length} Option Selected';
+                                  }
+                                });
+                              }
+                            : null,
                       ),
                     );
                   },

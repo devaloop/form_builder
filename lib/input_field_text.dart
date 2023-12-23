@@ -10,6 +10,7 @@ class InputFieldText extends StatelessWidget {
   final bool? isMultilines;
   final InputTextMode? inputTextMode;
   final String? Function(String? errorMessage)? onValidating;
+  final bool? isEditable;
 
   const InputFieldText({
     super.key,
@@ -20,12 +21,14 @@ class InputFieldText extends StatelessWidget {
     this.isMultilines,
     this.inputTextMode,
     this.onValidating,
+    this.isEditable,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
       controller: controller,
+      readOnly: !(isEditable ?? false),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       minLines: isMultilines ?? false ? 8 : null,
       maxLines: isMultilines ?? false ? 8 : null,
