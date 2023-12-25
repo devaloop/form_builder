@@ -148,32 +148,114 @@ class MyApp extends StatelessWidget {
                   isMultilines: true,
                 ),
               ),
-              const InputField(
+              InputField(
                 name: 'familyMembers',
                 inputFieldType: InputFieldType.form,
                 label: 'Family Members',
                 inputFormSettings: InputFormSettings(
                   formName: 'Family Members',
                   inputFields: [
-                    InputField(
+                    const InputField(
                       name: 'name',
                       inputFieldType: InputFieldType.text,
                       label: 'Name',
                     ),
-                    InputField(
+                    const InputField(
                       name: 'email',
                       inputFieldType: InputFieldType.text,
                       label: 'Email',
                       inputTextSettings: InputTextSettings(
                         inputTextMode: InputTextMode.email,
                       ),
+                      isOptional: true,
                     ),
-                    InputField(
+                    const InputField(
                       name: 'birthDate',
                       inputFieldType: InputFieldType.dateTime,
                       label: 'Birth Date',
                       inputDateTimeSettings: InputDateTimeSettings(
                         inputDateTimeMode: InputDateTimeMode.date,
+                      ),
+                    ),
+                    InputField(
+                      name: 'gender',
+                      inputFieldType: InputFieldType.option,
+                      label: 'Gender',
+                      inputOptionSettings: InputOptionSettings(
+                        optionData: Future<OptionData>(
+                          () {
+                            var data = [
+                              const OptionItem(
+                                  hiddenValue: ['Male'],
+                                  value: ['Male', 'Laki Laki']),
+                              const OptionItem(
+                                  hiddenValue: ['Female'], value: ['Female']),
+                            ];
+                            return OptionData(
+                                displayedListOfOptions: data,
+                                totalOption: data.length);
+                          },
+                        ),
+                        optionTotalData: Future(() => 2),
+                      ),
+                    ),
+                    InputField(
+                      name: 'hobbies',
+                      inputFieldType: InputFieldType.option,
+                      label: 'Hobbies',
+                      inputOptionSettings: InputOptionSettings(
+                        isMultiSelection: true,
+                        optionData: Future<OptionData>(
+                          () {
+                            var data = Db.hobbies
+                                .take(10)
+                                .map((e) => OptionItem(
+                                    hiddenValue: [e.id],
+                                    value: [e.name, e.detail]))
+                                .toList();
+                            return OptionData(
+                              displayedListOfOptions: data,
+                              totalOption: Db.hobbies.length,
+                            );
+                          },
+                        ),
+                        dataHeaders: ['Name', 'Detail'],
+                        optionTotalData: Future(() => Db.hobbies.length),
+                        optionSearchForm: OptionSearchForm(
+                          searchFields: [
+                            const InputField(
+                                name: 'name',
+                                inputFieldType: InputFieldType.text,
+                                label: 'Name',
+                                isOptional: true),
+                            const InputField(
+                              name: 'detail',
+                              inputFieldType: InputFieldType.text,
+                              label: 'Detail',
+                              isOptional: false,
+                            ),
+                          ],
+                          searchProcess: (params) {
+                            return Future<OptionData>(
+                              () {
+                                var data = Db.hobbies
+                                    .map((e) => OptionItem(
+                                        hiddenValue: [e.id],
+                                        value: [e.name, e.detail]))
+                                    .where((element) => element.value[0]
+                                        .toLowerCase()
+                                        .contains(params['name']!
+                                            .getString()!
+                                            .toLowerCase()))
+                                    .toList();
+                                return OptionData(
+                                  displayedListOfOptions: data,
+                                  totalOption: Db.hobbies.length,
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ],

@@ -3,6 +3,7 @@ library devaloop_form_builder;
 import 'dart:io';
 
 import 'package:devaloop_form_builder/input_field_date_time.dart';
+import 'package:devaloop_form_builder/input_field_option.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -127,8 +128,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                           .where((element) =>
                                                               element.key ==
                                                               e.name)
-                                                          .first
-                                                          .value);
+                                                          .firstOrNull
+                                                          ?.value);
                                                 }
                                                 if (e.inputFieldType ==
                                                     InputFieldType.dateTime) {
@@ -140,8 +141,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                           .where((element) =>
                                                               element.key ==
                                                               e.name)
-                                                          .first
-                                                          .value);
+                                                          .firstOrNull
+                                                          ?.value);
                                                 }
                                                 if (e.inputFieldType ==
                                                     InputFieldType.number) {
@@ -153,21 +154,22 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                           .where((element) =>
                                                               element.key ==
                                                               e.name)
-                                                          .first
-                                                          .value);
+                                                          .firstOrNull
+                                                          ?.value);
                                                 }
                                                 if (e.inputFieldType ==
                                                     InputFieldType.option) {
                                                   inputValues[e.name]!
                                                       .setListOptionValues(widget
-                                                          .controller
-                                                          .getData()[index]
-                                                          .entries
-                                                          .where((element) =>
-                                                              element.key ==
-                                                              e.name)
-                                                          .first
-                                                          .value);
+                                                              .controller
+                                                              .getData()[index]
+                                                              .entries
+                                                              .where((element) =>
+                                                                  element.key ==
+                                                                  e.name)
+                                                              .firstOrNull
+                                                              ?.value ??
+                                                          []);
                                                 }
                                                 if (e.inputFieldType ==
                                                     InputFieldType.form) {
@@ -179,8 +181,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                           .where((element) =>
                                                               element.key ==
                                                               e.name)
-                                                          .first
-                                                          .value);
+                                                          .firstOrNull
+                                                          ?.value);
                                                 }
                                                 //TODO Add for other input types
                                               }
@@ -258,8 +260,54 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                             .entries
                                             .where((element) =>
                                                 element.key == e.name)
-                                            .first
-                                            .value);
+                                            .firstOrNull
+                                            ?.value);
+                                      }
+                                      if (e.inputFieldType ==
+                                          InputFieldType.dateTime) {
+                                        inputValues[e.name]!.setDateTime(widget
+                                            .controller
+                                            .getData()[index]
+                                            .entries
+                                            .where((element) =>
+                                                element.key == e.name)
+                                            .firstOrNull
+                                            ?.value);
+                                      }
+                                      if (e.inputFieldType ==
+                                          InputFieldType.number) {
+                                        inputValues[e.name]!.setNumber(widget
+                                            .controller
+                                            .getData()[index]
+                                            .entries
+                                            .where((element) =>
+                                                element.key == e.name)
+                                            .firstOrNull
+                                            ?.value);
+                                      }
+                                      if (e.inputFieldType ==
+                                          InputFieldType.option) {
+                                        inputValues[e.name]!
+                                            .setListOptionValues(widget
+                                                    .controller
+                                                    .getData()[index]
+                                                    .entries
+                                                    .where((element) =>
+                                                        element.key == e.name)
+                                                    .firstOrNull
+                                                    ?.value ??
+                                                []);
+                                      }
+                                      if (e.inputFieldType ==
+                                          InputFieldType.form) {
+                                        inputValues[e.name]!.setFormValues(
+                                            widget.controller
+                                                .getData()[index]
+                                                .entries
+                                                .where((element) =>
+                                                    element.key == e.name)
+                                                .firstOrNull
+                                                ?.value);
                                       }
                                       //TODO Add for other input types
                                     }
@@ -327,6 +375,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                     return ListTile(
                       title: Wrap(
                         children: widget.inputFields.map((e) {
+                          List<Widget> listDataView = [];
                           String value = '';
                           if (e.inputFieldType == InputFieldType.dateTime) {
                             DateTime? data = widget.controller
@@ -354,22 +403,125 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                     .format(data);
                               }
                             }
-                            value = '${e.label}: $strData ';
+                            value = '${e.label}: $strData';
+
+                            listDataView.add(Card(
+                              color: Colors.white,
+                              elevation: 0,
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                  color: Colors.grey.shade200,
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(7.5),
+                                child: Text(value),
+                              ),
+                            ));
                           }
                           if (e.inputFieldType == InputFieldType.number) {
                             value =
                                 '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
+
+                            listDataView.add(Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(7.5),
+                                child: Text(value),
+                              ),
+                            ));
                           }
                           if (e.inputFieldType == InputFieldType.option) {
+                            List<OptionItem> data = widget.controller
+                                    .getData()[index]
+                                    .entries
+                                    .where((element) => element.key == e.name)
+                                    .firstOrNull
+                                    ?.value ??
+                                [];
                             value =
-                                '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
+                                '${e.label}: ${data.isNotEmpty ? ('${data.length} Selected') : '-'}';
+
+                            if ((e.inputOptionSettings!.isMultiSelection ??
+                                    false) ==
+                                false) {
+                              listDataView.add(Card(
+                                color: Colors.white,
+                                elevation: 0,
+                                shape: StadiumBorder(
+                                  side: BorderSide(
+                                    color: Colors.grey.shade200,
+                                    width: 1.0,
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(7.5),
+                                  child: Text(
+                                      '${e.label}: ${data.isEmpty ? '-' : data.map((e) => e.value.join(', ')).toList().join(', ')} '),
+                                ),
+                              ));
+                            } else {
+                              listDataView.add(Card(
+                                color: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: Colors.grey.shade200, width: 1),
+                                  borderRadius: BorderRadius.circular(15 + 7.5),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(7.5),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(value),
+                                      ListView.separated(
+                                          shrinkWrap: true,
+                                          itemBuilder: (context, index) =>
+                                              ListTile(
+                                                title: Wrap(
+                                                  children: data[index]
+                                                      .value
+                                                      .map((e) => Text(e))
+                                                      .toList(),
+                                                ),
+                                              ),
+                                          separatorBuilder: (context, index) =>
+                                              const Divider(
+                                                height: 1,
+                                              ),
+                                          itemCount: data.length)
+                                    ],
+                                  ),
+                                ),
+                              ));
+                            }
                           }
                           if (e.inputFieldType == InputFieldType.text) {
                             value =
                                 '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
+
+                            listDataView.add(Card(
+                              color: Colors.white,
+                              elevation: 0,
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                  color: Colors.grey.shade200,
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(7.5),
+                                child: Text(value),
+                              ),
+                            ));
                           }
-                          //TODO Add for other input types
-                          return Text(value);
+                          //TODO Add for other input types (View)
+                          return Wrap(
+                            children: listDataView,
+                          );
                         }).toList(),
                       ),
                       leading: IconButton(
@@ -422,8 +574,63 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                             .where((element) =>
                                                                 element.key ==
                                                                 e.name)
-                                                            .first
-                                                            .value);
+                                                            .firstOrNull
+                                                            ?.value);
+                                                  }
+                                                  if (e.inputFieldType ==
+                                                      InputFieldType.dateTime) {
+                                                    inputValues[e.name]!
+                                                        .setDateTime(widget
+                                                            .controller
+                                                            .getData()[index]
+                                                            .entries
+                                                            .where((element) =>
+                                                                element.key ==
+                                                                e.name)
+                                                            .firstOrNull
+                                                            ?.value);
+                                                  }
+                                                  if (e.inputFieldType ==
+                                                      InputFieldType.number) {
+                                                    inputValues[e.name]!
+                                                        .setNumber(widget
+                                                            .controller
+                                                            .getData()[index]
+                                                            .entries
+                                                            .where((element) =>
+                                                                element.key ==
+                                                                e.name)
+                                                            .firstOrNull
+                                                            ?.value);
+                                                  }
+                                                  if (e.inputFieldType ==
+                                                      InputFieldType.option) {
+                                                    inputValues[e.name]!
+                                                        .setListOptionValues(widget
+                                                                .controller
+                                                                .getData()[
+                                                                    index]
+                                                                .entries
+                                                                .where((element) =>
+                                                                    element
+                                                                        .key ==
+                                                                    e.name)
+                                                                .firstOrNull
+                                                                ?.value ??
+                                                            []);
+                                                  }
+                                                  if (e.inputFieldType ==
+                                                      InputFieldType.form) {
+                                                    inputValues[e.name]!
+                                                        .setFormValues(widget
+                                                            .controller
+                                                            .getData()[index]
+                                                            .entries
+                                                            .where((element) =>
+                                                                element.key ==
+                                                                e.name)
+                                                            .firstOrNull
+                                                            ?.value);
                                                   }
                                                   //TODO Add for other input types
                                                 }

@@ -618,6 +618,7 @@ class InputValue {
       if (value == null) {
         (controller as TextEditingController).text = '';
       } else {
+        //TODO need parameter to specified date, time or dateTime
         try {
           (controller as TextEditingController).text =
               DateFormat('yyyy-MM-dd hh:mm:ss').format(value);
