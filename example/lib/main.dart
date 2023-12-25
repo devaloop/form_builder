@@ -35,23 +35,6 @@ class MyApp extends StatelessWidget {
                 label: 'Name',
               ),
               const InputField(
-                  name: 'fullName',
-                  inputFieldType: InputFieldType.form,
-                  label: 'Full Name',
-                  inputFormSettings:
-                      InputFormSettings(formName: 'Full Name', inputFields: [
-                    InputField(
-                      name: 'first',
-                      inputFieldType: InputFieldType.text,
-                      label: 'First',
-                    ),
-                    InputField(
-                      name: 'last',
-                      inputFieldType: InputFieldType.text,
-                      label: 'Last',
-                    ),
-                  ])),
-              const InputField(
                 name: 'email',
                 inputFieldType: InputFieldType.text,
                 label: 'Email',
@@ -165,9 +148,48 @@ class MyApp extends StatelessWidget {
                   isMultilines: true,
                 ),
               ),
+              const InputField(
+                name: 'familyMembers',
+                inputFieldType: InputFieldType.form,
+                label: 'Family Members',
+                inputFormSettings: InputFormSettings(
+                  formName: 'Family Members',
+                  inputFields: [
+                    InputField(
+                      name: 'name',
+                      inputFieldType: InputFieldType.text,
+                      label: 'Name',
+                    ),
+                    InputField(
+                      name: 'email',
+                      inputFieldType: InputFieldType.text,
+                      label: 'Email',
+                      inputTextSettings: InputTextSettings(
+                        inputTextMode: InputTextMode.email,
+                      ),
+                    ),
+                    InputField(
+                      name: 'birthDate',
+                      inputFieldType: InputFieldType.dateTime,
+                      label: 'Birth Date',
+                      inputDateTimeSettings: InputDateTimeSettings(
+                        inputDateTimeMode: InputDateTimeMode.date,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
             onInitial: (context, inputValues) {
               inputValues['name']!.setString('Budi Saputra');
+
+              //TODO inital value for form input type need validation
+              inputValues['familyMembers']!.setFormValues([
+                {
+                  'name': 'Ani',
+                  'birthDate': DateTime(2000, 09, 09),
+                }
+              ]);
             },
             onBeforeValidation: (context, inputValues) {
               inputValues['name']!
@@ -181,7 +203,8 @@ class MyApp extends StatelessWidget {
               }
             },
             onSubmit: (context, inputValues) {
-              var result = inputValues['name']!.getString();
+              var result =
+                  inputValues['fullName']!.getFormValues().first['first']!;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Processing Data $result')),
               );

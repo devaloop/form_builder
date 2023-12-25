@@ -9,8 +9,6 @@ import 'package:devaloop_form_builder/input_field_text.dart';
 import 'package:intl/intl.dart';
 
 class FormBulder extends StatefulWidget {
-  //TODO Input Type Form
-
   const FormBulder({
     super.key,
     required this.formName,
@@ -67,7 +65,7 @@ class _FormBulderState extends State<FormBulder> {
       } else if (e.inputFieldType == InputFieldType.text) {
         _controllers.add(TextEditingController());
       } else if (e.inputFieldType == InputFieldType.form) {
-        _controllers.add(<String, InputValue>{});
+        _controllers.add(InputFieldFormController());
       } else {
         throw Exception('Unsupported InputFieldType ');
       }
@@ -367,10 +365,10 @@ class _FormBulderState extends State<FormBulder> {
         formName: e.label,
         inputFields: e.inputFormSettings!.inputFields,
         additionalButtons: e.inputFormSettings!.additionalButtons,
-        isFormEditable: e.inputFormSettings!.isFormEditable,
         onAfterValidation: e.inputFormSettings!.onAfterValidation,
         onBeforeValidation: e.inputFormSettings!.onBeforeValidation,
         onInitial: e.inputFormSettings!.onInitial,
+        isMultiInputForm: true,
       );
     } else {
       throw Exception('Unsupported InputFieldType ');
@@ -499,7 +497,6 @@ class InputFormSettings {
       bool isValid,
       Map<String, String?> errorsMessages)? onAfterValidation;
   final List<AdditionalButton>? additionalButtons;
-  final bool? isFormEditable;
 
   const InputFormSettings({
     this.onValidating,
@@ -509,7 +506,6 @@ class InputFormSettings {
     this.onBeforeValidation,
     this.onAfterValidation,
     this.additionalButtons,
-    this.isFormEditable,
   });
 }
 
@@ -574,23 +570,24 @@ class InputValue {
   final dynamic controller;
   final InputFieldType inputFieldType;
 
-  void setForm(Map<String, InputValue> value) {
+  void setFormValues(List<Map<String, dynamic>> value) {
     if (inputFieldType == InputFieldType.form) {
-      for (var e in value.entries) {
-        (controller as Map<String, InputValue>)[e.key] = e.value;
+      (controller as InputFieldFormController).clear();
+      for (var e in value) {
+        (controller as InputFieldFormController).add(e);
       }
     } else {
       throw Exception(
-          'Unsupported setForm for this input type $inputFieldType');
+          'Unsupported setListOptionValues for this input type $inputFieldType');
     }
   }
 
-  Map<String, InputValue> getForm() {
+  List<Map<String, dynamic>> getFormValues() {
     if (inputFieldType == InputFieldType.form) {
-      return (controller as Map<String, InputValue>);
+      return (controller as InputFieldFormController).getData();
     } else {
       throw Exception(
-          'Unsupported setForm for this input type $inputFieldType');
+          'Unsupported getListOptionValues for this input type $inputFieldType');
     }
   }
 

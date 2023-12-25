@@ -2,16 +2,18 @@ library devaloop_form_builder;
 
 import 'dart:io';
 
+import 'package:devaloop_form_builder/input_field_date_time.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:devaloop_form_builder/form_builder.dart';
+import 'package:intl/intl.dart';
 
 class InputFieldForm extends StatefulWidget {
   final String label;
   final bool isRequired;
   final String? helperText;
-  final Map<String, InputValue> controller;
+  final InputFieldFormController controller;
   final String? Function(String? errorMessage)? onValidating;
   final bool? isEditable;
   final String formName;
@@ -27,7 +29,7 @@ class InputFieldForm extends StatefulWidget {
       bool isValid,
       Map<String, String?> errorsMessages)? onAfterValidation;
   final List<AdditionalButton>? additionalButtons;
-  final bool? isFormEditable;
+  final bool? isMultiInputForm;
 
   const InputFieldForm({
     super.key,
@@ -43,7 +45,7 @@ class InputFieldForm extends StatefulWidget {
     this.onBeforeValidation,
     this.onAfterValidation,
     this.additionalButtons,
-    this.isFormEditable,
+    this.isMultiInputForm,
   });
 
   @override
@@ -57,8 +59,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
   @override
   void initState() {
     _textFieldIsFocused = false;
-    if (widget.controller.entries.isNotEmpty) {
-      _controller.text = 'Form Filled';
+    if (widget.controller.getData().isNotEmpty) {
+      _controller.text = 'Data Filled';
     } else {
       _controller.clear();
     }
@@ -84,7 +86,9 @@ class _InputFieldFormState extends State<InputFieldForm> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.edit_document),
+                    icon: widget.isMultiInputForm ?? false
+                        ? const Icon(Icons.add)
+                        : const Icon(Icons.edit_document),
                     onPressed: widget.isEditable ?? false
                         ? () {
                             Future<void>
@@ -98,11 +102,90 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                     formName: widget.formName,
                                     inputFields: widget.inputFields,
                                     additionalButtons: widget.additionalButtons,
-                                    isFormEditable: widget.isFormEditable,
+                                    isFormEditable: widget.isEditable,
                                     onAfterValidation: widget.onAfterValidation,
                                     onBeforeValidation:
                                         widget.onBeforeValidation,
-                                    onInitial: widget.onInitial,
+                                    onInitial: widget.isMultiInputForm ?? false
+                                        ? null
+                                        : (context, inputValues) {
+                                            for (var index = 0;
+                                                index <
+                                                    widget.controller
+                                                        .getData()
+                                                        .length;
+                                                index++) {
+                                              for (var e
+                                                  in widget.inputFields) {
+                                                if (e.inputFieldType ==
+                                                    InputFieldType.text) {
+                                                  inputValues[e.name]!
+                                                      .setString(widget
+                                                          .controller
+                                                          .getData()[index]
+                                                          .entries
+                                                          .where((element) =>
+                                                              element.key ==
+                                                              e.name)
+                                                          .first
+                                                          .value);
+                                                }
+                                                if (e.inputFieldType ==
+                                                    InputFieldType.dateTime) {
+                                                  inputValues[e.name]!
+                                                      .setDateTime(widget
+                                                          .controller
+                                                          .getData()[index]
+                                                          .entries
+                                                          .where((element) =>
+                                                              element.key ==
+                                                              e.name)
+                                                          .first
+                                                          .value);
+                                                }
+                                                if (e.inputFieldType ==
+                                                    InputFieldType.number) {
+                                                  inputValues[e.name]!
+                                                      .setNumber(widget
+                                                          .controller
+                                                          .getData()[index]
+                                                          .entries
+                                                          .where((element) =>
+                                                              element.key ==
+                                                              e.name)
+                                                          .first
+                                                          .value);
+                                                }
+                                                if (e.inputFieldType ==
+                                                    InputFieldType.option) {
+                                                  inputValues[e.name]!
+                                                      .setListOptionValues(widget
+                                                          .controller
+                                                          .getData()[index]
+                                                          .entries
+                                                          .where((element) =>
+                                                              element.key ==
+                                                              e.name)
+                                                          .first
+                                                          .value);
+                                                }
+                                                if (e.inputFieldType ==
+                                                    InputFieldType.form) {
+                                                  inputValues[e.name]!
+                                                      .setFormValues(widget
+                                                          .controller
+                                                          .getData()[index]
+                                                          .entries
+                                                          .where((element) =>
+                                                              element.key ==
+                                                              e.name)
+                                                          .first
+                                                          .value);
+                                                }
+                                                //TODO Add for other input types
+                                              }
+                                            }
+                                          },
                                   ),
                                 ),
                               );
@@ -111,10 +194,10 @@ class _InputFieldFormState extends State<InputFieldForm> {
 
                               if (result != null) {
                                 setState(() {
-                                  (result as Map<String, InputValue>)
-                                      .forEach((key, value) {
-                                    widget.controller[key] = value;
-                                  });
+                                  if (!(widget.isMultiInputForm ?? false)) {
+                                    widget.controller.clear();
+                                  }
+                                  widget.controller.add(result);
                                   _controller.text = 'Data Filled';
                                 });
                               }
@@ -156,10 +239,32 @@ class _InputFieldFormState extends State<InputFieldForm> {
                           formName: widget.formName,
                           inputFields: widget.inputFields,
                           additionalButtons: widget.additionalButtons,
-                          isFormEditable: widget.isFormEditable,
+                          isFormEditable: widget.isEditable,
                           onAfterValidation: widget.onAfterValidation,
                           onBeforeValidation: widget.onBeforeValidation,
-                          onInitial: widget.onInitial,
+                          onInitial: widget.isMultiInputForm ?? false
+                              ? null
+                              : (context, inputValues) {
+                                  for (var index = 0;
+                                      index <
+                                          widget.controller.getData().length;
+                                      index++) {
+                                    for (var e in widget.inputFields) {
+                                      if (e.inputFieldType ==
+                                          InputFieldType.text) {
+                                        inputValues[e.name]!.setString(widget
+                                            .controller
+                                            .getData()[index]
+                                            .entries
+                                            .where((element) =>
+                                                element.key == e.name)
+                                            .first
+                                            .value);
+                                      }
+                                      //TODO Add for other input types
+                                    }
+                                  }
+                                },
                         ),
                       ),
                     );
@@ -168,10 +273,10 @@ class _InputFieldFormState extends State<InputFieldForm> {
 
                     if (result != null) {
                       setState(() {
-                        (result as Map<String, InputValue>)
-                            .forEach((key, value) {
-                          widget.controller[key] = value;
-                        });
+                        if (!(widget.isMultiInputForm ?? false)) {
+                          widget.controller.clear();
+                        }
+                        widget.controller.add(result);
                         _controller.text = 'Data Filled';
                       });
                     }
@@ -189,7 +294,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
           },
         ),
         Visibility(
-          visible: (widget.controller.isNotEmpty ? true : false),
+          visible: (widget.controller.getData().isNotEmpty ? true : false),
           child: Card(
             shape: Border(
               bottom: BorderSide(
@@ -217,17 +322,53 @@ class _InputFieldFormState extends State<InputFieldForm> {
                     bottom: 15,
                   ),
                   shrinkWrap: true,
-                  itemCount: 1,
+                  itemCount: widget.controller.getData().length,
                   itemBuilder: (context, index) {
                     return ListTile(
                       title: Wrap(
                         children: widget.inputFields.map((e) {
                           String value = '';
+                          if (e.inputFieldType == InputFieldType.dateTime) {
+                            DateTime? data = widget.controller
+                                .getData()[index]
+                                .entries
+                                .where((element) => element.key == e.name)
+                                .firstOrNull
+                                ?.value;
+                            String strData = '-';
+                            if (data != null) {
+                              if ((e.inputDateTimeSettings!.inputDateTimeMode ??
+                                      InputDateTimeMode.dateTime) ==
+                                  InputDateTimeMode.date) {
+                                strData = DateFormat('yyyy-MM-dd').format(data);
+                              }
+                              if ((e.inputDateTimeSettings!.inputDateTimeMode ??
+                                      InputDateTimeMode.dateTime) ==
+                                  InputDateTimeMode.time) {
+                                strData = DateFormat('HH:mm:ss').format(data);
+                              }
+                              if ((e.inputDateTimeSettings!.inputDateTimeMode ??
+                                      InputDateTimeMode.dateTime) ==
+                                  InputDateTimeMode.dateTime) {
+                                strData = DateFormat('yyyy-MM-dd HH:mm:ss')
+                                    .format(data);
+                              }
+                            }
+                            value = '${e.label}: $strData ';
+                          }
+                          if (e.inputFieldType == InputFieldType.number) {
+                            value =
+                                '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
+                          }
+                          if (e.inputFieldType == InputFieldType.option) {
+                            value =
+                                '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
+                          }
                           if (e.inputFieldType == InputFieldType.text) {
                             value =
-                                '${e.label}: ${widget.controller.entries.where((element) => element.key == e.name).first.value.getString() ?? ''} ';
+                                '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
                           }
-                          //TODO Tipe Lain
+                          //TODO Add for other input types
                           return Text(value);
                         }).toList(),
                       ),
@@ -236,68 +377,78 @@ class _InputFieldFormState extends State<InputFieldForm> {
                         onPressed: widget.isEditable ?? false
                             ? () {
                                 setState(() {
-                                  widget.controller.clear();
-                                  _controller.clear();
+                                  widget.controller.clearAt(index);
+                                  if (widget.controller.getData().isEmpty) {
+                                    _controller.clear();
+                                  }
                                 });
                               }
                             : null,
                       ),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.navigate_next),
-                        onPressed: widget.isEditable ?? false
-                            ? () {
-                                Future<void>
-                                    navigateToInputFieldOptionSearchFormPage(
-                                        BuildContext context) async {
-                                  final result = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => InputFieldFormPage(
-                                        title: widget.label,
-                                        formName: widget.formName,
-                                        inputFields: widget.inputFields,
-                                        additionalButtons:
-                                            widget.additionalButtons,
-                                        isFormEditable: widget.isFormEditable,
-                                        onAfterValidation:
-                                            widget.onAfterValidation,
-                                        onBeforeValidation:
-                                            widget.onBeforeValidation,
-                                        onInitial: (context, inputValues) {
-                                          for (var element
-                                              in widget.inputFields) {
-                                            if (element.inputFieldType ==
-                                                InputFieldType.text) {
-                                              inputValues[element.name]!
-                                                  .setString(widget
-                                                      .controller[element.name]!
-                                                      .getString());
-                                            }
-                                            //TODO Tipe Lain
-                                          }
-                                        },
-                                      ),
-                                    ),
-                                  );
+                      trailing: widget.isMultiInputForm ?? false
+                          ? IconButton(
+                              icon: const Icon(Icons.navigate_next),
+                              onPressed: widget.isEditable ?? false
+                                  ? () {
+                                      Future<void>
+                                          navigateToInputFieldOptionSearchFormPage(
+                                              BuildContext context) async {
+                                        final result = await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                InputFieldFormPage(
+                                              title: widget.label,
+                                              formName: widget.formName,
+                                              inputFields: widget.inputFields,
+                                              additionalButtons:
+                                                  widget.additionalButtons,
+                                              isFormEditable: widget.isEditable,
+                                              onAfterValidation:
+                                                  widget.onAfterValidation,
+                                              onBeforeValidation:
+                                                  widget.onBeforeValidation,
+                                              onInitial:
+                                                  (context, inputValues) {
+                                                for (var e
+                                                    in widget.inputFields) {
+                                                  if (e.inputFieldType ==
+                                                      InputFieldType.text) {
+                                                    inputValues[e.name]!
+                                                        .setString(widget
+                                                            .controller
+                                                            .getData()[index]
+                                                            .entries
+                                                            .where((element) =>
+                                                                element.key ==
+                                                                e.name)
+                                                            .first
+                                                            .value);
+                                                  }
+                                                  //TODO Add for other input types
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        );
 
-                                  if (!mounted) return;
+                                        if (!mounted) return;
 
-                                  if (result != null) {
-                                    setState(() {
-                                      (result as Map<String, InputValue>)
-                                          .forEach((key, value) {
-                                        widget.controller[key] = value;
-                                      });
-                                      _controller.text = 'Data Filled';
-                                    });
-                                  }
-                                }
+                                        if (result != null) {
+                                          setState(() {
+                                            widget.controller
+                                                .set(index, result);
+                                            _controller.text = 'Data Filled';
+                                          });
+                                        }
+                                      }
 
-                                navigateToInputFieldOptionSearchFormPage(
-                                    context);
-                              }
-                            : null,
-                      ),
+                                      navigateToInputFieldOptionSearchFormPage(
+                                          context);
+                                    }
+                                  : null,
+                            )
+                          : null,
                     );
                   },
                   separatorBuilder: (context, index) {
@@ -375,9 +526,25 @@ class _InputFieldOptionSearchFormPage extends State<InputFieldFormPage> {
           formName: widget.formName,
           inputFields: widget.inputFields,
           onSubmit: (context, inputValues) {
-            Map<String, InputValue> controller = {};
+            Map<String, dynamic> controller = {};
             for (var inputField in widget.inputFields) {
-              controller[inputField.name] = inputValues[inputField.name]!;
+              if (inputField.inputFieldType == InputFieldType.text) {
+                controller[inputField.name] =
+                    inputValues[inputField.name]!.getString();
+              }
+              if (inputField.inputFieldType == InputFieldType.dateTime) {
+                controller[inputField.name] =
+                    inputValues[inputField.name]!.getDateTime();
+              }
+              if (inputField.inputFieldType == InputFieldType.number) {
+                controller[inputField.name] =
+                    inputValues[inputField.name]!.getNumber();
+              }
+              if (inputField.inputFieldType == InputFieldType.option) {
+                controller[inputField.name] =
+                    inputValues[inputField.name]!.getListOptionValues();
+              }
+              //TODO Add for other input types
             }
 
             Navigator.pop(context, controller);
@@ -394,5 +561,33 @@ class _InputFieldOptionSearchFormPage extends State<InputFieldFormPage> {
         ),
       ),
     );
+  }
+}
+
+class InputFieldFormController extends ChangeNotifier {
+  List<Map<String, dynamic>> _data = [];
+
+  void add(Map<String, dynamic> item) {
+    _data.add(item);
+    notifyListeners();
+  }
+
+  void set(int index, Map<String, dynamic> item) {
+    _data[index] = item;
+    notifyListeners();
+  }
+
+  void clearAt(int index) {
+    _data.removeAt(index);
+    notifyListeners();
+  }
+
+  List<Map<String, dynamic>> getData() {
+    return _data;
+  }
+
+  void clear() {
+    _data = [];
+    notifyListeners();
   }
 }
