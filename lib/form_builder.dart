@@ -171,33 +171,21 @@ class _FormBulderState extends State<FormBulder> {
                   mainAxisSize: MainAxisSize.min,
                   children: widget.inputFields.map((e) => getField(e)).toList(),
                 )
-              : Row(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: widget.inputFields
-                            .take((widget.inputFields.length / 2).round())
-                            .map((e) => getField(e))
-                            .toList(),
-                      ),
-                    ),
-                    const SizedBox(
-                      width: 7.5,
-                    ),
-                    Expanded(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: widget.inputFields
-                            .skip((widget.inputFields.length / 2).round())
-                            .map((e) => getField(e))
-                            .toList(),
-                      ),
-                    ),
-                  ],
-                ),
+              : LayoutBuilder(builder: (context, constraints) {
+                  double widthField = (constraints.maxWidth / 2) - 7.5;
+                  return Wrap(
+                    spacing: 7.5,
+                    runSpacing: 7.5,
+                    alignment: WrapAlignment.start,
+                    runAlignment: WrapAlignment.start,
+                    children: widget.inputFields
+                        .map((e) => SizedBox(
+                              width: widthField,
+                              child: getField(e),
+                            ))
+                        .toList(),
+                  );
+                }),
           const SizedBox(
             height: 7.5,
           ),
