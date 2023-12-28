@@ -186,8 +186,7 @@ class MyApp extends StatelessWidget {
                           () {
                             var data = [
                               const OptionItem(
-                                  hiddenValue: ['Male'],
-                                  value: ['Male', 'Laki Laki']),
+                                  hiddenValue: ['Male'], value: ['Male']),
                               const OptionItem(
                                   hiddenValue: ['Female'], value: ['Female']),
                             ];
@@ -219,7 +218,7 @@ class MyApp extends StatelessWidget {
                             );
                           },
                         ),
-                        dataHeaders: ['Name', 'Detail'],
+                        //dataHeaders: ['Name', 'Detail'],
                         optionTotalData: Future(() => Db.hobbies.length),
                         optionSearchForm: OptionSearchForm(
                           searchFields: [

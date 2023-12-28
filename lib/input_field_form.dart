@@ -457,7 +457,32 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(7.5),
                                   child: Text(
-                                      '${e.label}: ${data.isEmpty ? '-' : data.map((e) => e.value.join(', ')).toList().join(', ')} '),
+                                      '${e.label}: ${data.isEmpty ? '-' : data.map((eItem) {
+                                            int indexHeader = 0;
+                                            return eItem.value
+                                                .map((eValue) {
+                                                  String? label;
+                                                  if (e.inputOptionSettings!
+                                                          .dataHeaders !=
+                                                      null) {
+                                                    try {
+                                                      label =
+                                                          e.inputOptionSettings!
+                                                                  .dataHeaders![
+                                                              indexHeader];
+                                                    } catch (ex) {
+                                                      label = null;
+                                                    }
+                                                    indexHeader++;
+                                                  }
+                                                  return (label == null
+                                                          ? ''
+                                                          : ('$label: ')) +
+                                                      eValue;
+                                                })
+                                                .toList()
+                                                .join(' | ');
+                                          }).toList().join(', ')} '),
                                 ),
                               ));
                             } else {
@@ -479,15 +504,35 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                       Text(value),
                                       ListView.separated(
                                           shrinkWrap: true,
-                                          itemBuilder: (context, index) =>
-                                              ListTile(
-                                                title: Wrap(
-                                                  children: data[index]
-                                                      .value
-                                                      .map((e) => Text(e))
-                                                      .toList(),
-                                                ),
+                                          itemBuilder: (context, index) {
+                                            int indexHeader = 0;
+                                            return ListTile(
+                                              title: Wrap(
+                                                children: data[index]
+                                                    .value
+                                                    .map((fieldItem) {
+                                                  String? label;
+                                                  if (e.inputOptionSettings!
+                                                          .dataHeaders !=
+                                                      null) {
+                                                    try {
+                                                      label =
+                                                          e.inputOptionSettings!
+                                                                  .dataHeaders![
+                                                              indexHeader];
+                                                    } catch (ex) {
+                                                      label = null;
+                                                    }
+                                                    indexHeader++;
+                                                  }
+                                                  return Text((label == null
+                                                          ? ''
+                                                          : ('$label: ')) +
+                                                      fieldItem);
+                                                }).toList(),
                                               ),
+                                            );
+                                          },
                                           separatorBuilder: (context, index) =>
                                               const Divider(
                                                 height: 1,
