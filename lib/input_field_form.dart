@@ -17,7 +17,6 @@ class InputFieldForm extends StatefulWidget {
   final InputFieldFormController controller;
   final String? Function(String? errorMessage)? onValidating;
   final bool? isEditable;
-  final String formName;
   final List<InputField> inputFields;
   final void Function(
       BuildContext context, Map<String, InputValue> inputValues)? onInitial;
@@ -40,7 +39,6 @@ class InputFieldForm extends StatefulWidget {
     required this.controller,
     this.onValidating,
     this.isEditable,
-    required this.formName,
     required this.inputFields,
     this.onInitial,
     this.onBeforeValidation,
@@ -89,18 +87,16 @@ class _InputFieldFormState extends State<InputFieldForm> {
                   IconButton(
                     icon: widget.isMultiInputForm ?? false
                         ? const Icon(Icons.add)
-                        : const Icon(Icons.edit_document),
+                        : const Icon(Icons.edit),
                     onPressed: widget.isEditable ?? false
                         ? () {
-                            Future<void>
-                                navigateToInputFieldOptionSearchFormPage(
-                                    BuildContext context) async {
+                            Future<void> navigateToInputFieldFormPage(
+                                BuildContext context) async {
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => InputFieldFormPage(
                                     title: widget.label,
-                                    formName: widget.formName,
                                     inputFields: widget.inputFields,
                                     additionalButtons: widget.additionalButtons,
                                     isFormEditable: widget.isEditable,
@@ -175,16 +171,16 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                     InputFieldType.form) {
                                                   inputValues[e.name]!
                                                       .setFormValues(widget
-                                                          .controller
-                                                          .getData()[index]
-                                                          .entries
-                                                          .where((element) =>
-                                                              element.key ==
-                                                              e.name)
-                                                          .firstOrNull
-                                                          ?.value);
+                                                              .controller
+                                                              .getData()[index]
+                                                              .entries
+                                                              .where((element) =>
+                                                                  element.key ==
+                                                                  e.name)
+                                                              .firstOrNull
+                                                              ?.value ??
+                                                          []);
                                                 }
-                                                //TODO Add for other input types
                                               }
                                             }
                                           },
@@ -205,7 +201,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               }
                             }
 
-                            navigateToInputFieldOptionSearchFormPage(context);
+                            navigateToInputFieldFormPage(context);
                           }
                         : null,
                   ),
@@ -231,14 +227,13 @@ class _InputFieldFormState extends State<InputFieldForm> {
             onTap: () {
               if (!kIsWeb) {
                 if (Platform.isAndroid || Platform.isIOS) {
-                  Future<void> navigateToInputFieldOptionSearchFormPage(
+                  Future<void> navigateToInputFieldFormPage(
                       BuildContext context) async {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => InputFieldFormPage(
                           title: widget.label,
-                          formName: widget.formName,
                           inputFields: widget.inputFields,
                           additionalButtons: widget.additionalButtons,
                           isFormEditable: widget.isEditable,
@@ -302,14 +297,14 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                           InputFieldType.form) {
                                         inputValues[e.name]!.setFormValues(
                                             widget.controller
-                                                .getData()[index]
-                                                .entries
-                                                .where((element) =>
-                                                    element.key == e.name)
-                                                .firstOrNull
-                                                ?.value);
+                                                    .getData()[index]
+                                                    .entries
+                                                    .where((element) =>
+                                                        element.key == e.name)
+                                                    .firstOrNull
+                                                    ?.value ??
+                                                []);
                                       }
-                                      //TODO Add for other input types
                                     }
                                   }
                                 },
@@ -330,7 +325,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                     }
                   }
 
-                  navigateToInputFieldOptionSearchFormPage(context);
+                  navigateToInputFieldFormPage(context);
                 }
               }
             },
@@ -563,7 +558,30 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               ),
                             ));
                           }
-                          //TODO Add for other input types (View)
+                          if (e.inputFieldType == InputFieldType.form) {
+                            List<Map<String, dynamic>>? data = widget.controller
+                                .getData()[index]
+                                .entries
+                                .where((element) => element.key == e.name)
+                                .firstOrNull
+                                ?.value;
+                            value =
+                                '${e.label}: ${data == null ? '-' : 'Data Filled'}';
+                            listDataView.add(Card(
+                              color: Colors.white,
+                              elevation: 0,
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                  color: Colors.grey.shade200,
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(7.5),
+                                child: Text(value),
+                              ),
+                            ));
+                          }
                           return Wrap(
                             children: listDataView,
                           );
@@ -587,16 +605,14 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               icon: const Icon(Icons.navigate_next),
                               onPressed: widget.isEditable ?? false
                                   ? () {
-                                      Future<void>
-                                          navigateToInputFieldOptionSearchFormPage(
-                                              BuildContext context) async {
+                                      Future<void> navigateToInputFieldFormPage(
+                                          BuildContext context) async {
                                         final result = await Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 InputFieldFormPage(
                                               title: widget.label,
-                                              formName: widget.formName,
                                               inputFields: widget.inputFields,
                                               additionalButtons:
                                                   widget.additionalButtons,
@@ -668,16 +684,18 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                       InputFieldType.form) {
                                                     inputValues[e.name]!
                                                         .setFormValues(widget
-                                                            .controller
-                                                            .getData()[index]
-                                                            .entries
-                                                            .where((element) =>
-                                                                element.key ==
-                                                                e.name)
-                                                            .firstOrNull
-                                                            ?.value);
+                                                                .controller
+                                                                .getData()[
+                                                                    index]
+                                                                .entries
+                                                                .where((element) =>
+                                                                    element
+                                                                        .key ==
+                                                                    e.name)
+                                                                .firstOrNull
+                                                                ?.value ??
+                                                            []);
                                                   }
-                                                  //TODO Add for other input types
                                                 }
                                               },
                                             ),
@@ -695,8 +713,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                         }
                                       }
 
-                                      navigateToInputFieldOptionSearchFormPage(
-                                          context);
+                                      navigateToInputFieldFormPage(context);
                                     }
                                   : null,
                             )
@@ -718,7 +735,6 @@ class _InputFieldFormState extends State<InputFieldForm> {
 
 class InputFieldFormPage extends StatefulWidget {
   final String title;
-  final String formName;
   final List<InputField> inputFields;
   final void Function(
       BuildContext context, Map<String, InputValue> inputValues)? onInitial;
@@ -736,7 +752,6 @@ class InputFieldFormPage extends StatefulWidget {
   const InputFieldFormPage({
     super.key,
     required this.title,
-    required this.formName,
     required this.inputFields,
     this.onInitial,
     this.onBeforeValidation,
@@ -746,10 +761,10 @@ class InputFieldFormPage extends StatefulWidget {
   });
 
   @override
-  State<InputFieldFormPage> createState() => _InputFieldOptionSearchFormPage();
+  State<InputFieldFormPage> createState() => _InputFieldFormPage();
 }
 
-class _InputFieldOptionSearchFormPage extends State<InputFieldFormPage> {
+class _InputFieldFormPage extends State<InputFieldFormPage> {
   @override
   void initState() {
     super.initState();
@@ -775,7 +790,6 @@ class _InputFieldOptionSearchFormPage extends State<InputFieldFormPage> {
           bottom: 15,
         ),
         child: FormBulder(
-          formName: widget.formName,
           inputFields: widget.inputFields,
           onSubmit: (context, inputValues) {
             Map<String, dynamic> controller = {};
@@ -796,7 +810,10 @@ class _InputFieldOptionSearchFormPage extends State<InputFieldFormPage> {
                 controller[inputField.name] =
                     inputValues[inputField.name]!.getListOptionValues();
               }
-              //TODO Add for other input types
+              if (inputField.inputFieldType == InputFieldType.form) {
+                controller[inputField.name] =
+                    inputValues[inputField.name]!.getFormValues();
+              }
             }
 
             Navigator.pop(context, controller);

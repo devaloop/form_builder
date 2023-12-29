@@ -11,7 +11,7 @@ import 'package:intl/intl.dart';
 class FormBulder extends StatefulWidget {
   const FormBulder({
     super.key,
-    required this.formName,
+    this.formName,
     required this.inputFields,
     this.onInitial,
     this.onBeforeValidation,
@@ -22,7 +22,7 @@ class FormBulder extends StatefulWidget {
     this.isFormEditable,
   });
 
-  final String formName;
+  final String? formName;
   final List<InputField> inputFields;
   final void Function(
       BuildContext context, Map<String, InputValue> inputValues)? onInitial;
@@ -159,13 +159,14 @@ class _FormBulderState extends State<FormBulder> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            widget.formName,
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 18,
+          if (widget.formName != null)
+            Text(
+              widget.formName!,
+              style: const TextStyle(
+                color: Colors.black,
+                fontSize: 18,
+              ),
             ),
-          ),
           isPortrait
               ? Column(
                   mainAxisSize: MainAxisSize.min,
@@ -350,13 +351,12 @@ class _FormBulderState extends State<FormBulder> {
           return (errorMessage ?? '') + additionalErrorMessage;
         },
         isEditable: _isEditable ?? widget.isFormEditable ?? true,
-        formName: e.label,
         inputFields: e.inputFormSettings!.inputFields,
         additionalButtons: e.inputFormSettings!.additionalButtons,
         onAfterValidation: e.inputFormSettings!.onAfterValidation,
         onBeforeValidation: e.inputFormSettings!.onBeforeValidation,
         onInitial: e.inputFormSettings!.onInitial,
-        isMultiInputForm: true,
+        isMultiInputForm: e.inputFormSettings!.isMultiInputForm,
       );
     } else {
       throw Exception('Unsupported InputFieldType ');
@@ -472,7 +472,6 @@ class InputField {
 
 class InputFormSettings {
   final String? Function(String? errorMessage)? onValidating;
-  final String formName;
   final List<InputField> inputFields;
   final void Function(
       BuildContext context, Map<String, InputValue> inputValues)? onInitial;
@@ -485,15 +484,16 @@ class InputFormSettings {
       bool isValid,
       Map<String, String?> errorsMessages)? onAfterValidation;
   final List<AdditionalButton>? additionalButtons;
+  final bool? isMultiInputForm;
 
   const InputFormSettings({
     this.onValidating,
-    required this.formName,
     required this.inputFields,
     this.onInitial,
     this.onBeforeValidation,
     this.onAfterValidation,
     this.additionalButtons,
+    this.isMultiInputForm,
   });
 }
 
@@ -606,7 +606,7 @@ class InputValue {
       if (value == null) {
         (controller as TextEditingController).text = '';
       } else {
-        //TODO need parameter to specified date, time or dateTime
+        //TODO need parameter to specified date, time or dateTime, recommedation altertative Solution for this case, using Custom controller for Input Field Date Time
         try {
           (controller as TextEditingController).text =
               DateFormat('yyyy-MM-dd hh:mm:ss').format(value);

@@ -153,7 +153,6 @@ class MyApp extends StatelessWidget {
                 inputFieldType: InputFieldType.form,
                 label: 'Family Members',
                 inputFormSettings: InputFormSettings(
-                  formName: 'Family Members',
                   inputFields: [
                     const InputField(
                       name: 'name',
@@ -255,6 +254,29 @@ class MyApp extends StatelessWidget {
                             );
                           },
                         ),
+                      ),
+                    ),
+                    const InputField(
+                      name: 'additinalInformations',
+                      inputFieldType: InputFieldType.form,
+                      label: 'Additional Informations',
+                      inputFormSettings: InputFormSettings(
+                        isMultiInputForm: true,
+                        inputFields: [
+                          InputField(
+                            name: 'title',
+                            inputFieldType: InputFieldType.text,
+                            label: 'Tittle',
+                          ),
+                          InputField(
+                            name: 'information',
+                            inputFieldType: InputFieldType.text,
+                            label: 'Informations',
+                            inputTextSettings: InputTextSettings(
+                              isMultilines: true,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
