@@ -74,7 +74,7 @@ class _FormBulderState extends State<FormBulder> {
       for (int i = 0; i < widget.inputFields.length; i++)
         widget.inputFields[i].name: InputValue(
           controller: _controllers[i],
-          inputFieldType: widget.inputFields[i].inputFieldType,
+          inputField: widget.inputFields[i],
         )
     };
 
@@ -552,44 +552,44 @@ class SubmitButtonSettings {
 class InputValue {
   const InputValue({
     required this.controller,
-    required this.inputFieldType,
+    required this.inputField,
   });
 
   final dynamic controller;
-  final InputFieldType inputFieldType;
+  final InputField inputField;
 
   void setFormValues(List<Map<String, dynamic>> value) {
-    if (inputFieldType == InputFieldType.form) {
+    if (inputField.inputFieldType == InputFieldType.form) {
       (controller as InputFieldFormController).clear();
       for (var e in value) {
         (controller as InputFieldFormController).add(e);
       }
     } else {
       throw Exception(
-          'Unsupported setListOptionValues for this input type $inputFieldType');
+          'Unsupported setListOptionValues for this input type ${inputField.inputFieldType}');
     }
   }
 
   List<Map<String, dynamic>> getFormValues() {
-    if (inputFieldType == InputFieldType.form) {
+    if (inputField.inputFieldType == InputFieldType.form) {
       return (controller as InputFieldFormController).getData();
     } else {
       throw Exception(
-          'Unsupported getListOptionValues for this input type $inputFieldType');
+          'Unsupported getListOptionValues for this input type ${inputField.inputFieldType}');
     }
   }
 
   void setString(String? value) {
-    if (inputFieldType == InputFieldType.text) {
+    if (inputField.inputFieldType == InputFieldType.text) {
       (controller as TextEditingController).text = value ?? '';
     } else {
       throw Exception(
-          'Unsupported setString for this input type $inputFieldType');
+          'Unsupported setString for this input type ${inputField.inputFieldType}');
     }
   }
 
   String? getString() {
-    if (inputFieldType == InputFieldType.text) {
+    if (inputField.inputFieldType == InputFieldType.text) {
       if ((controller as TextEditingController).text.isEmpty) {
         return null;
       }
@@ -597,98 +597,98 @@ class InputValue {
       return (controller as TextEditingController).text;
     } else {
       throw Exception(
-          'Unsupported getString for this input type $inputFieldType');
+          'Unsupported getString for this input type ${inputField.inputFieldType}');
     }
   }
 
   void setDateTime(DateTime? value) {
-    if (inputFieldType == InputFieldType.dateTime) {
+    if (inputField.inputFieldType == InputFieldType.dateTime) {
       if (value == null) {
         (controller as TextEditingController).text = '';
       } else {
-        //TODO need parameter to specified date, time or dateTime, recommedation altertative Solution for this case, using Custom controller for Input Field Date Time
-        try {
+        if (inputField.inputDateTimeSettings!.inputDateTimeMode ==
+            InputDateTimeMode.date) {
+          (controller as TextEditingController).text =
+              DateFormat('yyyy-MM-dd').format(value);
+        } else if (inputField.inputDateTimeSettings!.inputDateTimeMode ==
+            InputDateTimeMode.time) {
+          (controller as TextEditingController).text =
+              DateFormat('hh:mm').format(value);
+        } else {
           (controller as TextEditingController).text =
               DateFormat('yyyy-MM-dd hh:mm:ss').format(value);
-        } catch (e) {
-          try {
-            (controller as TextEditingController).text =
-                DateFormat('yyyy-MM-dd').format(value);
-          } catch (e) {
-            (controller as TextEditingController).text =
-                DateFormat('hh:mm').format(value);
-          }
         }
       }
     } else {
       throw Exception(
-          'Unsupported setDateTime for this input type $inputFieldType');
+          'Unsupported setDateTime for this input type ${inputField.inputFieldType}');
     }
   }
 
   DateTime? getDateTime() {
-    if (inputFieldType == InputFieldType.dateTime) {
+    if (inputField.inputFieldType == InputFieldType.dateTime) {
       if ((controller as TextEditingController).text.isEmpty) {
         return null;
-      }
-      try {
-        return DateFormat('yyyy-MM-dd hh:mm:ss')
-            .parse((controller as TextEditingController).text);
-      } catch (e) {
-        try {
+      } else {
+        if (inputField.inputDateTimeSettings!.inputDateTimeMode ==
+            InputDateTimeMode.date) {
           return DateFormat('yyyy-MM-dd')
               .parse((controller as TextEditingController).text);
-        } catch (e) {
+        } else if (inputField.inputDateTimeSettings!.inputDateTimeMode ==
+            InputDateTimeMode.time) {
           return DateFormat('hh:mm')
+              .parse((controller as TextEditingController).text);
+        } else {
+          return DateFormat('yyyy-MM-dd hh:mm:ss')
               .parse((controller as TextEditingController).text);
         }
       }
     } else {
       throw Exception(
-          'Unsupported getDateTime for this input type $inputFieldType');
+          'Unsupported getDateTime for this input type ${inputField.inputFieldType}');
     }
   }
 
   void setListOptionValues(List<OptionItem> value) {
-    if (inputFieldType == InputFieldType.option) {
+    if (inputField.inputFieldType == InputFieldType.option) {
       (controller as InputFieldOptionController).clear();
       for (var e in value) {
         (controller as InputFieldOptionController).add(e);
       }
     } else {
       throw Exception(
-          'Unsupported setListOptionValues for this input type $inputFieldType');
+          'Unsupported setListOptionValues for this input type ${inputField.inputFieldType}');
     }
   }
 
   List<OptionItem> getListOptionValues() {
-    if (inputFieldType == InputFieldType.option) {
+    if (inputField.inputFieldType == InputFieldType.option) {
       return (controller as InputFieldOptionController).getData();
     } else {
       throw Exception(
-          'Unsupported getListOptionValues for this input type $inputFieldType');
+          'Unsupported getListOptionValues for this input type ${inputField.inputFieldType}');
     }
   }
 
   void setNumber(double? value) {
-    if (inputFieldType == InputFieldType.number) {
+    if (inputField.inputFieldType == InputFieldType.number) {
       (controller as TextEditingController).text =
           value == null ? '' : value.toString();
     } else {
       throw Exception(
-          'Unsupported getString for this input type $inputFieldType');
+          'Unsupported getString for this input type ${inputField.inputFieldType}');
     }
   }
 
   double? getNumber() {
-    if (inputFieldType == InputFieldType.number) {
+    if (inputField.inputFieldType == InputFieldType.number) {
       if ((controller as TextEditingController).text.isEmpty) {
         return null;
       }
       return double.parse((controller as TextEditingController).text);
     } else {
       throw Exception(
-          'Unsupported setString for this input type $inputFieldType');
+          'Unsupported setString for this input type ${inputField.inputFieldType}');
     }
   }
 }
