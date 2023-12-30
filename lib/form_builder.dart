@@ -447,68 +447,67 @@ abstract class Input {
   final String name;
   final String label;
   final String? helperText;
-  late bool? isOptional = false;
+  final bool? isOptional;
 
-  Input({
+  const Input({
     required this.name,
     required this.label,
     this.helperText,
-    this.isOptional,
+    this.isOptional = false,
   });
 }
 
 class InputText extends Input {
-  late bool? isMultilines = false;
-  late InputTextMode? inputTextMode = InputTextMode.freeText;
+  final bool? isMultilines;
+  final InputTextMode? inputTextMode;
 
-  InputText({
+  const InputText({
     required super.name,
     required super.label,
     super.helperText,
     super.isOptional,
-    this.isMultilines,
-    this.inputTextMode,
+    this.isMultilines = false,
+    this.inputTextMode = InputTextMode.freeText,
   });
 }
 
 class InputDateTime extends Input {
-  late InputDateTimeMode? inputDateTimeMode = InputDateTimeMode.dateTime;
+  final InputDateTimeMode? inputDateTimeMode;
 
-  InputDateTime({
+  const InputDateTime({
     required super.name,
     required super.label,
     super.helperText,
     super.isOptional,
-    this.inputDateTimeMode,
+    this.inputDateTimeMode = InputDateTimeMode.dateTime,
   });
 }
 
 class InputForm extends Input {
   final List<Input> inputFields;
-  late String? Function(String? errorMessage)? onValidating = onValidating;
-  late void Function(BuildContext context, Map<String, InputValue> inputValues)?
-      onInitial = onInitial;
-  late dynamic Function(
+  final String? Function(String? errorMessage)? onValidating;
+  final void Function(
+      BuildContext context, Map<String, InputValue> inputValues)? onInitial;
+  final dynamic Function(
           BuildContext context, Map<String, InputValue> inputValues)?
-      onBeforeValidation = onBeforeValidation;
-  late dynamic Function(
-          BuildContext context,
-          Map<String, InputValue> inputValues,
-          bool isValid,
-          Map<String, String?> errorsMessages)? onAfterValidation =
-      onAfterValidation;
-  late List<AdditionalButton>? additionalButtons = [];
-  late bool? isMultiInputForm = false;
+      onBeforeValidation;
+  final dynamic Function(
+      BuildContext context,
+      Map<String, InputValue> inputValues,
+      bool isValid,
+      Map<String, String?> errorsMessages)? onAfterValidation;
+  final List<AdditionalButton>? additionalButtons;
+  final bool? isMultiInputForm;
 
-  InputForm({
+  const InputForm({
     required super.name,
     required super.label,
     super.helperText,
     super.isOptional,
     required this.inputFields,
     this.onValidating,
-    this.additionalButtons,
-    this.isMultiInputForm,
+    this.additionalButtons = const [],
+    this.isMultiInputForm = false,
     this.onAfterValidation,
     this.onBeforeValidation,
     this.onInitial,
@@ -516,34 +515,34 @@ class InputForm extends Input {
 }
 
 class InputNumber extends Input {
-  late InputNumberMode? inputNumberMode = InputNumberMode.decimal;
+  final InputNumberMode? inputNumberMode;
 
-  InputNumber({
+  const InputNumber({
     required super.name,
     required super.label,
     super.helperText,
     super.isOptional,
-    this.inputNumberMode,
+    this.inputNumberMode = InputNumberMode.decimal,
   });
 }
 
 class InputOption extends Input {
   final Future<OptionData> optionData;
   final Future<int> optionTotalData;
-  late List<String>? dataHeaders = [];
-  late bool? isMultiSelection = false;
-  late OptionSearchForm? optionSearchForm;
+  final List<String>? dataHeaders;
+  final bool? isMultiSelection;
+  final OptionSearchForm? optionSearchForm;
 
-  InputOption({
+  const InputOption({
     required super.name,
     required super.label,
     super.helperText,
     super.isOptional,
     required this.optionData,
     required this.optionTotalData,
-    this.dataHeaders,
+    this.dataHeaders = const [],
     this.optionSearchForm,
-    this.isMultiSelection,
+    this.isMultiSelection = false,
   });
 }
 

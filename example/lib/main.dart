@@ -29,17 +29,16 @@ class MyApp extends StatelessWidget {
           child: FormBulder(
             formName: 'Member',
             inputFields: [
-              InputText(
+              const InputText(
                 name: 'name',
                 label: 'Name',
-                inputTextMode: InputTextMode.freeText,
               ),
-              InputText(
+              const InputText(
                 name: 'email',
                 label: 'Email',
                 inputTextMode: InputTextMode.email,
               ),
-              InputDateTime(
+              const InputDateTime(
                 name: 'birthDate',
                 label: 'Birth Date',
                 inputDateTimeMode: InputDateTimeMode.date,
@@ -81,8 +80,9 @@ class MyApp extends StatelessWidget {
                 optionTotalData: Future(() => Db.hobbies.length),
                 optionSearchForm: OptionSearchForm(
                   searchFields: [
-                    InputText(name: 'name', label: 'Name', isOptional: true),
-                    InputText(
+                    const InputText(
+                        name: 'name', label: 'Name', isOptional: true),
+                    const InputText(
                       name: 'detail',
                       label: 'Detail',
                       isOptional: false,
@@ -108,13 +108,13 @@ class MyApp extends StatelessWidget {
                   },
                 ),
               ),
-              InputNumber(
+              const InputNumber(
                 name: 'rate',
                 label: 'Rate',
                 isOptional: true,
                 inputNumberMode: InputNumberMode.decimal,
               ),
-              InputText(
+              const InputText(
                 name: 'rateInfo',
                 label: 'Rate Info',
                 helperText: 'Must be filled when rate is filled.',
@@ -125,17 +125,17 @@ class MyApp extends StatelessWidget {
                 name: 'familyMembers',
                 label: 'Family Members',
                 inputFields: [
-                  InputText(
+                  const InputText(
                     name: 'name',
                     label: 'Name',
                   ),
-                  InputText(
+                  const InputText(
                     name: 'email',
                     label: 'Email',
                     inputTextMode: InputTextMode.email,
                     isOptional: true,
                   ),
-                  InputDateTime(
+                  const InputDateTime(
                     name: 'birthDate',
                     label: 'Birth Date',
                     inputDateTimeMode: InputDateTimeMode.date,
@@ -179,9 +179,9 @@ class MyApp extends StatelessWidget {
                     optionTotalData: Future(() => Db.hobbies.length),
                     optionSearchForm: OptionSearchForm(
                       searchFields: [
-                        InputText(
+                        const InputText(
                             name: 'name', label: 'Name', isOptional: true),
-                        InputText(
+                        const InputText(
                           name: 'detail',
                           label: 'Detail',
                           isOptional: false,
@@ -209,7 +209,7 @@ class MyApp extends StatelessWidget {
                       },
                     ),
                   ),
-                  InputForm(
+                  const InputForm(
                     name: 'additinalInformations',
                     label: 'Additional Informations',
                     isMultiInputForm: true,
