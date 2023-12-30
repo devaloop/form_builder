@@ -29,258 +29,203 @@ class MyApp extends StatelessWidget {
           child: FormBulder(
             formName: 'Member',
             inputFields: [
-              const InputField(
+              InputText(
                 name: 'name',
-                inputFieldType: InputFieldType.text,
                 label: 'Name',
+                inputTextMode: InputTextMode.freeText,
               ),
-              const InputField(
+              InputText(
                 name: 'email',
-                inputFieldType: InputFieldType.text,
                 label: 'Email',
-                inputTextSettings: InputTextSettings(
-                  inputTextMode: InputTextMode.email,
-                ),
+                inputTextMode: InputTextMode.email,
               ),
-              const InputField(
+              InputDateTime(
                 name: 'birthDate',
-                inputFieldType: InputFieldType.dateTime,
                 label: 'Birth Date',
-                inputDateTimeSettings: InputDateTimeSettings(
-                  inputDateTimeMode: InputDateTimeMode.date,
-                ),
+                inputDateTimeMode: InputDateTimeMode.date,
               ),
-              InputField(
+              InputOption(
                 name: 'gender',
-                inputFieldType: InputFieldType.option,
                 label: 'Gender',
-                inputOptionSettings: InputOptionSettings(
-                  optionData: Future<OptionData>(
-                    () {
-                      var data = [
-                        const OptionItem(
-                            hiddenValue: ['Male'], value: ['Male']),
-                        const OptionItem(
-                            hiddenValue: ['Female'], value: ['Female']),
-                      ];
-                      return OptionData(
-                          displayedListOfOptions: data,
-                          totalOption: data.length);
-                    },
-                  ),
-                  optionTotalData: Future(() => 2),
+                optionData: Future<OptionData>(
+                  () {
+                    var data = [
+                      const OptionItem(hiddenValue: ['Male'], value: ['Male']),
+                      const OptionItem(
+                          hiddenValue: ['Female'], value: ['Female']),
+                    ];
+                    return OptionData(
+                        displayedListOfOptions: data, totalOption: data.length);
+                  },
                 ),
+                optionTotalData: Future(() => 2),
               ),
-              InputField(
+              InputOption(
                 name: 'hobbies',
-                inputFieldType: InputFieldType.option,
                 label: 'Hobbies',
-                inputOptionSettings: InputOptionSettings(
-                  isMultiSelection: true,
-                  optionData: Future<OptionData>(
-                    () {
-                      var data = Db.hobbies
-                          .take(10)
-                          .map((e) => OptionItem(
-                              hiddenValue: [e.id], value: [e.name, e.detail]))
-                          .toList();
-                      return OptionData(
-                        displayedListOfOptions: data,
-                        totalOption: Db.hobbies.length,
-                      );
-                    },
-                  ),
-                  dataHeaders: ['Name', 'Detail'],
-                  optionTotalData: Future(() => Db.hobbies.length),
-                  optionSearchForm: OptionSearchForm(
-                    searchFields: [
-                      const InputField(
-                          name: 'name',
-                          inputFieldType: InputFieldType.text,
-                          label: 'Name',
-                          isOptional: true),
-                      const InputField(
-                        name: 'detail',
-                        inputFieldType: InputFieldType.text,
-                        label: 'Detail',
-                        isOptional: false,
-                      ),
-                    ],
-                    searchProcess: (params) {
-                      return Future<OptionData>(
-                        () {
-                          var data = Db.hobbies
-                              .map((e) => OptionItem(
-                                  hiddenValue: [e.id],
-                                  value: [e.name, e.detail]))
-                              .where((element) => element.value[0]
-                                  .toLowerCase()
-                                  .contains(params['name']!
-                                      .getString()!
-                                      .toLowerCase()))
-                              .toList();
-                          return OptionData(
-                            displayedListOfOptions: data,
-                            totalOption: Db.hobbies.length,
-                          );
-                        },
-                      );
-                    },
-                  ),
+                isMultiSelection: true,
+                optionData: Future<OptionData>(
+                  () {
+                    var data = Db.hobbies
+                        .take(10)
+                        .map((e) => OptionItem(
+                            hiddenValue: [e.id], value: [e.name, e.detail]))
+                        .toList();
+                    return OptionData(
+                      displayedListOfOptions: data,
+                      totalOption: Db.hobbies.length,
+                    );
+                  },
+                ),
+                dataHeaders: ['Name', 'Detail'],
+                optionTotalData: Future(() => Db.hobbies.length),
+                optionSearchForm: OptionSearchForm(
+                  searchFields: [
+                    InputText(name: 'name', label: 'Name', isOptional: true),
+                    InputText(
+                      name: 'detail',
+                      label: 'Detail',
+                      isOptional: false,
+                    ),
+                  ],
+                  searchProcess: (params) {
+                    return Future<OptionData>(
+                      () {
+                        var data = Db.hobbies
+                            .map((e) => OptionItem(
+                                hiddenValue: [e.id], value: [e.name, e.detail]))
+                            .where((element) => element.value[0]
+                                .toLowerCase()
+                                .contains(
+                                    params['name']!.getString()!.toLowerCase()))
+                            .toList();
+                        return OptionData(
+                          displayedListOfOptions: data,
+                          totalOption: Db.hobbies.length,
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
-              const InputField(
+              InputNumber(
                 name: 'rate',
-                inputFieldType: InputFieldType.number,
                 label: 'Rate',
                 isOptional: true,
-                inputNumberSettings: InputNumberSettings(
-                  inputNumberMode: InputNumberMode.decimal,
-                ),
+                inputNumberMode: InputNumberMode.decimal,
               ),
-              const InputField(
+              InputText(
                 name: 'rateInfo',
-                inputFieldType: InputFieldType.text,
                 label: 'Rate Info',
                 helperText: 'Must be filled when rate is filled.',
                 isOptional: true,
-                inputTextSettings: InputTextSettings(
-                  isMultilines: true,
-                ),
+                isMultilines: true,
               ),
-              InputField(
+              InputForm(
                 name: 'familyMembers',
-                inputFieldType: InputFieldType.form,
                 label: 'Family Members',
-                inputFormSettings: InputFormSettings(
-                  inputFields: [
-                    const InputField(
-                      name: 'name',
-                      inputFieldType: InputFieldType.text,
-                      label: 'Name',
+                inputFields: [
+                  InputText(
+                    name: 'name',
+                    label: 'Name',
+                  ),
+                  InputText(
+                    name: 'email',
+                    label: 'Email',
+                    inputTextMode: InputTextMode.email,
+                    isOptional: true,
+                  ),
+                  InputDateTime(
+                    name: 'birthDate',
+                    label: 'Birth Date',
+                    inputDateTimeMode: InputDateTimeMode.date,
+                  ),
+                  InputOption(
+                    name: 'gender',
+                    label: 'Gender',
+                    optionData: Future<OptionData>(
+                      () {
+                        var data = [
+                          const OptionItem(
+                              hiddenValue: ['Male'], value: ['Male']),
+                          const OptionItem(
+                              hiddenValue: ['Female'], value: ['Female']),
+                        ];
+                        return OptionData(
+                            displayedListOfOptions: data,
+                            totalOption: data.length);
+                      },
                     ),
-                    const InputField(
-                      name: 'email',
-                      inputFieldType: InputFieldType.text,
-                      label: 'Email',
-                      inputTextSettings: InputTextSettings(
-                        inputTextMode: InputTextMode.email,
-                      ),
-                      isOptional: true,
+                    optionTotalData: Future(() => 2),
+                  ),
+                  InputOption(
+                    name: 'hobbies',
+                    label: 'Hobbies',
+                    isMultiSelection: true,
+                    optionData: Future<OptionData>(
+                      () {
+                        var data = Db.hobbies
+                            .take(10)
+                            .map((e) => OptionItem(
+                                hiddenValue: [e.id], value: [e.name, e.detail]))
+                            .toList();
+                        return OptionData(
+                          displayedListOfOptions: data,
+                          totalOption: Db.hobbies.length,
+                        );
+                      },
                     ),
-                    const InputField(
-                      name: 'birthDate',
-                      inputFieldType: InputFieldType.dateTime,
-                      label: 'Birth Date',
-                      inputDateTimeSettings: InputDateTimeSettings(
-                        inputDateTimeMode: InputDateTimeMode.date,
-                      ),
-                    ),
-                    InputField(
-                      name: 'gender',
-                      inputFieldType: InputFieldType.option,
-                      label: 'Gender',
-                      inputOptionSettings: InputOptionSettings(
-                        optionData: Future<OptionData>(
-                          () {
-                            var data = [
-                              const OptionItem(
-                                  hiddenValue: ['Male'], value: ['Male']),
-                              const OptionItem(
-                                  hiddenValue: ['Female'], value: ['Female']),
-                            ];
-                            return OptionData(
-                                displayedListOfOptions: data,
-                                totalOption: data.length);
-                          },
+                    //dataHeaders: ['Name', 'Detail'],
+                    optionTotalData: Future(() => Db.hobbies.length),
+                    optionSearchForm: OptionSearchForm(
+                      searchFields: [
+                        InputText(
+                            name: 'name', label: 'Name', isOptional: true),
+                        InputText(
+                          name: 'detail',
+                          label: 'Detail',
+                          isOptional: false,
                         ),
-                        optionTotalData: Future(() => 2),
-                      ),
-                    ),
-                    InputField(
-                      name: 'hobbies',
-                      inputFieldType: InputFieldType.option,
-                      label: 'Hobbies',
-                      inputOptionSettings: InputOptionSettings(
-                        isMultiSelection: true,
-                        optionData: Future<OptionData>(
+                      ],
+                      searchProcess: (params) {
+                        return Future<OptionData>(
                           () {
                             var data = Db.hobbies
-                                .take(10)
                                 .map((e) => OptionItem(
                                     hiddenValue: [e.id],
                                     value: [e.name, e.detail]))
+                                .where((element) => element.value[0]
+                                    .toLowerCase()
+                                    .contains(params['name']!
+                                        .getString()!
+                                        .toLowerCase()))
                                 .toList();
                             return OptionData(
                               displayedListOfOptions: data,
                               totalOption: Db.hobbies.length,
                             );
                           },
-                        ),
-                        //dataHeaders: ['Name', 'Detail'],
-                        optionTotalData: Future(() => Db.hobbies.length),
-                        optionSearchForm: OptionSearchForm(
-                          searchFields: [
-                            const InputField(
-                                name: 'name',
-                                inputFieldType: InputFieldType.text,
-                                label: 'Name',
-                                isOptional: true),
-                            const InputField(
-                              name: 'detail',
-                              inputFieldType: InputFieldType.text,
-                              label: 'Detail',
-                              isOptional: false,
-                            ),
-                          ],
-                          searchProcess: (params) {
-                            return Future<OptionData>(
-                              () {
-                                var data = Db.hobbies
-                                    .map((e) => OptionItem(
-                                        hiddenValue: [e.id],
-                                        value: [e.name, e.detail]))
-                                    .where((element) => element.value[0]
-                                        .toLowerCase()
-                                        .contains(params['name']!
-                                            .getString()!
-                                            .toLowerCase()))
-                                    .toList();
-                                return OptionData(
-                                  displayedListOfOptions: data,
-                                  totalOption: Db.hobbies.length,
-                                );
-                              },
-                            );
-                          },
-                        ),
-                      ),
+                        );
+                      },
                     ),
-                    const InputField(
-                      name: 'additinalInformations',
-                      inputFieldType: InputFieldType.form,
-                      label: 'Additional Informations',
-                      inputFormSettings: InputFormSettings(
-                        isMultiInputForm: true,
-                        inputFields: [
-                          InputField(
-                            name: 'title',
-                            inputFieldType: InputFieldType.text,
-                            label: 'Tittle',
-                          ),
-                          InputField(
-                            name: 'information',
-                            inputFieldType: InputFieldType.text,
-                            label: 'Informations',
-                            inputTextSettings: InputTextSettings(
-                              isMultilines: true,
-                            ),
-                          ),
-                        ],
+                  ),
+                  InputForm(
+                    name: 'additinalInformations',
+                    label: 'Additional Informations',
+                    isMultiInputForm: true,
+                    inputFields: [
+                      InputText(
+                        name: 'title',
+                        label: 'Tittle',
                       ),
-                    ),
-                  ],
-                ),
+                      InputText(
+                        name: 'information',
+                        label: 'Informations',
+                        isMultilines: true,
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
             onInitial: (context, inputValues) {

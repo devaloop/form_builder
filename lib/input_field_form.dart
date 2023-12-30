@@ -17,7 +17,7 @@ class InputFieldForm extends StatefulWidget {
   final InputFieldFormController controller;
   final String? Function(String? errorMessage)? onValidating;
   final bool? isEditable;
-  final List<InputField> inputFields;
+  final List<Input> inputFields;
   final void Function(
       BuildContext context, Map<String, InputValue> inputValues)? onInitial;
   final dynamic Function(
@@ -114,8 +114,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                 index++) {
                                               for (var e
                                                   in widget.inputFields) {
-                                                if (e.inputFieldType ==
-                                                    InputFieldType.text) {
+                                                if (e.runtimeType ==
+                                                    InputText) {
                                                   inputValues[e.name]!
                                                       .setString(widget
                                                           .controller
@@ -126,9 +126,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                               e.name)
                                                           .firstOrNull
                                                           ?.value);
-                                                }
-                                                if (e.inputFieldType ==
-                                                    InputFieldType.dateTime) {
+                                                } else if (e.runtimeType ==
+                                                    InputDateTime) {
                                                   inputValues[e.name]!
                                                       .setDateTime(widget
                                                           .controller
@@ -139,9 +138,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                               e.name)
                                                           .firstOrNull
                                                           ?.value);
-                                                }
-                                                if (e.inputFieldType ==
-                                                    InputFieldType.number) {
+                                                } else if (e.runtimeType ==
+                                                    InputNumber) {
                                                   inputValues[e.name]!
                                                       .setNumber(widget
                                                           .controller
@@ -152,9 +150,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                               e.name)
                                                           .firstOrNull
                                                           ?.value);
-                                                }
-                                                if (e.inputFieldType ==
-                                                    InputFieldType.option) {
+                                                } else if (e.runtimeType ==
+                                                    InputOption) {
                                                   inputValues[e.name]!
                                                       .setListOptionValues(widget
                                                               .controller
@@ -166,9 +163,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                               .firstOrNull
                                                               ?.value ??
                                                           []);
-                                                }
-                                                if (e.inputFieldType ==
-                                                    InputFieldType.form) {
+                                                } else if (e.runtimeType ==
+                                                    InputForm) {
                                                   inputValues[e.name]!
                                                       .setFormValues(widget
                                                               .controller
@@ -180,7 +176,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                               .firstOrNull
                                                               ?.value ??
                                                           []);
-                                                }
+                                                } else {}
                                               }
                                             }
                                           },
@@ -247,8 +243,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                           widget.controller.getData().length;
                                       index++) {
                                     for (var e in widget.inputFields) {
-                                      if (e.inputFieldType ==
-                                          InputFieldType.text) {
+                                      if (e.runtimeType == InputText) {
                                         inputValues[e.name]!.setString(widget
                                             .controller
                                             .getData()[index]
@@ -257,9 +252,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                 element.key == e.name)
                                             .firstOrNull
                                             ?.value);
-                                      }
-                                      if (e.inputFieldType ==
-                                          InputFieldType.dateTime) {
+                                      } else if (e.runtimeType ==
+                                          InputDateTime) {
                                         inputValues[e.name]!.setDateTime(widget
                                             .controller
                                             .getData()[index]
@@ -268,9 +262,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                 element.key == e.name)
                                             .firstOrNull
                                             ?.value);
-                                      }
-                                      if (e.inputFieldType ==
-                                          InputFieldType.number) {
+                                      } else if (e.runtimeType == InputNumber) {
                                         inputValues[e.name]!.setNumber(widget
                                             .controller
                                             .getData()[index]
@@ -279,9 +271,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                 element.key == e.name)
                                             .firstOrNull
                                             ?.value);
-                                      }
-                                      if (e.inputFieldType ==
-                                          InputFieldType.option) {
+                                      } else if (e.runtimeType == InputOption) {
                                         inputValues[e.name]!
                                             .setListOptionValues(widget
                                                     .controller
@@ -292,9 +282,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                     .firstOrNull
                                                     ?.value ??
                                                 []);
-                                      }
-                                      if (e.inputFieldType ==
-                                          InputFieldType.form) {
+                                      } else if (e.runtimeType == InputForm) {
                                         inputValues[e.name]!.setFormValues(
                                             widget.controller
                                                     .getData()[index]
@@ -304,7 +292,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                     .firstOrNull
                                                     ?.value ??
                                                 []);
-                                      }
+                                      } else {}
                                     }
                                   }
                                 },
@@ -372,7 +360,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                         children: widget.inputFields.map((e) {
                           List<Widget> listDataView = [];
                           String value = '';
-                          if (e.inputFieldType == InputFieldType.dateTime) {
+                          if (e.runtimeType == InputDateTime) {
                             DateTime? data = widget.controller
                                 .getData()[index]
                                 .entries
@@ -381,17 +369,17 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                 ?.value;
                             String strData = '-';
                             if (data != null) {
-                              if ((e.inputDateTimeSettings!.inputDateTimeMode ??
+                              if (((e as InputDateTime).inputDateTimeMode ??
                                       InputDateTimeMode.dateTime) ==
                                   InputDateTimeMode.date) {
                                 strData = DateFormat('yyyy-MM-dd').format(data);
                               }
-                              if ((e.inputDateTimeSettings!.inputDateTimeMode ??
+                              if (((e).inputDateTimeMode ??
                                       InputDateTimeMode.dateTime) ==
                                   InputDateTimeMode.time) {
                                 strData = DateFormat('HH:mm:ss').format(data);
                               }
-                              if ((e.inputDateTimeSettings!.inputDateTimeMode ??
+                              if (((e).inputDateTimeMode ??
                                       InputDateTimeMode.dateTime) ==
                                   InputDateTimeMode.dateTime) {
                                 strData = DateFormat('yyyy-MM-dd HH:mm:ss')
@@ -415,7 +403,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               ),
                             ));
                           }
-                          if (e.inputFieldType == InputFieldType.number) {
+                          if (e.runtimeType == InputNumber) {
                             value =
                                 '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
 
@@ -426,7 +414,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               ),
                             ));
                           }
-                          if (e.inputFieldType == InputFieldType.option) {
+                          if (e.runtimeType == InputOption) {
                             List<OptionItem> data = widget.controller
                                     .getData()[index]
                                     .entries
@@ -437,7 +425,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                             value =
                                 '${e.label}: ${data.isNotEmpty ? ('${data.length} Selected') : '-'}';
 
-                            if ((e.inputOptionSettings!.isMultiSelection ??
+                            if (((e as InputOption).isMultiSelection ??
                                     false) ==
                                 false) {
                               listDataView.add(Card(
@@ -457,14 +445,10 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                             return eItem.value
                                                 .map((eValue) {
                                                   String? label;
-                                                  if (e.inputOptionSettings!
-                                                          .dataHeaders !=
-                                                      null) {
+                                                  if (e.dataHeaders != null) {
                                                     try {
-                                                      label =
-                                                          e.inputOptionSettings!
-                                                                  .dataHeaders![
-                                                              indexHeader];
+                                                      label = e.dataHeaders![
+                                                          indexHeader];
                                                     } catch (ex) {
                                                       label = null;
                                                     }
@@ -507,14 +491,10 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                     .value
                                                     .map((fieldItem) {
                                                   String? label;
-                                                  if (e.inputOptionSettings!
-                                                          .dataHeaders !=
-                                                      null) {
+                                                  if (e.dataHeaders != null) {
                                                     try {
-                                                      label =
-                                                          e.inputOptionSettings!
-                                                                  .dataHeaders![
-                                                              indexHeader];
+                                                      label = e.dataHeaders![
+                                                          indexHeader];
                                                     } catch (ex) {
                                                       label = null;
                                                     }
@@ -539,7 +519,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               ));
                             }
                           }
-                          if (e.inputFieldType == InputFieldType.text) {
+                          if (e.runtimeType == InputText) {
                             value =
                                 '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
 
@@ -558,7 +538,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               ),
                             ));
                           }
-                          if (e.inputFieldType == InputFieldType.form) {
+                          if (e.runtimeType == InputForm) {
                             List<Map<String, dynamic>>? data = widget.controller
                                 .getData()[index]
                                 .entries
@@ -625,8 +605,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                   (context, inputValues) {
                                                 for (var e
                                                     in widget.inputFields) {
-                                                  if (e.inputFieldType ==
-                                                      InputFieldType.text) {
+                                                  if (e.runtimeType ==
+                                                      InputText) {
                                                     inputValues[e.name]!
                                                         .setString(widget
                                                             .controller
@@ -637,9 +617,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                                 e.name)
                                                             .firstOrNull
                                                             ?.value);
-                                                  }
-                                                  if (e.inputFieldType ==
-                                                      InputFieldType.dateTime) {
+                                                  } else if (e.runtimeType ==
+                                                      InputDateTime) {
                                                     inputValues[e.name]!
                                                         .setDateTime(widget
                                                             .controller
@@ -650,9 +629,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                                 e.name)
                                                             .firstOrNull
                                                             ?.value);
-                                                  }
-                                                  if (e.inputFieldType ==
-                                                      InputFieldType.number) {
+                                                  } else if (e.runtimeType ==
+                                                      InputNumber) {
                                                     inputValues[e.name]!
                                                         .setNumber(widget
                                                             .controller
@@ -663,9 +641,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                                 e.name)
                                                             .firstOrNull
                                                             ?.value);
-                                                  }
-                                                  if (e.inputFieldType ==
-                                                      InputFieldType.option) {
+                                                  } else if (e.runtimeType ==
+                                                      InputOption) {
                                                     inputValues[e.name]!
                                                         .setListOptionValues(widget
                                                                 .controller
@@ -679,9 +656,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                                 .firstOrNull
                                                                 ?.value ??
                                                             []);
-                                                  }
-                                                  if (e.inputFieldType ==
-                                                      InputFieldType.form) {
+                                                  } else if (e.runtimeType ==
+                                                      InputForm) {
                                                     inputValues[e.name]!
                                                         .setFormValues(widget
                                                                 .controller
@@ -695,7 +671,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                                 .firstOrNull
                                                                 ?.value ??
                                                             []);
-                                                  }
+                                                  } else {}
                                                 }
                                               },
                                             ),
@@ -735,7 +711,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
 
 class InputFieldFormPage extends StatefulWidget {
   final String title;
-  final List<InputField> inputFields;
+  final List<Input> inputFields;
   final void Function(
       BuildContext context, Map<String, InputValue> inputValues)? onInitial;
   final dynamic Function(
@@ -794,23 +770,23 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
           onSubmit: (context, inputValues) {
             Map<String, dynamic> controller = {};
             for (var inputField in widget.inputFields) {
-              if (inputField.inputFieldType == InputFieldType.text) {
+              if (inputField.runtimeType == InputText) {
                 controller[inputField.name] =
                     inputValues[inputField.name]!.getString();
               }
-              if (inputField.inputFieldType == InputFieldType.dateTime) {
+              if (inputField.runtimeType == InputDateTime) {
                 controller[inputField.name] =
                     inputValues[inputField.name]!.getDateTime();
               }
-              if (inputField.inputFieldType == InputFieldType.number) {
+              if (inputField.runtimeType == InputNumber) {
                 controller[inputField.name] =
                     inputValues[inputField.name]!.getNumber();
               }
-              if (inputField.inputFieldType == InputFieldType.option) {
+              if (inputField.runtimeType == InputOption) {
                 controller[inputField.name] =
                     inputValues[inputField.name]!.getListOptionValues();
               }
-              if (inputField.inputFieldType == InputFieldType.form) {
+              if (inputField.runtimeType == InputForm) {
                 controller[inputField.name] =
                     inputValues[inputField.name]!.getFormValues();
               }

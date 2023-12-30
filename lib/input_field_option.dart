@@ -15,7 +15,7 @@ class InputFieldOption extends StatefulWidget {
   final List<String>? dataHeaders;
   final Future<OptionData> Function(Map<String, InputValue>)? searchProcess;
   final InputFieldOptionController controller;
-  final List<InputField>? searchFields;
+  final List<Input>? searchFields;
   final bool? isMultiSelection;
   final String? Function(String? errorMessage)? onValidating;
   final bool? isEditable;
@@ -330,7 +330,7 @@ class InputFiledOptionSearchFormPage extends StatefulWidget {
   final String title;
   final Future<OptionData> optionData;
   final List<String>? dataHeaders;
-  final List<InputField>? searchFields;
+  final List<Input>? searchFields;
   final Future<OptionData> Function(Map<String, InputValue>)? searchProcess;
 
   const InputFiledOptionSearchFormPage({
@@ -762,6 +762,6 @@ class OptionSearchForm {
     required this.searchProcess,
   });
 
-  final List<InputField> searchFields;
+  final List<Input> searchFields;
   final Future<OptionData> Function(Map<String, InputValue>) searchProcess;
 }

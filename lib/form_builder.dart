@@ -23,7 +23,7 @@ class FormBulder extends StatefulWidget {
   });
 
   final String? formName;
-  final List<InputField> inputFields;
+  final List<Input> inputFields;
   final void Function(
       BuildContext context, Map<String, InputValue> inputValues)? onInitial;
   final dynamic Function(
@@ -46,7 +46,7 @@ class FormBulder extends StatefulWidget {
 
 class _FormBulderState extends State<FormBulder> {
   final List<dynamic> _controllers = [];
-  late Map<InputField, String?> _errors = {};
+  late Map<Input, String?> _errors = {};
   late Map<String, String?> _additionalErrorOnAfterValidation = {};
   final _formKey = GlobalKey<FormState>();
   late Map<String, InputValue> _inputValues;
@@ -56,18 +56,18 @@ class _FormBulderState extends State<FormBulder> {
   @override
   void initState() {
     for (var e in widget.inputFields) {
-      if (e.inputFieldType == InputFieldType.dateTime) {
+      if (e.runtimeType == InputText) {
         _controllers.add(TextEditingController());
-      } else if (e.inputFieldType == InputFieldType.number) {
+      } else if (e.runtimeType == InputNumber) {
         _controllers.add(TextEditingController());
-      } else if (e.inputFieldType == InputFieldType.option) {
+      } else if (e.runtimeType == InputOption) {
         _controllers.add(InputFieldOptionController());
-      } else if (e.inputFieldType == InputFieldType.text) {
+      } else if (e.runtimeType == InputDateTime) {
         _controllers.add(TextEditingController());
-      } else if (e.inputFieldType == InputFieldType.form) {
+      } else if (e.runtimeType == InputForm) {
         _controllers.add(InputFieldFormController());
       } else {
-        throw Exception('Unsupported InputFieldType ');
+        throw Exception('Unsupported InputFieldType ${e.runtimeType}');
       }
     }
     _inputValues = {
@@ -211,15 +211,16 @@ class _FormBulderState extends State<FormBulder> {
     );
   }
 
-  Widget getField(InputField e) {
-    if (e.inputFieldType == InputFieldType.dateTime) {
+  Widget getField(Input e) {
+    if (e.runtimeType == InputDateTime) {
+      e = (e as InputDateTime);
       return InputFieldDateTime(
         controller: _controllers[
             widget.inputFields.indexWhere((element) => element == e)],
         label: e.label,
         helperText: e.helperText,
         isRequired: !(e.isOptional ?? false),
-        inputDateTimeMode: e.inputDateTimeSettings?.inputDateTimeMode,
+        inputDateTimeMode: e.inputDateTimeMode,
         onValidating: (errorMessage) {
           _errors[e] = errorMessage;
 
@@ -238,14 +239,15 @@ class _FormBulderState extends State<FormBulder> {
         },
         isEditable: _isEditable ?? widget.isFormEditable ?? true,
       );
-    } else if (e.inputFieldType == InputFieldType.number) {
+    } else if (e.runtimeType == InputNumber) {
+      e = (e as InputNumber);
       return InputFieldNumber(
         controller: _controllers[
             widget.inputFields.indexWhere((element) => element == e)],
         label: e.label,
         helperText: e.helperText,
         isRequired: !(e.isOptional ?? false),
-        inputFieldNumberMode: e.inputNumberSettings?.inputNumberMode,
+        inputFieldNumberMode: e.inputNumberMode,
         onValidating: (errorMessage) {
           _errors[e] = errorMessage;
 
@@ -264,51 +266,47 @@ class _FormBulderState extends State<FormBulder> {
         },
         isEditable: _isEditable ?? widget.isFormEditable ?? true,
       );
-    } else if (e.inputFieldType == InputFieldType.option) {
-      if (e.inputOptionSettings != null) {
-        return InputFieldOption(
-          controller: _controllers[
-              widget.inputFields.indexWhere((element) => element == e)],
-          label: e.label,
-          helperText: e.helperText,
-          isRequired: !(e.isOptional ?? false),
-          optionData: e.inputOptionSettings!.optionData,
-          dataHeaders: e.inputOptionSettings!.dataHeaders,
-          searchFields: e.inputOptionSettings?.optionSearchForm?.searchFields,
-          searchProcess: e.inputOptionSettings?.optionSearchForm?.searchProcess,
-          isMultiSelection: e.inputOptionSettings!.isMultiSelection,
-          onValidating: (errorMessage) {
-            _errors[e] = errorMessage;
+    } else if (e.runtimeType == InputOption) {
+      e = (e as InputOption);
+      return InputFieldOption(
+        controller: _controllers[
+            widget.inputFields.indexWhere((element) => element == e)],
+        label: e.label,
+        helperText: e.helperText,
+        isRequired: !(e.isOptional ?? false),
+        optionData: e.optionData,
+        dataHeaders: e.dataHeaders,
+        searchFields: e.optionSearchForm?.searchFields,
+        searchProcess: e.optionSearchForm?.searchProcess,
+        isMultiSelection: e.isMultiSelection,
+        onValidating: (errorMessage) {
+          _errors[e] = errorMessage;
 
-            var additionalErrorMessage = _additionalErrorOnAfterValidation
-                .entries
-                .where((element) => element.key == e.name)
-                .map((e) => e.value ?? '')
-                .toList()
-                .join(', ');
-            if (additionalErrorMessage.isEmpty && errorMessage == null) {
-              return null;
-            }
-            if (additionalErrorMessage.isNotEmpty) {
-              additionalErrorMessage = ', $additionalErrorMessage';
-            }
-            return (errorMessage ?? '') + additionalErrorMessage;
-          },
-          isEditable: _isEditable ?? widget.isFormEditable ?? true,
-        );
-      } else {
-        throw Exception(
-            'optionSettings must be provided for InputFieldType.option');
-      }
-    } else if (e.inputFieldType == InputFieldType.text) {
+          var additionalErrorMessage = _additionalErrorOnAfterValidation.entries
+              .where((element) => element.key == e.name)
+              .map((e) => e.value ?? '')
+              .toList()
+              .join(', ');
+          if (additionalErrorMessage.isEmpty && errorMessage == null) {
+            return null;
+          }
+          if (additionalErrorMessage.isNotEmpty) {
+            additionalErrorMessage = ', $additionalErrorMessage';
+          }
+          return (errorMessage ?? '') + additionalErrorMessage;
+        },
+        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+      );
+    } else if (e.runtimeType == InputText) {
+      e = (e as InputText);
       return InputFieldText(
         controller: _controllers[
             widget.inputFields.indexWhere((element) => element == e)],
         label: e.label,
         helperText: e.helperText,
         isRequired: !(e.isOptional ?? false),
-        isMultilines: e.inputTextSettings?.isMultilines,
-        inputTextMode: e.inputTextSettings?.inputTextMode,
+        isMultilines: e.isMultilines,
+        inputTextMode: e.inputTextMode,
         onValidating: (errorMessage) {
           _errors[e] = errorMessage;
 
@@ -327,7 +325,8 @@ class _FormBulderState extends State<FormBulder> {
         },
         isEditable: _isEditable ?? widget.isFormEditable ?? true,
       );
-    } else if (e.inputFieldType == InputFieldType.form) {
+    } else if (e.runtimeType == InputForm) {
+      e = (e as InputForm);
       return InputFieldForm(
         controller: _controllers[
             widget.inputFields.indexWhere((element) => element == e)],
@@ -351,15 +350,15 @@ class _FormBulderState extends State<FormBulder> {
           return (errorMessage ?? '') + additionalErrorMessage;
         },
         isEditable: _isEditable ?? widget.isFormEditable ?? true,
-        inputFields: e.inputFormSettings!.inputFields,
-        additionalButtons: e.inputFormSettings!.additionalButtons,
-        onAfterValidation: e.inputFormSettings!.onAfterValidation,
-        onBeforeValidation: e.inputFormSettings!.onBeforeValidation,
-        onInitial: e.inputFormSettings!.onInitial,
-        isMultiInputForm: e.inputFormSettings!.isMultiInputForm,
+        inputFields: e.inputFields,
+        additionalButtons: e.additionalButtons,
+        onAfterValidation: e.onAfterValidation,
+        onBeforeValidation: e.onBeforeValidation,
+        onInitial: e.onInitial,
+        isMultiInputForm: e.isMultiInputForm,
       );
     } else {
-      throw Exception('Unsupported InputFieldType ');
+      throw Exception('Unsupported InputFieldType ${e.runtimeType}');
     }
   }
 
@@ -372,7 +371,7 @@ class _FormBulderState extends State<FormBulder> {
     _formKey.currentState!.validate();
 
     int errorMessagesIndex = 0;
-    Map<int, MapEntry<InputField, String?>> errorMessages = {};
+    Map<int, MapEntry<Input, String?>> errorMessages = {};
     _errors.entries
         .where((element) => element.value != null)
         .toList()
@@ -444,99 +443,108 @@ class _FormBulderState extends State<FormBulder> {
   }
 }
 
-class InputField {
-  const InputField({
+abstract class Input {
+  final String name;
+  final String label;
+  final String? helperText;
+  late bool? isOptional = false;
+
+  Input({
     required this.name,
-    required this.inputFieldType,
     required this.label,
     this.helperText,
     this.isOptional,
-    this.inputOptionSettings,
-    this.inputTextSettings,
-    this.inputDateTimeSettings,
-    this.inputNumberSettings,
-    this.inputFormSettings,
-  });
-
-  final String name;
-  final InputFieldType inputFieldType;
-  final String label;
-  final String? helperText;
-  final bool? isOptional;
-  final InputOptionSettings? inputOptionSettings;
-  final InputTextSettings? inputTextSettings;
-  final InputDateTimeSettings? inputDateTimeSettings;
-  final InputNumberSettings? inputNumberSettings;
-  final InputFormSettings? inputFormSettings;
-}
-
-class InputFormSettings {
-  final String? Function(String? errorMessage)? onValidating;
-  final List<InputField> inputFields;
-  final void Function(
-      BuildContext context, Map<String, InputValue> inputValues)? onInitial;
-  final dynamic Function(
-          BuildContext context, Map<String, InputValue> inputValues)?
-      onBeforeValidation;
-  final dynamic Function(
-      BuildContext context,
-      Map<String, InputValue> inputValues,
-      bool isValid,
-      Map<String, String?> errorsMessages)? onAfterValidation;
-  final List<AdditionalButton>? additionalButtons;
-  final bool? isMultiInputForm;
-
-  const InputFormSettings({
-    this.onValidating,
-    required this.inputFields,
-    this.onInitial,
-    this.onBeforeValidation,
-    this.onAfterValidation,
-    this.additionalButtons,
-    this.isMultiInputForm,
   });
 }
 
-class InputNumberSettings {
-  const InputNumberSettings({
-    this.inputNumberMode,
-  });
+class InputText extends Input {
+  late bool? isMultilines = false;
+  late InputTextMode? inputTextMode = InputTextMode.freeText;
 
-  final InputNumberMode? inputNumberMode;
-}
-
-class InputDateTimeSettings {
-  const InputDateTimeSettings({
-    this.inputDateTimeMode,
-  });
-
-  final InputDateTimeMode? inputDateTimeMode;
-}
-
-class InputTextSettings {
-  const InputTextSettings({
+  InputText({
+    required super.name,
+    required super.label,
+    super.helperText,
+    super.isOptional,
     this.isMultilines,
     this.inputTextMode,
   });
-
-  final bool? isMultilines;
-  final InputTextMode? inputTextMode;
 }
 
-class InputOptionSettings {
-  const InputOptionSettings({
+class InputDateTime extends Input {
+  late InputDateTimeMode? inputDateTimeMode = InputDateTimeMode.dateTime;
+
+  InputDateTime({
+    required super.name,
+    required super.label,
+    super.helperText,
+    super.isOptional,
+    this.inputDateTimeMode,
+  });
+}
+
+class InputForm extends Input {
+  final List<Input> inputFields;
+  late String? Function(String? errorMessage)? onValidating = onValidating;
+  late void Function(BuildContext context, Map<String, InputValue> inputValues)?
+      onInitial = onInitial;
+  late dynamic Function(
+          BuildContext context, Map<String, InputValue> inputValues)?
+      onBeforeValidation = onBeforeValidation;
+  late dynamic Function(
+          BuildContext context,
+          Map<String, InputValue> inputValues,
+          bool isValid,
+          Map<String, String?> errorsMessages)? onAfterValidation =
+      onAfterValidation;
+  late List<AdditionalButton>? additionalButtons = [];
+  late bool? isMultiInputForm = false;
+
+  InputForm({
+    required super.name,
+    required super.label,
+    super.helperText,
+    super.isOptional,
+    required this.inputFields,
+    this.onValidating,
+    this.additionalButtons,
+    this.isMultiInputForm,
+    this.onAfterValidation,
+    this.onBeforeValidation,
+    this.onInitial,
+  });
+}
+
+class InputNumber extends Input {
+  late InputNumberMode? inputNumberMode = InputNumberMode.decimal;
+
+  InputNumber({
+    required super.name,
+    required super.label,
+    super.helperText,
+    super.isOptional,
+    this.inputNumberMode,
+  });
+}
+
+class InputOption extends Input {
+  final Future<OptionData> optionData;
+  final Future<int> optionTotalData;
+  late List<String>? dataHeaders = [];
+  late bool? isMultiSelection = false;
+  late OptionSearchForm? optionSearchForm;
+
+  InputOption({
+    required super.name,
+    required super.label,
+    super.helperText,
+    super.isOptional,
     required this.optionData,
     required this.optionTotalData,
     this.dataHeaders,
-    this.isMultiSelection,
     this.optionSearchForm,
+    this.isMultiSelection,
   });
-
-  final Future<OptionData> optionData;
-  final Future<int> optionTotalData;
-  final List<String>? dataHeaders;
-  final bool? isMultiSelection;
-  final OptionSearchForm? optionSearchForm;
 }
 
 class SubmitButtonSettings {
@@ -556,40 +564,40 @@ class InputValue {
   });
 
   final dynamic controller;
-  final InputField inputField;
+  final Input inputField;
 
   void setFormValues(List<Map<String, dynamic>> value) {
-    if (inputField.inputFieldType == InputFieldType.form) {
+    if (inputField.runtimeType == InputForm) {
       (controller as InputFieldFormController).clear();
       for (var e in value) {
         (controller as InputFieldFormController).add(e);
       }
     } else {
       throw Exception(
-          'Unsupported setListOptionValues for this input type ${inputField.inputFieldType}');
+          'Unsupported setListOptionValues for this input type ${inputField.runtimeType}');
     }
   }
 
   List<Map<String, dynamic>> getFormValues() {
-    if (inputField.inputFieldType == InputFieldType.form) {
+    if (inputField.runtimeType == InputForm) {
       return (controller as InputFieldFormController).getData();
     } else {
       throw Exception(
-          'Unsupported getListOptionValues for this input type ${inputField.inputFieldType}');
+          'Unsupported getListOptionValues for this input type ${inputField.runtimeType}');
     }
   }
 
   void setString(String? value) {
-    if (inputField.inputFieldType == InputFieldType.text) {
+    if (inputField.runtimeType == InputText) {
       (controller as TextEditingController).text = value ?? '';
     } else {
       throw Exception(
-          'Unsupported setString for this input type ${inputField.inputFieldType}');
+          'Unsupported setString for this input type ${inputField.runtimeType}');
     }
   }
 
   String? getString() {
-    if (inputField.inputFieldType == InputFieldType.text) {
+    if (inputField.runtimeType == InputText) {
       if ((controller as TextEditingController).text.isEmpty) {
         return null;
       }
@@ -597,20 +605,20 @@ class InputValue {
       return (controller as TextEditingController).text;
     } else {
       throw Exception(
-          'Unsupported getString for this input type ${inputField.inputFieldType}');
+          'Unsupported getString for this input type ${inputField.runtimeType}');
     }
   }
 
   void setDateTime(DateTime? value) {
-    if (inputField.inputFieldType == InputFieldType.dateTime) {
+    if (inputField.runtimeType == InputDateTime) {
       if (value == null) {
         (controller as TextEditingController).text = '';
       } else {
-        if (inputField.inputDateTimeSettings!.inputDateTimeMode ==
+        if ((inputField as InputDateTime).inputDateTimeMode ==
             InputDateTimeMode.date) {
           (controller as TextEditingController).text =
               DateFormat('yyyy-MM-dd').format(value);
-        } else if (inputField.inputDateTimeSettings!.inputDateTimeMode ==
+        } else if ((inputField as InputDateTime).inputDateTimeMode ==
             InputDateTimeMode.time) {
           (controller as TextEditingController).text =
               DateFormat('hh:mm').format(value);
@@ -621,20 +629,20 @@ class InputValue {
       }
     } else {
       throw Exception(
-          'Unsupported setDateTime for this input type ${inputField.inputFieldType}');
+          'Unsupported setDateTime for this input type ${inputField.runtimeType}');
     }
   }
 
   DateTime? getDateTime() {
-    if (inputField.inputFieldType == InputFieldType.dateTime) {
+    if (inputField.runtimeType == InputDateTime) {
       if ((controller as TextEditingController).text.isEmpty) {
         return null;
       } else {
-        if (inputField.inputDateTimeSettings!.inputDateTimeMode ==
+        if ((inputField as InputDateTime).inputDateTimeMode ==
             InputDateTimeMode.date) {
           return DateFormat('yyyy-MM-dd')
               .parse((controller as TextEditingController).text);
-        } else if (inputField.inputDateTimeSettings!.inputDateTimeMode ==
+        } else if ((inputField as InputDateTime).inputDateTimeMode ==
             InputDateTimeMode.time) {
           return DateFormat('hh:mm')
               .parse((controller as TextEditingController).text);
@@ -645,55 +653,53 @@ class InputValue {
       }
     } else {
       throw Exception(
-          'Unsupported getDateTime for this input type ${inputField.inputFieldType}');
+          'Unsupported getDateTime for this input type ${inputField.runtimeType}');
     }
   }
 
   void setListOptionValues(List<OptionItem> value) {
-    if (inputField.inputFieldType == InputFieldType.option) {
+    if (inputField.runtimeType == InputOption) {
       (controller as InputFieldOptionController).clear();
       for (var e in value) {
         (controller as InputFieldOptionController).add(e);
       }
     } else {
       throw Exception(
-          'Unsupported setListOptionValues for this input type ${inputField.inputFieldType}');
+          'Unsupported setListOptionValues for this input type ${inputField.runtimeType}');
     }
   }
 
   List<OptionItem> getListOptionValues() {
-    if (inputField.inputFieldType == InputFieldType.option) {
+    if (inputField.runtimeType == InputOption) {
       return (controller as InputFieldOptionController).getData();
     } else {
       throw Exception(
-          'Unsupported getListOptionValues for this input type ${inputField.inputFieldType}');
+          'Unsupported getListOptionValues for this input type ${inputField.runtimeType}');
     }
   }
 
   void setNumber(double? value) {
-    if (inputField.inputFieldType == InputFieldType.number) {
+    if (inputField.runtimeType == InputNumber) {
       (controller as TextEditingController).text =
           value == null ? '' : value.toString();
     } else {
       throw Exception(
-          'Unsupported getString for this input type ${inputField.inputFieldType}');
+          'Unsupported getString for this input type ${inputField.runtimeType}');
     }
   }
 
   double? getNumber() {
-    if (inputField.inputFieldType == InputFieldType.number) {
+    if (inputField.runtimeType == InputNumber) {
       if ((controller as TextEditingController).text.isEmpty) {
         return null;
       }
       return double.parse((controller as TextEditingController).text);
     } else {
       throw Exception(
-          'Unsupported setString for this input type ${inputField.inputFieldType}');
+          'Unsupported setString for this input type ${inputField.runtimeType}');
     }
   }
 }
-
-enum InputFieldType { dateTime, number, option, text, form }
 
 class AdditionalButton {
   final String label;
