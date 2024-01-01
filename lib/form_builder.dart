@@ -232,7 +232,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (additionalErrorMessage.isNotEmpty) {
+          if (errorMessage != null) {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -259,7 +259,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (additionalErrorMessage.isNotEmpty) {
+          if (errorMessage != null) {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -290,7 +290,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (additionalErrorMessage.isNotEmpty) {
+          if (errorMessage != null) {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -318,7 +318,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (additionalErrorMessage.isNotEmpty) {
+          if (errorMessage != null) {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -344,7 +344,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (additionalErrorMessage.isNotEmpty) {
+          if (errorMessage != null) {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -380,6 +380,59 @@ class _FormBulderState extends State<FormBulder> {
       errorMessagesIndex++;
     });
     _additionalErrorOnAfterValidation = {};
+
+    for (var inputForm in _inputValues.entries
+        .where((f) => f.value.inputField.runtimeType == InputForm)
+        .toList()) {
+      String errorMessageForm = '';
+      int index = 0;
+      for (var inputFieldValue in inputForm.value.getFormValues()) {
+        index++;
+        var inputFieldForm = inputForm.value.inputField as InputForm;
+
+        for (var inputFieldFormInputField in inputFieldForm.inputFields) {
+          if (inputFieldFormInputField.runtimeType == InputDateTime) {
+            var item = inputFieldFormInputField as InputDateTime;
+            if (item.isOptional == false) {
+              if (inputFieldValue[inputFieldFormInputField.name] == null) {
+                errorMessageForm +=
+                    'Item $index ${inputFieldFormInputField.label} is required. ';
+              }
+            }
+          }
+          if (inputFieldFormInputField.runtimeType == InputNumber) {
+            var item = inputFieldFormInputField as InputNumber;
+            if (item.isOptional == false) {
+              if (inputFieldValue[inputFieldFormInputField.name] == null) {
+                errorMessageForm +=
+                    'Item $index ${inputFieldFormInputField.label} is required. ';
+              }
+            }
+          }
+          if (inputFieldFormInputField.runtimeType == InputOption) {
+            var item = inputFieldFormInputField as InputOption;
+            if (item.isOptional == false) {
+              if (inputFieldValue[inputFieldFormInputField.name] == null) {
+                errorMessageForm +=
+                    'Item $index ${inputFieldFormInputField.label} is required. ';
+              }
+            }
+          }
+          if (inputFieldFormInputField.runtimeType == InputText) {
+            var item = inputFieldFormInputField as InputText;
+            if (item.isOptional == false) {
+              errorMessageForm +=
+                  'Item $index ${inputFieldFormInputField.label} is required. ';
+            }
+          }
+          //TODO Add validation recrusive for Type Form
+        }
+        _additionalErrorOnAfterValidation = {
+          inputFieldForm.name: errorMessageForm
+        };
+      }
+    }
+    _formKey.currentState!.validate();
 
     if (widget.onAfterValidation != null) {
       if (!context.mounted) return;
@@ -569,6 +622,7 @@ class InputValue {
     if (inputField.runtimeType == InputForm) {
       (controller as InputFieldFormController).clear();
       for (var e in value) {
+        //TODO Validate macthing type of value and input type in each form fields
         (controller as InputFieldFormController).add(e);
       }
     } else {

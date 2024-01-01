@@ -67,7 +67,7 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                           final TimeOfDay? result = await showTimePicker(
                             initialTime: widget.controller.text != ""
                                 ? TimeOfDay.fromDateTime(DateTime.parse(
-                                    "2022-01-01 ${widget.controller.text}:00.000"))
+                                    "0000-00-00 ${widget.controller.text}:00.000"))
                                 : TimeOfDay.now(),
                             context: context,
                           );
@@ -182,7 +182,7 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                 final TimeOfDay? result = await showTimePicker(
                   initialTime: widget.controller.text != ""
                       ? TimeOfDay.fromDateTime(DateTime.parse(
-                          "2022-01-01 ${widget.controller.text}:00.000"))
+                          "0000-00-00 ${widget.controller.text}:00.000"))
                       : TimeOfDay.now(),
                   context: context,
                 );
