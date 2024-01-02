@@ -410,6 +410,24 @@ class _FormBulderState extends State<FormBulder> {
                     'Item $index ${inputFieldFormInputField.label} is required. ';
               }
             }
+            if (inputFieldValue[inputFieldFormInputField.name] != null) {
+              if (item.inputNumberMode == InputNumberMode.decimal) {
+                try {
+                  double.tryParse(
+                      inputFieldValue[inputFieldFormInputField.name]);
+                } catch (ex) {
+                  errorMessageForm +=
+                      'Item $index ${inputFieldFormInputField.label} must be a decimal.';
+                }
+              } else {
+                try {
+                  int.tryParse(inputFieldValue[inputFieldFormInputField.name]);
+                } catch (ex) {
+                  errorMessageForm +=
+                      'Item $index ${inputFieldFormInputField.label} must be an integer.';
+                }
+              }
+            }
           }
           if (inputFieldFormInputField.runtimeType == InputOption) {
             var item = inputFieldFormInputField as InputOption;
@@ -423,8 +441,20 @@ class _FormBulderState extends State<FormBulder> {
           if (inputFieldFormInputField.runtimeType == InputText) {
             var item = inputFieldFormInputField as InputText;
             if (item.isOptional == false) {
-              errorMessageForm +=
-                  'Item $index ${inputFieldFormInputField.label} is required. ';
+              if (inputFieldValue[inputFieldFormInputField.name] == null) {
+                errorMessageForm +=
+                    'Item $index ${inputFieldFormInputField.label} is required. ';
+              }
+            }
+            if (inputFieldValue[inputFieldFormInputField.name] != null) {
+              if (item.inputTextMode == InputTextMode.email) {
+                if (!RegExp(
+                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+                    .hasMatch(inputFieldValue[inputFieldFormInputField.name])) {
+                  errorMessageForm +=
+                      'Item $index ${inputFieldFormInputField.label} must be a email format. ';
+                }
+              }
             }
           }
           //TODO Add validation recrusive for Type Form
