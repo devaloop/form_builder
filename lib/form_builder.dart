@@ -173,7 +173,8 @@ class _FormBulderState extends State<FormBulder> {
                   children: widget.inputFields.map((e) => getField(e)).toList(),
                 )
               : LayoutBuilder(builder: (context, constraints) {
-                  double widthField = (constraints.maxWidth / 2) - 7.5;
+                  double widthField = (constraints.maxWidth / 2) -
+                      (widget.inputFields.length == 1 ? 0 : 7.5);
                   return Wrap(
                     spacing: 7.5,
                     runSpacing: 7.5,
@@ -181,7 +182,8 @@ class _FormBulderState extends State<FormBulder> {
                     runAlignment: WrapAlignment.start,
                     children: widget.inputFields
                         .map((e) => SizedBox(
-                              width: widthField,
+                              width: widthField *
+                                  (widget.inputFields.length == 1 ? 2 : 1),
                               child: getField(e),
                             ))
                         .toList(),
