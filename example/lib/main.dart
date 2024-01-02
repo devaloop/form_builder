@@ -213,6 +213,7 @@ class MyApp extends StatelessWidget {
                     name: 'additinalInformations',
                     label: 'Additional Informations',
                     isMultiInputForm: true,
+                    isOptional: false,
                     inputFields: [
                       InputText(
                         name: 'title',
@@ -236,6 +237,11 @@ class MyApp extends StatelessWidget {
                 {
                   'name': 'Ani',
                   'birthDate': DateTime(2000, 09, 09),
+                  'additinalInformations': [
+                    {
+                      'title': 'Apa',
+                    }
+                  ],
                 }
               ]);
             },

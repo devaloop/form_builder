@@ -457,7 +457,21 @@ class _FormBulderState extends State<FormBulder> {
               }
             }
           }
-          //TODO Add validation recrusive for Type Form
+          if (inputFieldFormInputField.runtimeType == InputForm) {
+            var item = inputFieldFormInputField as InputForm;
+            if (item.isOptional == false) {
+              if (inputFieldValue[inputFieldFormInputField.name] == null) {
+                errorMessageForm +=
+                    'Item $index ${inputFieldFormInputField.label} is required. ';
+              }
+            }
+            if (inputFieldValue[inputFieldFormInputField.name] != null) {
+              //TODO Add validation recrusive for Type Form
+              /*
+              validateFormField return new List of InputFieldValueTypeForm
+               */
+            }
+          }
         }
         _additionalErrorOnAfterValidation = {
           inputFieldForm.name: errorMessageForm
