@@ -232,14 +232,13 @@ class MyApp extends StatelessWidget {
             onInitial: (context, inputValues) {
               inputValues['name']!.setString('Budi Saputra');
 
-              //TODO inital value for form input type need validation
               inputValues['familyMembers']!.setFormValues([
                 {
                   'name': 'Ani',
                   'birthDate': DateTime(2000, 09, 09),
                   'additinalInformations': [
                     {
-                      'title': 'Apa',
+                      'title': 'Favorite Food',
                     }
                   ],
                 }
@@ -258,7 +257,7 @@ class MyApp extends StatelessWidget {
             },
             onSubmit: (context, inputValues) {
               var result =
-                  inputValues['fullName']!.getFormValues().first['first']!;
+                  inputValues['familyMembers']!.getFormValues().first['name']!;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Processing Data $result')),
               );

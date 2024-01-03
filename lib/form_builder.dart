@@ -470,12 +470,35 @@ class _FormBulderState extends State<FormBulder> {
               /*
               validateFormField return new List of InputFieldValueTypeForm
                */
+              MapEntry<bool, List<Map<List<Map<String, dynamic>>, InputForm>>>
+                  loopCheck = MapEntry(true, [
+                {
+                  inputFieldValue[inputFieldFormInputField.name]:
+                      inputFieldFormInputField
+                }
+              ]);
+              bool isSubFormValid = true;
+              while (loopCheck.key == true && loopCheck.value.isNotEmpty) {
+                loopCheck = validateSubForm(
+                    inputFieldValue[inputFieldFormInputField.name],
+                    inputFieldFormInputField);
+                if (loopCheck.key == false) {
+                  isSubFormValid = false;
+                }
+              }
+              if (isSubFormValid == false) {
+                errorMessageForm +=
+                    'Item $index ${inputFieldFormInputField.label} form data is invalid. ';
+              }
             }
           }
         }
-        _additionalErrorOnAfterValidation = {
-          inputFieldForm.name: errorMessageForm
-        };
+        if (errorMessageForm != '') {
+          _additionalErrorOnAfterValidation = {
+            inputFieldForm.name: errorMessageForm
+          };
+        }
+        _formKey.currentState!.validate();
       }
     }
     _formKey.currentState!.validate();
@@ -539,6 +562,96 @@ class _FormBulderState extends State<FormBulder> {
         },
       );
     }
+  }
+
+  MapEntry<bool, List<Map<List<Map<String, dynamic>>, InputForm>>>
+      validateSubForm(
+          List<Map<String, dynamic>> formValues, InputForm inputForm) {
+    bool isValid = true;
+    List<Map<List<Map<String, dynamic>>, InputForm>> nextCheck = [];
+
+    for (var formValue in formValues) {
+      for (var inputFieldFormInputField in inputForm.inputFields) {
+        if (inputFieldFormInputField.runtimeType == InputDateTime) {
+          var item = inputFieldFormInputField as InputDateTime;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+        }
+        if (inputFieldFormInputField.runtimeType == InputNumber) {
+          var item = inputFieldFormInputField as InputNumber;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+          if (formValue[inputFieldFormInputField.name] != null) {
+            if (item.inputNumberMode == InputNumberMode.decimal) {
+              try {
+                double.tryParse(formValue[inputFieldFormInputField.name]);
+              } catch (ex) {
+                isValid = false;
+                break;
+              }
+            } else {
+              try {
+                int.tryParse(formValue[inputFieldFormInputField.name]);
+              } catch (ex) {
+                isValid = false;
+                break;
+              }
+            }
+          }
+        }
+        if (inputFieldFormInputField.runtimeType == InputOption) {
+          var item = inputFieldFormInputField as InputOption;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+        }
+        if (inputFieldFormInputField.runtimeType == InputText) {
+          var item = inputFieldFormInputField as InputText;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+          if (formValue[inputFieldFormInputField.name] != null) {
+            if (item.inputTextMode == InputTextMode.email) {
+              if (!RegExp(
+                      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+                  .hasMatch(formValue[inputFieldFormInputField.name])) {
+                isValid = false;
+                break;
+              }
+            }
+          }
+        }
+        if (inputFieldFormInputField.runtimeType == InputForm) {
+          var item = inputFieldFormInputField as InputForm;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+          if (formValue[inputFieldFormInputField.name] != null) {
+            nextCheck.add({
+              formValue[inputFieldFormInputField.name]: inputFieldFormInputField
+            });
+          }
+        }
+      }
+    }
+    return MapEntry(isValid, nextCheck);
   }
 }
 
