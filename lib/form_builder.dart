@@ -1,6 +1,8 @@
 library devaloop_form_builder;
 
+import 'package:devaloop_form_builder/input_field_file.dart';
 import 'package:devaloop_form_builder/input_field_form.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:devaloop_form_builder/input_field_date_time.dart';
 import 'package:devaloop_form_builder/input_field_number.dart';
@@ -66,6 +68,8 @@ class _FormBulderState extends State<FormBulder> {
         _controllers.add(TextEditingController());
       } else if (e.runtimeType == InputForm) {
         _controllers.add(InputFieldFormController());
+      } else if (e.runtimeType == InputFile) {
+        _controllers.add(InputFieldFileController());
       } else {
         throw Exception('Unsupported InputFieldType ${e.runtimeType}');
       }
@@ -358,6 +362,35 @@ class _FormBulderState extends State<FormBulder> {
         onBeforeValidation: e.onBeforeValidation,
         onInitial: e.onInitial,
         isMultiInputForm: e.isMultiInputForm,
+      );
+    } else if (e.runtimeType == InputFile) {
+      e = (e as InputFile);
+      return InputFieldFile(
+        controller: _controllers[
+            widget.inputFields.indexWhere((element) => element == e)],
+        label: e.label,
+        helperText: e.helperText,
+        isRequired: !(e.isOptional ?? false),
+        onValidating: (errorMessage) {
+          _errors[e] = errorMessage;
+
+          var additionalErrorMessage = _additionalErrorOnAfterValidation.entries
+              .where((element) => element.key == e.name)
+              .map((e) => e.value ?? '')
+              .toList()
+              .join(', ');
+          if (additionalErrorMessage.isEmpty && errorMessage == null) {
+            return null;
+          }
+          if (errorMessage != null) {
+            additionalErrorMessage = ', $additionalErrorMessage';
+          }
+          return (errorMessage ?? '') + additionalErrorMessage;
+        },
+        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        isMultiSelection: e.isAllowMultiple ?? false,
+        fileType: e.fileType ?? FileType.any,
+        onDownload: e.onDownload,
       );
     } else {
       throw Exception('Unsupported InputFieldType ${e.runtimeType}');
@@ -758,6 +791,22 @@ class InputOption extends Input {
   });
 }
 
+class InputFile extends Input {
+  final bool? isAllowMultiple;
+  final FileType? fileType;
+  final void Function(PlatformFile file)? onDownload;
+
+  const InputFile({
+    required super.name,
+    required super.label,
+    super.helperText,
+    super.isOptional,
+    this.isAllowMultiple = false,
+    this.fileType = FileType.any,
+    this.onDownload,
+  });
+}
+
 class SubmitButtonSettings {
   const SubmitButtonSettings({
     required this.label,
@@ -777,6 +826,27 @@ class InputValue {
   final dynamic controller;
   final Input inputField;
 
+  void setFiles(List<PlatformFile> value) {
+    if (inputField.runtimeType == InputFile) {
+      (controller as InputFieldFileController).clear();
+      for (var e in value) {
+        (controller as InputFieldFileController).add(e);
+      }
+    } else {
+      throw Exception(
+          'Unsupported setFiles for this input type ${inputField.runtimeType}');
+    }
+  }
+
+  List<PlatformFile> getFiles() {
+    if (inputField.runtimeType == InputFile) {
+      return (controller as InputFieldFileController).getData();
+    } else {
+      throw Exception(
+          'Unsupported getListOptionValues for this input type ${inputField.runtimeType}');
+    }
+  }
+
   void setFormValues(List<Map<String, dynamic>> value) {
     if (inputField.runtimeType == InputForm) {
       (controller as InputFieldFormController).clear();
@@ -786,7 +856,7 @@ class InputValue {
       }
     } else {
       throw Exception(
-          'Unsupported setListOptionValues for this input type ${inputField.runtimeType}');
+          'Unsupported setFormValues for this input type ${inputField.runtimeType}');
     }
   }
 
@@ -795,7 +865,7 @@ class InputValue {
       return (controller as InputFieldFormController).getData();
     } else {
       throw Exception(
-          'Unsupported getListOptionValues for this input type ${inputField.runtimeType}');
+          'Unsupported getFormValues for this input type ${inputField.runtimeType}');
     }
   }
 

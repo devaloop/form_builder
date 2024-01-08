@@ -228,6 +228,15 @@ class MyApp extends StatelessWidget {
                   ),
                 ],
               ),
+              InputFile(
+                name: 'documents',
+                label: 'Documents',
+                isOptional: true,
+                isAllowMultiple: true,
+                onDownload: (file) {
+                  print(file.name);
+                },
+              ),
             ],
             onInitial: (context, inputValues) {
               inputValues['name']!.setString('Budi Saputra');

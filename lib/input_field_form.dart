@@ -209,6 +209,9 @@ class _InputFieldFormState extends State<InputFieldForm> {
                 if (widget.isRequired && (value == null || value.isEmpty)) {
                   return 'Required';
                 }
+                if (widget.controller.getData().isNotEmpty) {
+                  //TODO Do Recrusive Validation
+                }
 
                 return null;
               }
