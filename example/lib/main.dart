@@ -124,6 +124,8 @@ class MyApp extends StatelessWidget {
               InputForm(
                 name: 'familyMembers',
                 label: 'Family Members',
+                isMultiInputForm:
+                    true, //TODO The error message does not disappear when the form data is changed, it must be changed. This already works for false multi forms..
                 inputFields: [
                   const InputText(
                     name: 'name',

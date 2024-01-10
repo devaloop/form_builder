@@ -499,10 +499,6 @@ class _FormBulderState extends State<FormBulder> {
               }
             }
             if (inputFieldValue[inputFieldFormInputField.name] != null) {
-              //TODO Add validation recrusive for Type Form
-              /*
-              validateFormField return new List of InputFieldValueTypeForm
-               */
               MapEntry<bool, List<Map<List<Map<String, dynamic>>, InputForm>>>
                   loopCheck = MapEntry(true, [
                 {
@@ -851,7 +847,6 @@ class InputValue {
     if (inputField.runtimeType == InputForm) {
       (controller as InputFieldFormController).clear();
       for (var e in value) {
-        //TODO Validate macthing type of value and input type in each form fields
         (controller as InputFieldFormController).add(e);
       }
     } else {

@@ -10,6 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:devaloop_form_builder/form_builder.dart';
 import 'package:intl/intl.dart';
 
+import 'input_field_number.dart';
+import 'input_field_text.dart';
+
 class InputFieldForm extends StatefulWidget {
   final String label;
   final bool isRequired;
@@ -59,7 +62,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
   void initState() {
     _textFieldIsFocused = false;
     if (widget.controller.getData().isNotEmpty) {
-      _controller.text = 'Data Filled';
+      _controller.text = '${widget.controller.getData().length} Data Filled';
     } else {
       _controller.clear();
     }
@@ -192,12 +195,25 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                     widget.controller.clear();
                                   }
                                   widget.controller.add(result);
-                                  _controller.text = 'Data Filled';
+                                  if (widget.controller.getData().isEmpty) {
+                                    _controller.clear();
+                                  } else {
+                                    _controller.text =
+                                        '${widget.controller.getData().length} Data Filled';
+                                  }
                                 });
                               }
                             }
 
                             navigateToInputFieldFormPage(context);
+                            setState(() {
+                              if (widget.controller.getData().isEmpty) {
+                                _controller.clear();
+                              } else {
+                                _controller.text =
+                                    '${widget.controller.getData().length} Data Filled';
+                              }
+                            });
                           }
                         : null,
                   ),
@@ -209,8 +225,24 @@ class _InputFieldFormState extends State<InputFieldForm> {
                 if (widget.isRequired && (value == null || value.isEmpty)) {
                   return 'Required';
                 }
+
                 if (widget.controller.getData().isNotEmpty) {
-                  //TODO Do Recrusive Validation
+                  MapEntry<bool,
+                          List<Map<List<Map<String, dynamic>>, List<Input>>>>
+                      loopCheck = MapEntry(true, [
+                    {widget.controller.getData(): widget.inputFields}
+                  ]);
+                  bool isSubFormValid = true;
+                  while (loopCheck.key == true && loopCheck.value.isNotEmpty) {
+                    loopCheck = validateSubForm(
+                        widget.controller.getData(), widget.inputFields);
+                    if (loopCheck.key == false) {
+                      isSubFormValid = false;
+                    }
+                  }
+                  if (isSubFormValid == false) {
+                    return 'Data Invalid';
+                  }
                 }
 
                 return null;
@@ -311,12 +343,25 @@ class _InputFieldFormState extends State<InputFieldForm> {
                           widget.controller.clear();
                         }
                         widget.controller.add(result);
-                        _controller.text = 'Data Filled';
+                        if (widget.controller.getData().isEmpty) {
+                          _controller.clear();
+                        } else {
+                          _controller.text =
+                              '${widget.controller.getData().length} Data Filled';
+                        }
                       });
                     }
                   }
 
                   navigateToInputFieldFormPage(context);
+                  setState(() {
+                    if (widget.controller.getData().isEmpty) {
+                      _controller.clear();
+                    } else {
+                      _controller.text =
+                          '${widget.controller.getData().length} Data Filled';
+                    }
+                  });
                 }
               }
             },
@@ -549,7 +594,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                 .firstOrNull
                                 ?.value;
                             value =
-                                '${e.label}: ${data == null ? '-' : 'Data Filled'}';
+                                '${e.label}: ${data == null ? '-' : '${widget.controller.getData().length} Data Filled'}';
                             listDataView.add(Card(
                               color: Colors.white,
                               elevation: 0,
@@ -687,12 +732,29 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                           setState(() {
                                             widget.controller
                                                 .set(index, result);
-                                            _controller.text = 'Data Filled';
+                                            if (widget.controller
+                                                .getData()
+                                                .isEmpty) {
+                                              _controller.clear();
+                                            } else {
+                                              _controller.text =
+                                                  '${widget.controller.getData().length} Data Filled';
+                                            }
                                           });
                                         }
                                       }
 
                                       navigateToInputFieldFormPage(context);
+                                      setState(() {
+                                        if (widget.controller
+                                            .getData()
+                                            .isEmpty) {
+                                          _controller.clear();
+                                        } else {
+                                          _controller.text =
+                                              '${widget.controller.getData().length} Data Filled';
+                                        }
+                                      });
                                     }
                                   : null,
                             )
@@ -709,6 +771,97 @@ class _InputFieldFormState extends State<InputFieldForm> {
         ),
       ],
     );
+  }
+
+  MapEntry<bool, List<Map<List<Map<String, dynamic>>, List<Input>>>>
+      validateSubForm(
+          List<Map<String, dynamic>> formValues, List<Input> inputFields) {
+    bool isValid = true;
+    List<Map<List<Map<String, dynamic>>, List<Input>>> nextCheck = [];
+
+    for (var formValue in formValues) {
+      for (var inputFieldFormInputField in inputFields) {
+        if (inputFieldFormInputField.runtimeType == InputDateTime) {
+          var item = inputFieldFormInputField as InputDateTime;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+        }
+        if (inputFieldFormInputField.runtimeType == InputNumber) {
+          var item = inputFieldFormInputField as InputNumber;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+          if (formValue[inputFieldFormInputField.name] != null) {
+            if (item.inputNumberMode == InputNumberMode.decimal) {
+              try {
+                double.tryParse(formValue[inputFieldFormInputField.name]);
+              } catch (ex) {
+                isValid = false;
+                break;
+              }
+            } else {
+              try {
+                int.tryParse(formValue[inputFieldFormInputField.name]);
+              } catch (ex) {
+                isValid = false;
+                break;
+              }
+            }
+          }
+        }
+        if (inputFieldFormInputField.runtimeType == InputOption) {
+          var item = inputFieldFormInputField as InputOption;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+        }
+        if (inputFieldFormInputField.runtimeType == InputText) {
+          var item = inputFieldFormInputField as InputText;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+          if (formValue[inputFieldFormInputField.name] != null) {
+            if (item.inputTextMode == InputTextMode.email) {
+              if (!RegExp(
+                      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+                  .hasMatch(formValue[inputFieldFormInputField.name])) {
+                isValid = false;
+                break;
+              }
+            }
+          }
+        }
+        if (inputFieldFormInputField.runtimeType == InputForm) {
+          var item = inputFieldFormInputField as InputForm;
+          if (item.isOptional == false) {
+            if (formValue[inputFieldFormInputField.name] == null) {
+              isValid = false;
+              break;
+            }
+          }
+          if (formValue[inputFieldFormInputField.name] != null) {
+            nextCheck.add({
+              formValue[inputFieldFormInputField.name]:
+                  inputFieldFormInputField.inputFields
+            });
+          }
+        }
+      }
+    }
+    return MapEntry(isValid, nextCheck);
   }
 }
 
@@ -794,7 +947,6 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
                     inputValues[inputField.name]!.getFormValues();
               }
             }
-
             Navigator.pop(context, controller);
           },
           additionalButtons: widget.additionalButtons,
