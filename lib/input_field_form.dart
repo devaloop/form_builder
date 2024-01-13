@@ -253,7 +253,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                     } else {
                       itemErrorPosition = loopCheck.key.value.key;
                     }
-                    return 'Invalid Data Item At $itemErrorPosition';
+                    return 'Data Item at position $itemErrorPosition is invalid';
                   }
                 }
 
