@@ -416,122 +416,6 @@ class _FormBulderState extends State<FormBulder> {
     });
     _additionalErrorOnAfterValidation = {};
 
-    for (var inputForm in _inputValues.entries
-        .where((f) => f.value.inputField.runtimeType == InputForm)
-        .toList()) {
-      String errorMessageForm = '';
-      int index = 0;
-      for (var inputFieldValue in inputForm.value.getFormValues()) {
-        index++;
-        var inputFieldForm = inputForm.value.inputField as InputForm;
-
-        for (var inputFieldFormInputField in inputFieldForm.inputFields) {
-          if (inputFieldFormInputField.runtimeType == InputDateTime) {
-            var item = inputFieldFormInputField as InputDateTime;
-            if (item.isOptional == false) {
-              if (inputFieldValue[inputFieldFormInputField.name] == null) {
-                errorMessageForm +=
-                    'Item $index ${inputFieldFormInputField.label} is required. ';
-              }
-            }
-          }
-          if (inputFieldFormInputField.runtimeType == InputNumber) {
-            var item = inputFieldFormInputField as InputNumber;
-            if (item.isOptional == false) {
-              if (inputFieldValue[inputFieldFormInputField.name] == null) {
-                errorMessageForm +=
-                    'Item $index ${inputFieldFormInputField.label} is required. ';
-              }
-            }
-            if (inputFieldValue[inputFieldFormInputField.name] != null) {
-              if (item.inputNumberMode == InputNumberMode.decimal) {
-                try {
-                  double.tryParse(
-                      inputFieldValue[inputFieldFormInputField.name]);
-                } catch (ex) {
-                  errorMessageForm +=
-                      'Item $index ${inputFieldFormInputField.label} must be a decimal.';
-                }
-              } else {
-                try {
-                  int.tryParse(inputFieldValue[inputFieldFormInputField.name]);
-                } catch (ex) {
-                  errorMessageForm +=
-                      'Item $index ${inputFieldFormInputField.label} must be an integer.';
-                }
-              }
-            }
-          }
-          if (inputFieldFormInputField.runtimeType == InputOption) {
-            var item = inputFieldFormInputField as InputOption;
-            if (item.isOptional == false) {
-              if (inputFieldValue[inputFieldFormInputField.name] == null) {
-                errorMessageForm +=
-                    'Item $index ${inputFieldFormInputField.label} is required. ';
-              }
-            }
-          }
-          if (inputFieldFormInputField.runtimeType == InputText) {
-            var item = inputFieldFormInputField as InputText;
-            if (item.isOptional == false) {
-              if (inputFieldValue[inputFieldFormInputField.name] == null) {
-                errorMessageForm +=
-                    'Item $index ${inputFieldFormInputField.label} is required. ';
-              }
-            }
-            if (inputFieldValue[inputFieldFormInputField.name] != null) {
-              if (item.inputTextMode == InputTextMode.email) {
-                if (!RegExp(
-                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-                    .hasMatch(inputFieldValue[inputFieldFormInputField.name])) {
-                  errorMessageForm +=
-                      'Item $index ${inputFieldFormInputField.label} must be a email format. ';
-                }
-              }
-            }
-          }
-          if (inputFieldFormInputField.runtimeType == InputForm) {
-            var item = inputFieldFormInputField as InputForm;
-            if (item.isOptional == false) {
-              if (inputFieldValue[inputFieldFormInputField.name] == null) {
-                errorMessageForm +=
-                    'Item $index ${inputFieldFormInputField.label} is required. ';
-              }
-            }
-            if (inputFieldValue[inputFieldFormInputField.name] != null) {
-              MapEntry<bool, List<Map<List<Map<String, dynamic>>, InputForm>>>
-                  loopCheck = MapEntry(true, [
-                {
-                  inputFieldValue[inputFieldFormInputField.name]:
-                      inputFieldFormInputField
-                }
-              ]);
-              bool isSubFormValid = true;
-              while (loopCheck.key == true && loopCheck.value.isNotEmpty) {
-                loopCheck = validateSubForm(
-                    inputFieldValue[inputFieldFormInputField.name],
-                    inputFieldFormInputField);
-                if (loopCheck.key == false) {
-                  isSubFormValid = false;
-                }
-              }
-              if (isSubFormValid == false) {
-                errorMessageForm +=
-                    'Item $index ${inputFieldFormInputField.label} form data is invalid. ';
-              }
-            }
-          }
-        }
-        if (errorMessageForm != '') {
-          _additionalErrorOnAfterValidation = {
-            inputFieldForm.name: errorMessageForm
-          };
-        }
-        _formKey.currentState!.validate();
-      }
-    }
-    _formKey.currentState!.validate();
-
     if (widget.onAfterValidation != null) {
       if (!context.mounted) return;
       await widget.onAfterValidation!.call(context, _inputValues,
@@ -593,7 +477,7 @@ class _FormBulderState extends State<FormBulder> {
     }
   }
 
-  MapEntry<bool, List<Map<List<Map<String, dynamic>>, InputForm>>>
+  /*MapEntry<bool, List<Map<List<Map<String, dynamic>>, InputForm>>>
       validateSubForm(
           List<Map<String, dynamic>> formValues, InputForm inputForm) {
     bool isValid = true;
@@ -681,7 +565,7 @@ class _FormBulderState extends State<FormBulder> {
       }
     }
     return MapEntry(isValid, nextCheck);
-  }
+  }*/
 }
 
 abstract class Input {

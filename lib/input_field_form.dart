@@ -227,21 +227,33 @@ class _InputFieldFormState extends State<InputFieldForm> {
                 }
 
                 if (widget.controller.getData().isNotEmpty) {
-                  MapEntry<bool,
-                          List<Map<List<Map<String, dynamic>>, List<Input>>>>
-                      loopCheck = MapEntry(true, [
-                    {widget.controller.getData(): widget.inputFields}
-                  ]);
+                  List<MapEntry<List<Map<String, dynamic>>, List<Input>>> data =
+                      [];
+                  data.add(MapEntry(
+                      widget.controller.getData(), widget.inputFields));
+
+                  MapEntry<
+                          MapEntry<bool, MapEntry<int, int>>,
+                          List<
+                              MapEntry<List<Map<String, dynamic>>,
+                                  List<Input>>>> loopCheck =
+                      MapEntry(const MapEntry(true, MapEntry(-1, 0)), data);
                   bool isSubFormValid = true;
-                  while (loopCheck.key == true && loopCheck.value.isNotEmpty) {
-                    loopCheck = validateSubForm(
-                        widget.controller.getData(), widget.inputFields);
-                    if (loopCheck.key == false) {
+                  while (
+                      loopCheck.key.key == true && loopCheck.value.isNotEmpty) {
+                    loopCheck = validateSubForm(loopCheck);
+                    if (loopCheck.key.key == false) {
                       isSubFormValid = false;
                     }
                   }
                   if (isSubFormValid == false) {
-                    return 'Data Invalid';
+                    int itemErrorPosition = -1;
+                    if (loopCheck.key.value.key == -1) {
+                      itemErrorPosition = loopCheck.key.value.value;
+                    } else {
+                      itemErrorPosition = loopCheck.key.value.key;
+                    }
+                    return 'Invalid Data Item At $itemErrorPosition';
                   }
                 }
 
@@ -732,6 +744,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                           setState(() {
                                             widget.controller
                                                 .set(index, result);
+                                            _controller.clear();
                                             if (widget.controller
                                                 .getData()
                                                 .isEmpty) {
@@ -746,6 +759,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
 
                                       navigateToInputFieldFormPage(context);
                                       setState(() {
+                                        _controller.clear();
                                         if (widget.controller
                                             .getData()
                                             .isEmpty) {
@@ -773,95 +787,113 @@ class _InputFieldFormState extends State<InputFieldForm> {
     );
   }
 
-  MapEntry<bool, List<Map<List<Map<String, dynamic>>, List<Input>>>>
+  MapEntry<MapEntry<bool, MapEntry<int, int>>,
+          List<MapEntry<List<Map<String, dynamic>>, List<Input>>>>
       validateSubForm(
-          List<Map<String, dynamic>> formValues, List<Input> inputFields) {
+          MapEntry<MapEntry<bool, MapEntry<int, int>>,
+                  List<MapEntry<List<Map<String, dynamic>>, List<Input>>>>
+              toBeChecks) {
     bool isValid = true;
-    List<Map<List<Map<String, dynamic>>, List<Input>>> nextCheck = [];
+    List<MapEntry<List<Map<String, dynamic>>, List<Input>>> nextCheck = [];
 
-    for (var formValue in formValues) {
-      for (var inputFieldFormInputField in inputFields) {
-        if (inputFieldFormInputField.runtimeType == InputDateTime) {
-          var item = inputFieldFormInputField as InputDateTime;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
-            }
-          }
-        }
-        if (inputFieldFormInputField.runtimeType == InputNumber) {
-          var item = inputFieldFormInputField as InputNumber;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
-            }
-          }
-          if (formValue[inputFieldFormInputField.name] != null) {
-            if (item.inputNumberMode == InputNumberMode.decimal) {
-              try {
-                double.tryParse(formValue[inputFieldFormInputField.name]);
-              } catch (ex) {
-                isValid = false;
-                break;
-              }
-            } else {
-              try {
-                int.tryParse(formValue[inputFieldFormInputField.name]);
-              } catch (ex) {
+    int index = 0;
+    for (var toBeCheck in toBeChecks.value) {
+      index = 0;
+      for (var formValue in toBeCheck.key) {
+        index++;
+        for (var inputFieldFormInputField in toBeCheck.value) {
+          if (inputFieldFormInputField.runtimeType == InputDateTime) {
+            var item = inputFieldFormInputField as InputDateTime;
+            if (item.isOptional == false) {
+              if (formValue[inputFieldFormInputField.name] == null) {
                 isValid = false;
                 break;
               }
             }
           }
-        }
-        if (inputFieldFormInputField.runtimeType == InputOption) {
-          var item = inputFieldFormInputField as InputOption;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
+          if (inputFieldFormInputField.runtimeType == InputNumber) {
+            var item = inputFieldFormInputField as InputNumber;
+            if (item.isOptional == false) {
+              if (formValue[inputFieldFormInputField.name] == null) {
+                isValid = false;
+                break;
+              }
+            }
+            if (formValue[inputFieldFormInputField.name] != null) {
+              if (item.inputNumberMode == InputNumberMode.decimal) {
+                try {
+                  double.tryParse(formValue[inputFieldFormInputField.name]);
+                } catch (ex) {
+                  isValid = false;
+                  break;
+                }
+              } else {
+                try {
+                  int.tryParse(formValue[inputFieldFormInputField.name]);
+                } catch (ex) {
+                  isValid = false;
+                  break;
+                }
+              }
             }
           }
-        }
-        if (inputFieldFormInputField.runtimeType == InputText) {
-          var item = inputFieldFormInputField as InputText;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
-            }
-          }
-          if (formValue[inputFieldFormInputField.name] != null) {
-            if (item.inputTextMode == InputTextMode.email) {
-              if (!RegExp(
-                      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-                  .hasMatch(formValue[inputFieldFormInputField.name])) {
+          if (inputFieldFormInputField.runtimeType == InputOption) {
+            var item = inputFieldFormInputField as InputOption;
+            if (item.isOptional == false) {
+              if (formValue[inputFieldFormInputField.name] == null) {
                 isValid = false;
                 break;
               }
             }
           }
-        }
-        if (inputFieldFormInputField.runtimeType == InputForm) {
-          var item = inputFieldFormInputField as InputForm;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
+          if (inputFieldFormInputField.runtimeType == InputText) {
+            var item = inputFieldFormInputField as InputText;
+            if (item.isOptional == false) {
+              if (formValue[inputFieldFormInputField.name] == null) {
+                isValid = false;
+                break;
+              }
+            }
+            if (formValue[inputFieldFormInputField.name] != null) {
+              if (item.inputTextMode == InputTextMode.email) {
+                if (!RegExp(
+                        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+                    .hasMatch(formValue[inputFieldFormInputField.name])) {
+                  isValid = false;
+                  break;
+                }
+              }
             }
           }
-          if (formValue[inputFieldFormInputField.name] != null) {
-            nextCheck.add({
-              formValue[inputFieldFormInputField.name]:
-                  inputFieldFormInputField.inputFields
-            });
+          if (inputFieldFormInputField.runtimeType == InputForm) {
+            var item = inputFieldFormInputField as InputForm;
+            if (item.isOptional == false) {
+              if (formValue[inputFieldFormInputField.name] == null) {
+                isValid = false;
+                break;
+              }
+            }
+            if (formValue[inputFieldFormInputField.name] != null) {
+              nextCheck.add(MapEntry(formValue[inputFieldFormInputField.name],
+                  inputFieldFormInputField.inputFields));
+            }
           }
+        }
+        if (isValid == false) {
+          break;
         }
       }
     }
-    return MapEntry(isValid, nextCheck);
+
+    return MapEntry(
+        MapEntry(
+            isValid,
+            MapEntry(
+                toBeChecks.key.value.key == -1
+                    ? index
+                    : toBeChecks.key.value.key,
+                index)),
+        nextCheck);
   }
 }
 
