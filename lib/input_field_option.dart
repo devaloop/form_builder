@@ -311,8 +311,6 @@ class _InputFieldOptionSearchFormPage
 
   @override
   Widget build(BuildContext context) {
-    var screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -322,7 +320,9 @@ class _InputFieldOptionSearchFormPage
           systemNavigationBarColor: Colors.white,
           systemNavigationBarDividerColor: Colors.white,
         ),
+        backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: Form(
         key: _formKey,
@@ -509,7 +509,9 @@ class _InputFieldOptionSearchResultPage
           systemNavigationBarColor: Colors.white,
           systemNavigationBarDividerColor: Colors.white,
         ),
+        backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: FutureBuilder<OptionData>(
         future: widget.searchProcess!.call(widget.searchParameters),

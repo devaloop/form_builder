@@ -945,7 +945,9 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
           systemNavigationBarColor: Colors.white,
           systemNavigationBarDividerColor: Colors.white,
         ),
+        backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(
