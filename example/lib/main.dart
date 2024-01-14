@@ -270,7 +270,7 @@ class MyApp extends StatelessWidget {
               if (inputValues['rate']!.getNumber() != null &&
                   inputValues['rateInfo']!.getString() == null) {
                 errorMessages['rateInfo'] =
-                    'Must be filled because rate is filled.';
+                    'Must be filled because rate is filled';
               }
             },
             onSubmit: (context, inputValues) {

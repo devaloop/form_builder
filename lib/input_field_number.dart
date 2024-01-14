@@ -77,6 +77,7 @@ class InputFieldNumber extends StatelessWidget {
         labelText: label + (isRequired ? '' : ' - Optional'),
         helperText: helperText,
         helperMaxLines: 100,
+        suffixIcon: const Icon(Icons.numbers),
       ),
       validator: (value) {
         validation() {

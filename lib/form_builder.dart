@@ -157,6 +157,31 @@ class _FormBulderState extends State<FormBulder> {
       }
     }
 
+    var fieldOptionFormAndFile = widget.inputFields
+        .where(
+            (e) => [InputForm, InputOption, InputFile].contains(e.runtimeType))
+        .toList();
+
+    var fieldTextMultiLine = widget.inputFields.where((e) {
+      if (e.runtimeType == InputText) {
+        return (e as InputText).isMultilines == true ? true : false;
+      } else {
+        return false;
+      }
+    }).toList();
+
+    var fieldTextAndDate = widget.inputFields
+        .where((e) => !fieldOptionFormAndFile.contains(e))
+        .where((e) => !fieldTextMultiLine.contains(e))
+        .toList();
+
+    var fieldOdd = [];
+
+    if (fieldTextAndDate.length % 2 != 0) {
+      fieldOdd.add(fieldTextAndDate.last);
+      fieldTextAndDate.removeAt(fieldTextAndDate.length - 1);
+    }
+
     return Form(
       key: _formKey,
       child: Column(
@@ -171,28 +196,50 @@ class _FormBulderState extends State<FormBulder> {
                 fontSize: 18,
               ),
             ),
-          isPortrait
-              ? Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: widget.inputFields.map((e) => getField(e)).toList(),
+          LayoutBuilder(builder: (context, constraints) {
+            double widthField = widget.inputFields.length == 1 || isPortrait
+                ? constraints.maxWidth
+                : (constraints.maxWidth / 2) - 7.5;
+            var widgets = fieldTextAndDate
+                .map(
+                  (e) => SizedBox(
+                    width: widthField,
+                    child: getField(e),
+                  ),
                 )
-              : LayoutBuilder(builder: (context, constraints) {
-                  double widthField = (constraints.maxWidth / 2) -
-                      (widget.inputFields.length == 1 ? 0 : 7.5);
-                  return Wrap(
-                    spacing: 7.5,
-                    runSpacing: 7.5,
-                    alignment: WrapAlignment.start,
-                    runAlignment: WrapAlignment.start,
-                    children: widget.inputFields
-                        .map((e) => SizedBox(
-                              width: widthField *
-                                  (widget.inputFields.length == 1 ? 2 : 1),
-                              child: getField(e),
-                            ))
-                        .toList(),
-                  );
-                }),
+                .toList();
+            widgets.addAll(fieldOdd
+                .map(
+                  (e) => SizedBox(
+                    width: constraints.maxWidth,
+                    child: getField(e),
+                  ),
+                )
+                .toList());
+            widgets.addAll(fieldOptionFormAndFile
+                .map(
+                  (e) => SizedBox(
+                    width: constraints.maxWidth,
+                    child: getField(e),
+                  ),
+                )
+                .toList());
+            widgets.addAll(fieldTextMultiLine
+                .map(
+                  (e) => SizedBox(
+                    width: constraints.maxWidth,
+                    child: getField(e),
+                  ),
+                )
+                .toList());
+            return Wrap(
+              spacing: 7.5,
+              runSpacing: 7.5,
+              alignment: WrapAlignment.spaceBetween,
+              runAlignment: WrapAlignment.start,
+              children: widgets,
+            );
+          }),
           const SizedBox(
             height: 7.5,
           ),
@@ -238,7 +285,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (errorMessage != null) {
+          if (errorMessage != null && additionalErrorMessage != '') {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -265,7 +312,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (errorMessage != null) {
+          if (errorMessage != null && additionalErrorMessage != '') {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -296,7 +343,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (errorMessage != null) {
+          if (errorMessage != null && additionalErrorMessage != '') {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -324,7 +371,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (errorMessage != null) {
+          if (errorMessage != null && additionalErrorMessage != '') {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -350,7 +397,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (errorMessage != null) {
+          if (errorMessage != null && additionalErrorMessage != '') {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;
@@ -382,7 +429,7 @@ class _FormBulderState extends State<FormBulder> {
           if (additionalErrorMessage.isEmpty && errorMessage == null) {
             return null;
           }
-          if (errorMessage != null) {
+          if (errorMessage != null && additionalErrorMessage != '') {
             additionalErrorMessage = ', $additionalErrorMessage';
           }
           return (errorMessage ?? '') + additionalErrorMessage;

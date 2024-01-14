@@ -204,119 +204,71 @@ class _InputFieldOptionState extends State<InputFieldOption> {
               top: 1,
               bottom: 0,
             ),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                double boxWidth = constraints.maxWidth;
-                return ListView.separated(
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(
-                    top: 15,
-                    bottom: 15,
-                  ),
-                  shrinkWrap: true,
-                  itemCount: widget.controller.getData().length,
-                  itemBuilder: (context, index) {
-                    if (widget.controller.getData()[index].value.length == 1 &&
-                        (widget.dataHeaders == null ||
-                            widget.dataHeaders!.isEmpty)) {
-                      return ListTile(
-                        title: Text(
-                            widget.controller.getData()[index].value.first),
-                        leading: IconButton(
-                          icon: const Icon(Icons.remove),
-                          onPressed: widget.isEditable ?? false
-                              ? () {
-                                  setState(() {
-                                    widget.controller.getData().removeAt(index);
-                                    if (widget.controller.getData().isEmpty) {
-                                      _controller.clear();
-                                    } else {
-                                      _controller.text =
-                                          '${widget.controller.getData().length} Option Selected';
-                                    }
-                                  });
-                                }
-                              : null,
-                        ),
-                      );
-                    }
-                    return ListTile(
-                      title:
-                          Text(widget.controller.getData()[index].value.first),
-                      subtitle: Wrap(
-                        children: widget.controller
-                            .getData()[index]
-                            .value
-                            .asMap()
-                            .map((key, value) {
-                              String field;
-                              try {
-                                field = '${widget.dataHeaders![key]}: $value';
-                              } catch (e) {
-                                field = value;
-                              }
-
-                              Widget widgetField;
-                              double listWidth = boxWidth - 92;
-                              if (listWidth < field.width()) {
-                                widgetField = SizedBox(
-                                  width: listWidth,
-                                  child: Column(
-                                    children: [Text(field)],
-                                  ),
-                                );
-                              } else {
-                                widgetField = Text(field);
-                              }
-                              return MapEntry(
-                                key,
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    widgetField,
-                                    if (key <
-                                        widget.controller
-                                                .getData()[index]
-                                                .value
-                                                .length -
-                                            1)
-                                      Container(
-                                        width: 1,
-                                        height: 10,
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 7.5),
-                                        color: Colors.grey.shade300,
-                                        child: const Text(''),
-                                      ),
-                                  ],
+            child: ListView.separated(
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.only(
+                top: 15,
+                bottom: 15,
+              ),
+              shrinkWrap: true,
+              itemCount: widget.controller.getData().length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Wrap(
+                    children: widget.controller
+                        .getData()[index]
+                        .value
+                        .asMap()
+                        .map(
+                          (key, value) {
+                            String header = '';
+                            try {
+                              header = widget.dataHeaders![key];
+                            } catch (e) {
+                              header = '';
+                            }
+                            return MapEntry(
+                              key,
+                              Card(
+                                color: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                      color: Colors.grey.shade200, width: 1),
+                                  borderRadius: BorderRadius.circular(15 + 7.5),
                                 ),
-                              );
-                            })
-                            .values
-                            .toList(),
-                      ),
-                      leading: IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed: widget.isEditable ?? false
-                            ? () {
-                                setState(() {
-                                  widget.controller.getData().removeAt(index);
-                                  if (widget.controller.getData().isEmpty) {
-                                    _controller.clear();
-                                  } else {
-                                    _controller.text =
-                                        '${widget.controller.getData().length} Option Selected';
-                                  }
-                                });
+                                child: Padding(
+                                  padding: const EdgeInsets.all(7.5),
+                                  child: Text(
+                                      '${header == '' ? '' : '$header: '}$value'),
+                                ),
+                              ),
+                            );
+                          },
+                        )
+                        .values
+                        .toList(),
+                  ),
+                  leading: IconButton(
+                    icon: const Icon(Icons.remove),
+                    onPressed: widget.isEditable ?? false
+                        ? () {
+                            setState(() {
+                              widget.controller.getData().removeAt(index);
+                              if (widget.controller.getData().isEmpty) {
+                                _controller.clear();
+                              } else {
+                                _controller.text =
+                                    '${widget.controller.getData().length} Option Selected';
                               }
-                            : null,
-                      ),
-                    );
-                  },
-                  separatorBuilder: (context, index) {
-                    return const Divider();
-                  },
+                            });
+                          }
+                        : null,
+                  ),
                 );
+              },
+              separatorBuilder: (context, index) {
+                return const Divider();
               },
             ),
           ),
@@ -446,72 +398,42 @@ class _InputFieldOptionSearchFormPage
                           shrinkWrap: true,
                           itemCount: displayedListOfOptions.length,
                           itemBuilder: (context, index) {
-                            if (displayedListOfOptions[index].value.length ==
-                                    1 &&
-                                (widget.dataHeaders == null ||
-                                    widget.dataHeaders!.isEmpty)) {
-                              return ListTile(
-                                title: Text(
-                                    displayedListOfOptions[index].value.first),
-                                onTap: () {
-                                  Navigator.pop(
-                                      context, displayedListOfOptions[index]);
-                                },
-                              );
-                            }
                             return ListTile(
-                              title: Text(
-                                  displayedListOfOptions[index].value.first),
-                              subtitle: Wrap(
+                              title: Wrap(
                                 children: displayedListOfOptions[index]
                                     .value
                                     .asMap()
-                                    .map((key, value) {
-                                      String field;
-                                      try {
-                                        field =
-                                            '${widget.dataHeaders![key]}: $value';
-                                      } catch (e) {
-                                        field = value;
-                                      }
-
-                                      Widget widgetField;
-
-                                      double listWidth = screenWidth - 70;
-                                      if (listWidth < field.width()) {
-                                        widgetField = SizedBox(
-                                          width: listWidth,
-                                          child: Column(
-                                            children: [Text(field)],
+                                    .map(
+                                      (key, value) {
+                                        String header = '';
+                                        try {
+                                          header = widget.dataHeaders![key];
+                                        } catch (e) {
+                                          header = '';
+                                        }
+                                        return MapEntry(
+                                          key,
+                                          Card(
+                                            color: Colors.white,
+                                            elevation: 0,
+                                            shape: RoundedRectangleBorder(
+                                              side: BorderSide(
+                                                  color: Colors.grey.shade200,
+                                                  width: 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                      15 + 7.5),
+                                            ),
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.all(7.5),
+                                              child: Text(
+                                                  '${header == '' ? '' : '$header: '}$value'),
+                                            ),
                                           ),
                                         );
-                                      } else {
-                                        widgetField = Text(field);
-                                      }
-                                      return MapEntry(
-                                        key,
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            widgetField,
-                                            if (key <
-                                                displayedListOfOptions[index]
-                                                        .value
-                                                        .length -
-                                                    1)
-                                              Container(
-                                                width: 1,
-                                                height: 10,
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 7.5),
-                                                color: Colors.grey.shade300,
-                                                child: const Text(''),
-                                              ),
-                                          ],
-                                        ),
-                                      );
-                                    })
+                                      },
+                                    )
                                     .values
                                     .toList(),
                               ),
