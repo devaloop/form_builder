@@ -1,3 +1,3 @@
-## 0.0.1
+## 0.0.2
 
-* Form Builder : Consists of, input with text type, input with email type, input with date type, input with option type, input with more than one option type, input with number type, and input with text type with multiple lines
+* Major changes to input types and addition of file and form input types.

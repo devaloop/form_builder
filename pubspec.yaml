@@ -1,6 +1,6 @@
 name: devaloop_form_builder
-description: "Form Builder : Consists of, input with text type, input with email type, input with date type, input with option type, input with more than one option type, input with number type, and input with text type with multiple lines"
-version: 0.0.1
+description: "Form Builder : Create forms easily and neatly."
+version: 0.0.2
 homepage: https://github.com/devaloop/form_builder
 
 environment:
