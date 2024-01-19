@@ -123,7 +123,9 @@ class _FormBulderState extends State<FormBulder> {
                     color: Colors.grey,
                   ),
                 )
-              : widget.submitButtonSettings!.icon,
+              : widget.submitButtonSettings != null
+                  ? widget.submitButtonSettings!.icon
+                  : const Icon(Icons.arrow_upward),
         ));
       } else {
         AdditionalButton additionalButton = widget.additionalButtons![i];
