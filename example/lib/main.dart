@@ -287,10 +287,17 @@ class MyApp extends StatelessWidget {
             additionalButtons: [
               AdditionalButton(
                 onTap: () async {
-                  await Future.delayed(const Duration(seconds: 12));
+                  await Future.delayed(const Duration(seconds: 2));
                 },
                 label: 'Cancel',
                 icon: const Icon(Icons.cancel),
+              ),
+              AdditionalButton(
+                onTap: () async {
+                  await Future.delayed(const Duration(seconds: 2));
+                },
+                label: 'Back',
+                icon: const Icon(Icons.arrow_back),
               ),
             ],
           ),

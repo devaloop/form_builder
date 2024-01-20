@@ -135,17 +135,17 @@ class _FormBulderState extends State<FormBulder> {
                   ? null
                   : () async {
                       setState(() {
-                        _isSubmittings[0] = true;
+                        _isSubmittings[i] = true;
                         _isEditable = false;
                       });
                       await additionalButton.onTap.call();
                       setState(() {
-                        _isSubmittings[0] = false;
+                        _isSubmittings[i] = false;
                         _isEditable = null;
                       });
                     },
           label: Text(additionalButton.label),
-          icon: _isSubmittings[0] == true
+          icon: _isSubmittings[i] == true
               ? const SizedBox(
                   height: 16,
                   width: 16,
