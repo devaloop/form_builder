@@ -1,3 +1,4 @@
-## 0.0.2
+## 0.0.3
 
-* Major changes to input types and addition of file and form input types.
+* Bugs fix unexpected null value when submitButtonSettings is null
+* Bugs fix A non-specific loading animation appears when the button is clicked
