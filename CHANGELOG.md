@@ -1,4 +1,3 @@
-## 0.0.3
+## 0.0.4
 
-* Bugs fix unexpected null value when submitButtonSettings is null
-* Bugs fix A non-specific loading animation appears when the button is clicked
+* Change Option Item Hiden Value & Value to List of Dynamic
