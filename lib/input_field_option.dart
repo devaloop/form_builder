@@ -676,8 +676,8 @@ class OptionItem {
     required this.value,
   });
 
-  final List<String> hiddenValue;
-  final List<String> value;
+  final List<dynamic> hiddenValue;
+  final List<dynamic> value;
 }
 
 class OptionSearchForm {
