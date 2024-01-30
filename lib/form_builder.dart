@@ -22,6 +22,7 @@ class FormBulder extends StatefulWidget {
     this.submitButtonSettings,
     this.additionalButtons,
     this.isFormEditable,
+    this.onValueChanged,
   });
 
   final String? formName;
@@ -41,6 +42,12 @@ class FormBulder extends StatefulWidget {
   final SubmitButtonSettings? submitButtonSettings;
   final List<AdditionalButton>? additionalButtons;
   final bool? isFormEditable;
+  final dynamic Function(
+      BuildContext context,
+      Input field,
+      dynamic previousValue,
+      dynamic currentValue,
+      Map<String, InputValue> inputValues)? onValueChanged;
 
   @override
   State<FormBulder> createState() => _FormBulderState();
@@ -293,6 +300,13 @@ class _FormBulderState extends State<FormBulder> {
           return (errorMessage ?? '') + additionalErrorMessage;
         },
         isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        onValueChanged: (context, previousValue, currentValue) {
+          if (widget.onValueChanged != null) {
+            widget.onValueChanged!
+                .call(context, e, previousValue, currentValue, _inputValues);
+          }
+        },
+        input: e,
       );
     } else if (e.runtimeType == InputNumber) {
       e = (e as InputNumber);
@@ -525,96 +539,6 @@ class _FormBulderState extends State<FormBulder> {
       );
     }
   }
-
-  /*MapEntry<bool, List<Map<List<Map<String, dynamic>>, InputForm>>>
-      validateSubForm(
-          List<Map<String, dynamic>> formValues, InputForm inputForm) {
-    bool isValid = true;
-    List<Map<List<Map<String, dynamic>>, InputForm>> nextCheck = [];
-
-    for (var formValue in formValues) {
-      for (var inputFieldFormInputField in inputForm.inputFields) {
-        if (inputFieldFormInputField.runtimeType == InputDateTime) {
-          var item = inputFieldFormInputField as InputDateTime;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
-            }
-          }
-        }
-        if (inputFieldFormInputField.runtimeType == InputNumber) {
-          var item = inputFieldFormInputField as InputNumber;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
-            }
-          }
-          if (formValue[inputFieldFormInputField.name] != null) {
-            if (item.inputNumberMode == InputNumberMode.decimal) {
-              try {
-                double.tryParse(formValue[inputFieldFormInputField.name]);
-              } catch (ex) {
-                isValid = false;
-                break;
-              }
-            } else {
-              try {
-                int.tryParse(formValue[inputFieldFormInputField.name]);
-              } catch (ex) {
-                isValid = false;
-                break;
-              }
-            }
-          }
-        }
-        if (inputFieldFormInputField.runtimeType == InputOption) {
-          var item = inputFieldFormInputField as InputOption;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
-            }
-          }
-        }
-        if (inputFieldFormInputField.runtimeType == InputText) {
-          var item = inputFieldFormInputField as InputText;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
-            }
-          }
-          if (formValue[inputFieldFormInputField.name] != null) {
-            if (item.inputTextMode == InputTextMode.email) {
-              if (!RegExp(
-                      r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-                  .hasMatch(formValue[inputFieldFormInputField.name])) {
-                isValid = false;
-                break;
-              }
-            }
-          }
-        }
-        if (inputFieldFormInputField.runtimeType == InputForm) {
-          var item = inputFieldFormInputField as InputForm;
-          if (item.isOptional == false) {
-            if (formValue[inputFieldFormInputField.name] == null) {
-              isValid = false;
-              break;
-            }
-          }
-          if (formValue[inputFieldFormInputField.name] != null) {
-            nextCheck.add({
-              formValue[inputFieldFormInputField.name]: inputFieldFormInputField
-            });
-          }
-        }
-      }
-    }
-    return MapEntry(isValid, nextCheck);
-  }*/
 }
 
 abstract class Input {
@@ -622,12 +546,14 @@ abstract class Input {
   final String label;
   final String? helperText;
   final bool? isOptional;
+  final dynamic Function(InputValue inputValue)? onValueChanged;
 
   const Input({
     required this.name,
     required this.label,
     this.helperText,
     this.isOptional = false,
+    this.onValueChanged,
   });
 }
 
@@ -654,6 +580,7 @@ class InputDateTime extends Input {
     super.helperText,
     super.isOptional,
     this.inputDateTimeMode = InputDateTimeMode.dateTime,
+    super.onValueChanged,
   });
 }
 

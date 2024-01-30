@@ -2,6 +2,7 @@ library devaloop_form_builder;
 
 import 'dart:io';
 
+import 'package:devaloop_form_builder/form_builder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,13 @@ class InputFieldDateTime extends StatefulWidget {
   final InputDateTimeMode? inputDateTimeMode;
   final String? Function(String? errorMessage)? onValidating;
   final bool? isEditable;
+  final dynamic Function(
+          BuildContext context,
+          DateTime? previousValue,
+          DateTime?
+              currentValue /*Sesuai dengan tip inputfieldnya, Tipe data DateTime karena metupakan Input adalah InputDateTime*/)?
+      onValueChanged;
+  final InputDateTime input;
 
   const InputFieldDateTime({
     super.key,
@@ -24,6 +32,8 @@ class InputFieldDateTime extends StatefulWidget {
     this.inputDateTimeMode,
     this.onValidating,
     this.isEditable,
+    this.onValueChanged,
+    required this.input,
   });
 
   @override
@@ -48,7 +58,7 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
               IconButton(
                 icon: const Icon(Icons.clear),
                 onPressed: widget.isEditable ?? true
-                    ? () {
+                    ? () async {
                         setState(() {
                           widget.controller.clear();
                         });
@@ -61,6 +71,11 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                   : const Icon(Icons.calendar_month),
               onPressed: widget.isEditable ?? true
                   ? () async {
+                      var inputValue = InputValue(
+                          controller: widget.controller,
+                          inputField: widget.input);
+                      final DateTime? prevValue = inputValue.getDateTime();
+
                       if (widget.inputDateTimeMode == InputDateTimeMode.time) {
                         String? pickedTime;
                         Future<void> show() async {
@@ -89,7 +104,7 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                           }
                         }
 
-                        show();
+                        await show();
                       } else {
                         if (widget.inputDateTimeMode ==
                             InputDateTimeMode.date) {
@@ -148,8 +163,13 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                               }
                             }
 
-                            show();
+                            await show();
                           }
+                        }
+                        if (widget.onValueChanged != null) {
+                          if (!mounted) return;
+                          await widget.onValueChanged!.call(
+                              context, prevValue, inputValue.getDateTime());
                         }
                       }
                     }
@@ -204,9 +224,10 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                 }
               }
 
-              show();
+              await show();
             } else {
               if (widget.inputDateTimeMode == InputDateTimeMode.date) {
+                if (!mounted) return;
                 DateTime? pickedDate = await showDatePicker(
                   context: context,
                   initialDate: (widget.controller.text != ""
@@ -223,6 +244,7 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                   });
                 }
               } else {
+                if (!mounted) return;
                 DateTime? pickedDate = await showDatePicker(
                   context: context,
                   initialDate: (widget.controller.text != ""
@@ -261,7 +283,7 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                     }
                   }
 
-                  show();
+                  await show();
                 }
               }
             }
