@@ -222,11 +222,11 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                         .map(
                           (key, value) {
                             String header = '';
-                            try {
+                            if (widget.dataHeaders!.isNotEmpty &&
+                                key < widget.dataHeaders!.length) {
                               header = widget.dataHeaders![key];
-                            } catch (e) {
-                              header = '';
                             }
+
                             return MapEntry(
                               key,
                               Card(
@@ -406,11 +406,11 @@ class _InputFieldOptionSearchFormPage
                                     .map(
                                       (key, value) {
                                         String header = '';
-                                        try {
+                                        if (widget.dataHeaders!.isNotEmpty &&
+                                            key < widget.dataHeaders!.length) {
                                           header = widget.dataHeaders![key];
-                                        } catch (e) {
-                                          header = '';
                                         }
+
                                         return MapEntry(
                                           key,
                                           Card(
@@ -574,9 +574,10 @@ class _InputFieldOptionSearchResultPage
                               .asMap()
                               .map((key, value) {
                                 String field;
-                                try {
+                                if (widget.dataHeaders!.isNotEmpty &&
+                                    key < widget.dataHeaders!.length) {
                                   field = '${widget.dataHeaders![key]}: $value';
-                                } catch (e) {
+                                } else {
                                   field = value;
                                 }
 
