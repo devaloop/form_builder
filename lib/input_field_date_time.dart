@@ -59,9 +59,18 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                 icon: const Icon(Icons.clear),
                 onPressed: widget.isEditable ?? true
                     ? () async {
+                        var inputValue = InputValue(
+                            controller: widget.controller,
+                            inputField: widget.input);
+                        final DateTime? prevValue = inputValue.getDateTime();
                         setState(() {
                           widget.controller.clear();
                         });
+                        if (widget.onValueChanged != null) {
+                          if (!mounted) return;
+                          await widget.onValueChanged!.call(
+                              context, prevValue, inputValue.getDateTime());
+                        }
                       }
                     : null,
               ),

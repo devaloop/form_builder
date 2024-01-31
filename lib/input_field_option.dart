@@ -54,9 +54,12 @@ class _InputFieldOptionState extends State<InputFieldOption> {
 
   @override
   Widget build(BuildContext context) {
-    _controller.text = widget.controller.getData().isEmpty
-        ? ''
-        : '${widget.controller.getData().length} Option Selected';
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.text = widget.controller.getData().isEmpty
+          ? ''
+          : '${widget.controller.getData().length} Option Selected';
+    });
+
     return Column(
       children: [
         Focus(
