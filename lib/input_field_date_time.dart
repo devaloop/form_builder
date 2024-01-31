@@ -196,6 +196,10 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
       onTap: () async {
         if (!kIsWeb) {
           if (Platform.isAndroid || Platform.isIOS) {
+            var inputValue = InputValue(
+                controller: widget.controller, inputField: widget.input);
+            final DateTime? prevValue = inputValue.getDateTime();
+
             if (widget.inputDateTimeMode == InputDateTimeMode.time) {
               String? pickedTime;
               Future<void> show() async {
@@ -286,6 +290,12 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                   await show();
                 }
               }
+            }
+
+            if (widget.onValueChanged != null) {
+              if (!mounted) return;
+              await widget.onValueChanged!
+                  .call(context, prevValue, inputValue.getDateTime());
             }
           }
         }

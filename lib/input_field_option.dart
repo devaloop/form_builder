@@ -42,23 +42,21 @@ class InputFieldOption extends StatefulWidget {
 class _InputFieldOptionState extends State<InputFieldOption> {
   bool _textFieldIsFocused = false;
   final TextEditingController _controller = TextEditingController();
+
   late bool _isMultiSelection;
 
   @override
   void initState() {
     _isMultiSelection = widget.isMultiSelection ?? false;
     _textFieldIsFocused = false;
-    if (widget.controller.getData().isNotEmpty) {
-      _controller.text =
-          '${widget.controller.getData().length} Option Selected';
-    } else {
-      _controller.clear();
-    }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    _controller.text = widget.controller.getData().isEmpty
+        ? ''
+        : '${widget.controller.getData().length} Option Selected';
     return Column(
       children: [
         Focus(
@@ -106,12 +104,6 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                                     widget.controller.clear();
                                   }
                                   widget.controller.add(result);
-                                  if (widget.controller.getData().isEmpty) {
-                                    _controller.clear();
-                                  } else {
-                                    _controller.text =
-                                        '${widget.controller.getData().length} Option Selected';
-                                  }
                                 });
                               }
                             }
@@ -164,12 +156,6 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                           widget.controller.clear();
                         }
                         widget.controller.add(result);
-                        if (widget.controller.getData().isEmpty) {
-                          _controller.clear();
-                        } else {
-                          _controller.text =
-                              '${widget.controller.getData().length} Option Selected';
-                        }
                       });
                     }
                   }
@@ -255,12 +241,6 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                         ? () {
                             setState(() {
                               widget.controller.getData().removeAt(index);
-                              if (widget.controller.getData().isEmpty) {
-                                _controller.clear();
-                              } else {
-                                _controller.text =
-                                    '${widget.controller.getData().length} Option Selected';
-                              }
                             });
                           }
                         : null,

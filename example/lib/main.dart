@@ -274,63 +274,65 @@ class _MyAppState extends State<MyApp> {
             ],
             onValueChanged:
                 (context, field, previousValue, currentValue, inputValues) {
-              setState(() {
-                //TODO penambahan logika jika value berubah maka field terdampak akan berubah valuenya
-                inputValues['trainingProgram']!.setListOptionValues([]);
-                if (inputValues['joinDate']!.getDateTime() == null) {
-                  _futureTrainingProgramOptionData = Future<OptionData>(
-                    () {
-                      List<OptionItem> data = [];
-                      return OptionData(
-                          displayedListOfOptions: data,
-                          totalOption: data.length);
-                    },
-                  );
-                  _futureTrainingProgramOptionTotalData = Future(() => 0);
-                } else {
-                  if (inputValues['joinDate']!
-                      .getDateTime()!
-                      .isAfter(DateTime(2024))) {
-                    _futureTrainingProgramOptionData = Future<OptionData>(
-                      () {
-                        List<OptionItem> data = [
-                          const OptionItem(
-                            hiddenValue: ['Flutter'],
-                            value: ['Flutter'],
-                          ),
-                          const OptionItem(
-                            hiddenValue: ['.NET MAUI'],
-                            value: ['.NET MAUI'],
-                          ),
-                        ];
-                        return OptionData(
-                            displayedListOfOptions: data,
-                            totalOption: data.length);
-                      },
-                    );
-                    _futureTrainingProgramOptionTotalData = Future(() => 2);
+              if (field.name == 'joinDate') {
+                DateTime? joinDate = inputValues['joinDate']!.getDateTime();
+                if (previousValue != currentValue) {
+                  inputValues['trainingProgram']!.setListOptionValues([]);
+                  if (joinDate == null) {
+                    setState(() {
+                      _futureTrainingProgramOptionData = Future<OptionData>(
+                        () => const OptionData(
+                            displayedListOfOptions: [], totalOption: 0),
+                      );
+                      _futureTrainingProgramOptionTotalData = Future(() => 0);
+                    });
                   } else {
-                    _futureTrainingProgramOptionData = Future<OptionData>(
-                      () {
-                        List<OptionItem> data = [
-                          const OptionItem(
-                            hiddenValue: ['HTML'],
-                            value: ['HTML'],
-                          ),
-                          const OptionItem(
-                            hiddenValue: ['ASP Classic'],
-                            value: ['ASP Classic'],
-                          ),
-                        ];
-                        return OptionData(
-                            displayedListOfOptions: data,
-                            totalOption: data.length);
-                      },
-                    );
-                    _futureTrainingProgramOptionTotalData = Future(() => 2);
+                    if (joinDate.isAfter(DateTime(2024))) {
+                      setState(() {
+                        _futureTrainingProgramOptionData = Future<OptionData>(
+                          () {
+                            List<OptionItem> data = [
+                              const OptionItem(
+                                hiddenValue: ['Flutter'],
+                                value: ['Flutter'],
+                              ),
+                              const OptionItem(
+                                hiddenValue: ['.NET MAUI'],
+                                value: ['.NET MAUI'],
+                              ),
+                            ];
+                            return OptionData(
+                                displayedListOfOptions: data,
+                                totalOption: data.length);
+                          },
+                        );
+                        _futureTrainingProgramOptionTotalData = Future(() => 2);
+                      });
+                    } else {
+                      setState(() {
+                        _futureTrainingProgramOptionData = Future<OptionData>(
+                          () {
+                            List<OptionItem> data = [
+                              const OptionItem(
+                                hiddenValue: ['HTML'],
+                                value: ['HTML'],
+                              ),
+                              const OptionItem(
+                                hiddenValue: ['ASP Classic'],
+                                value: ['ASP Classic'],
+                              ),
+                            ];
+                            return OptionData(
+                                displayedListOfOptions: data,
+                                totalOption: data.length);
+                          },
+                        );
+                        _futureTrainingProgramOptionTotalData = Future(() => 2);
+                      });
+                    }
                   }
                 }
-              });
+              }
             },
             onInitial: (context, inputValues) {
               inputValues['name']!.setString('Budi Saputra');
