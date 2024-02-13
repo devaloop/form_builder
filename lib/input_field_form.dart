@@ -112,94 +112,105 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => InputFieldFormPage(
-                                    title: widget.label,
-                                    inputFields: widget.inputFields,
-                                    additionalButtons: widget.additionalButtons,
-                                    isFormEditable: widget.isEditable,
-                                    onAfterValidation: widget.onAfterValidation,
-                                    onBeforeValidation:
-                                        widget.onBeforeValidation,
-                                    onFormValueChanged:
-                                        widget.input.onFormValueChanged,
-                                    onInitial: widget.isMultiInputForm ?? false
-                                        ? null
-                                        : (context, inputValues) {
-                                            for (var index = 0;
-                                                index <
-                                                    widget.controller
-                                                        .getData()
-                                                        .length;
-                                                index++) {
-                                              for (var e
-                                                  in widget.inputFields) {
-                                                if (e.runtimeType ==
-                                                    InputText) {
-                                                  inputValues[e.name]!
-                                                      .setString(widget
-                                                          .controller
-                                                          .getData()[index]
-                                                          .entries
-                                                          .where((element) =>
-                                                              element.key ==
-                                                              e.name)
-                                                          .firstOrNull
-                                                          ?.value);
-                                                } else if (e.runtimeType ==
-                                                    InputDateTime) {
-                                                  inputValues[e.name]!
-                                                      .setDateTime(widget
-                                                          .controller
-                                                          .getData()[index]
-                                                          .entries
-                                                          .where((element) =>
-                                                              element.key ==
-                                                              e.name)
-                                                          .firstOrNull
-                                                          ?.value);
-                                                } else if (e.runtimeType ==
-                                                    InputNumber) {
-                                                  inputValues[e.name]!
-                                                      .setNumber(widget
-                                                          .controller
-                                                          .getData()[index]
-                                                          .entries
-                                                          .where((element) =>
-                                                              element.key ==
-                                                              e.name)
-                                                          .firstOrNull
-                                                          ?.value);
-                                                } else if (e.runtimeType ==
-                                                    InputOption) {
-                                                  inputValues[e.name]!
-                                                      .setListOptionValues(widget
-                                                              .controller
-                                                              .getData()[index]
-                                                              .entries
-                                                              .where((element) =>
-                                                                  element.key ==
-                                                                  e.name)
-                                                              .firstOrNull
-                                                              ?.value ??
-                                                          []);
-                                                } else if (e.runtimeType ==
-                                                    InputForm) {
-                                                  inputValues[e.name]!
-                                                      .setFormValues(widget
-                                                              .controller
-                                                              .getData()[index]
-                                                              .entries
-                                                              .where((element) =>
-                                                                  element.key ==
-                                                                  e.name)
-                                                              .firstOrNull
-                                                              ?.value ??
-                                                          []);
-                                                } else {}
+                                  builder: (context) => StatefulBuilder(
+                                      builder: (context, setFormState) {
+                                    return InputFieldFormPage(
+                                      title: widget.label,
+                                      inputFields: widget.inputFields,
+                                      additionalButtons:
+                                          widget.additionalButtons,
+                                      isFormEditable: widget.isEditable,
+                                      onAfterValidation:
+                                          widget.onAfterValidation,
+                                      onBeforeValidation:
+                                          widget.onBeforeValidation,
+                                      onFormValueChanged:
+                                          widget.input.onFormValueChanged,
+                                      setFormState: setFormState,
+                                      onInitial: widget.isMultiInputForm ??
+                                              false
+                                          ? null
+                                          : (context, inputValues) {
+                                              for (var index = 0;
+                                                  index <
+                                                      widget.controller
+                                                          .getData()
+                                                          .length;
+                                                  index++) {
+                                                for (var e
+                                                    in widget.inputFields) {
+                                                  if (e.runtimeType ==
+                                                      InputText) {
+                                                    inputValues[e.name]!
+                                                        .setString(widget
+                                                            .controller
+                                                            .getData()[index]
+                                                            .entries
+                                                            .where((element) =>
+                                                                element.key ==
+                                                                e.name)
+                                                            .firstOrNull
+                                                            ?.value);
+                                                  } else if (e.runtimeType ==
+                                                      InputDateTime) {
+                                                    inputValues[e.name]!
+                                                        .setDateTime(widget
+                                                            .controller
+                                                            .getData()[index]
+                                                            .entries
+                                                            .where((element) =>
+                                                                element.key ==
+                                                                e.name)
+                                                            .firstOrNull
+                                                            ?.value);
+                                                  } else if (e.runtimeType ==
+                                                      InputNumber) {
+                                                    inputValues[e.name]!
+                                                        .setNumber(widget
+                                                            .controller
+                                                            .getData()[index]
+                                                            .entries
+                                                            .where((element) =>
+                                                                element.key ==
+                                                                e.name)
+                                                            .firstOrNull
+                                                            ?.value);
+                                                  } else if (e.runtimeType ==
+                                                      InputOption) {
+                                                    inputValues[e.name]!
+                                                        .setListOptionValues(widget
+                                                                .controller
+                                                                .getData()[
+                                                                    index]
+                                                                .entries
+                                                                .where((element) =>
+                                                                    element
+                                                                        .key ==
+                                                                    e.name)
+                                                                .firstOrNull
+                                                                ?.value ??
+                                                            []);
+                                                  } else if (e.runtimeType ==
+                                                      InputForm) {
+                                                    inputValues[e.name]!
+                                                        .setFormValues(widget
+                                                                .controller
+                                                                .getData()[
+                                                                    index]
+                                                                .entries
+                                                                .where((element) =>
+                                                                    element
+                                                                        .key ==
+                                                                    e.name)
+                                                                .firstOrNull
+                                                                ?.value ??
+                                                            []);
+                                                  } else {}
+                                                }
                                               }
-                                            }
-                                          },
-                                  ),
+                                            },
+                                    );
+                                  }),
                                 ),
                               );
 
@@ -304,76 +315,82 @@ class _InputFieldFormState extends State<InputFieldForm> {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => InputFieldFormPage(
-                          title: widget.label,
-                          inputFields: widget.inputFields,
-                          additionalButtons: widget.additionalButtons,
-                          isFormEditable: widget.isEditable,
-                          onAfterValidation: widget.onAfterValidation,
-                          onBeforeValidation: widget.onBeforeValidation,
-                          onFormValueChanged: widget.input.onFormValueChanged,
-                          onInitial: widget.isMultiInputForm ?? false
-                              ? null
-                              : (context, inputValues) {
-                                  for (var index = 0;
-                                      index <
-                                          widget.controller.getData().length;
-                                      index++) {
-                                    for (var e in widget.inputFields) {
-                                      if (e.runtimeType == InputText) {
-                                        inputValues[e.name]!.setString(widget
-                                            .controller
-                                            .getData()[index]
-                                            .entries
-                                            .where((element) =>
-                                                element.key == e.name)
-                                            .firstOrNull
-                                            ?.value);
-                                      } else if (e.runtimeType ==
-                                          InputDateTime) {
-                                        inputValues[e.name]!.setDateTime(widget
-                                            .controller
-                                            .getData()[index]
-                                            .entries
-                                            .where((element) =>
-                                                element.key == e.name)
-                                            .firstOrNull
-                                            ?.value);
-                                      } else if (e.runtimeType == InputNumber) {
-                                        inputValues[e.name]!.setNumber(widget
-                                            .controller
-                                            .getData()[index]
-                                            .entries
-                                            .where((element) =>
-                                                element.key == e.name)
-                                            .firstOrNull
-                                            ?.value);
-                                      } else if (e.runtimeType == InputOption) {
-                                        inputValues[e.name]!
-                                            .setListOptionValues(widget
-                                                    .controller
-                                                    .getData()[index]
-                                                    .entries
-                                                    .where((element) =>
-                                                        element.key == e.name)
-                                                    .firstOrNull
-                                                    ?.value ??
-                                                []);
-                                      } else if (e.runtimeType == InputForm) {
-                                        inputValues[e.name]!.setFormValues(
-                                            widget.controller
-                                                    .getData()[index]
-                                                    .entries
-                                                    .where((element) =>
-                                                        element.key == e.name)
-                                                    .firstOrNull
-                                                    ?.value ??
-                                                []);
-                                      } else {}
+                        builder: (context) =>
+                            StatefulBuilder(builder: (context, setFormState) {
+                          return InputFieldFormPage(
+                            title: widget.label,
+                            inputFields: widget.inputFields,
+                            additionalButtons: widget.additionalButtons,
+                            isFormEditable: widget.isEditable,
+                            onAfterValidation: widget.onAfterValidation,
+                            onBeforeValidation: widget.onBeforeValidation,
+                            onFormValueChanged: widget.input.onFormValueChanged,
+                            setFormState: setFormState,
+                            onInitial: widget.isMultiInputForm ?? false
+                                ? null
+                                : (context, inputValues) {
+                                    for (var index = 0;
+                                        index <
+                                            widget.controller.getData().length;
+                                        index++) {
+                                      for (var e in widget.inputFields) {
+                                        if (e.runtimeType == InputText) {
+                                          inputValues[e.name]!.setString(widget
+                                              .controller
+                                              .getData()[index]
+                                              .entries
+                                              .where((element) =>
+                                                  element.key == e.name)
+                                              .firstOrNull
+                                              ?.value);
+                                        } else if (e.runtimeType ==
+                                            InputDateTime) {
+                                          inputValues[e.name]!.setDateTime(
+                                              widget.controller
+                                                  .getData()[index]
+                                                  .entries
+                                                  .where((element) =>
+                                                      element.key == e.name)
+                                                  .firstOrNull
+                                                  ?.value);
+                                        } else if (e.runtimeType ==
+                                            InputNumber) {
+                                          inputValues[e.name]!.setNumber(widget
+                                              .controller
+                                              .getData()[index]
+                                              .entries
+                                              .where((element) =>
+                                                  element.key == e.name)
+                                              .firstOrNull
+                                              ?.value);
+                                        } else if (e.runtimeType ==
+                                            InputOption) {
+                                          inputValues[e.name]!
+                                              .setListOptionValues(widget
+                                                      .controller
+                                                      .getData()[index]
+                                                      .entries
+                                                      .where((element) =>
+                                                          element.key == e.name)
+                                                      .firstOrNull
+                                                      ?.value ??
+                                                  []);
+                                        } else if (e.runtimeType == InputForm) {
+                                          inputValues[e.name]!.setFormValues(
+                                              widget.controller
+                                                      .getData()[index]
+                                                      .entries
+                                                      .where((element) =>
+                                                          element.key == e.name)
+                                                      .firstOrNull
+                                                      ?.value ??
+                                                  []);
+                                        } else {}
+                                      }
                                     }
-                                  }
-                                },
-                        ),
+                                  },
+                          );
+                        }),
                       ),
                     );
 
@@ -706,92 +723,97 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
-                                                InputFieldFormPage(
-                                              title: widget.label,
-                                              inputFields: widget.inputFields,
-                                              additionalButtons:
-                                                  widget.additionalButtons,
-                                              isFormEditable: widget.isEditable,
-                                              onAfterValidation:
-                                                  widget.onAfterValidation,
-                                              onBeforeValidation:
-                                                  widget.onBeforeValidation,
-                                              onFormValueChanged: widget
-                                                  .input.onFormValueChanged,
-                                              onInitial:
-                                                  (context, inputValues) {
-                                                for (var e
-                                                    in widget.inputFields) {
-                                                  if (e.runtimeType ==
-                                                      InputText) {
-                                                    inputValues[e.name]!
-                                                        .setString(widget
-                                                            .controller
-                                                            .getData()[index]
-                                                            .entries
-                                                            .where((element) =>
-                                                                element.key ==
-                                                                e.name)
-                                                            .firstOrNull
-                                                            ?.value);
-                                                  } else if (e.runtimeType ==
-                                                      InputDateTime) {
-                                                    inputValues[e.name]!
-                                                        .setDateTime(widget
-                                                            .controller
-                                                            .getData()[index]
-                                                            .entries
-                                                            .where((element) =>
-                                                                element.key ==
-                                                                e.name)
-                                                            .firstOrNull
-                                                            ?.value);
-                                                  } else if (e.runtimeType ==
-                                                      InputNumber) {
-                                                    inputValues[e.name]!
-                                                        .setNumber(widget
-                                                            .controller
-                                                            .getData()[index]
-                                                            .entries
-                                                            .where((element) =>
-                                                                element.key ==
-                                                                e.name)
-                                                            .firstOrNull
-                                                            ?.value);
-                                                  } else if (e.runtimeType ==
-                                                      InputOption) {
-                                                    inputValues[e.name]!
-                                                        .setListOptionValues(widget
-                                                                .controller
-                                                                .getData()[
-                                                                    index]
-                                                                .entries
-                                                                .where((element) =>
-                                                                    element
-                                                                        .key ==
-                                                                    e.name)
-                                                                .firstOrNull
-                                                                ?.value ??
-                                                            []);
-                                                  } else if (e.runtimeType ==
-                                                      InputForm) {
-                                                    inputValues[e.name]!
-                                                        .setFormValues(widget
-                                                                .controller
-                                                                .getData()[
-                                                                    index]
-                                                                .entries
-                                                                .where((element) =>
-                                                                    element
-                                                                        .key ==
-                                                                    e.name)
-                                                                .firstOrNull
-                                                                ?.value ??
-                                                            []);
-                                                  } else {}
-                                                }
-                                              },
-                                            ),
+                                                StatefulBuilder(builder:
+                                                    (context, setFormState) {
+                                              return InputFieldFormPage(
+                                                title: widget.label,
+                                                inputFields: widget.inputFields,
+                                                additionalButtons:
+                                                    widget.additionalButtons,
+                                                isFormEditable:
+                                                    widget.isEditable,
+                                                onAfterValidation:
+                                                    widget.onAfterValidation,
+                                                onBeforeValidation:
+                                                    widget.onBeforeValidation,
+                                                onFormValueChanged: widget
+                                                    .input.onFormValueChanged,
+                                                setFormState: setFormState,
+                                                onInitial:
+                                                    (context, inputValues) {
+                                                  for (var e
+                                                      in widget.inputFields) {
+                                                    if (e.runtimeType ==
+                                                        InputText) {
+                                                      inputValues[e.name]!
+                                                          .setString(widget
+                                                              .controller
+                                                              .getData()[index]
+                                                              .entries
+                                                              .where((element) =>
+                                                                  element.key ==
+                                                                  e.name)
+                                                              .firstOrNull
+                                                              ?.value);
+                                                    } else if (e.runtimeType ==
+                                                        InputDateTime) {
+                                                      inputValues[e.name]!
+                                                          .setDateTime(widget
+                                                              .controller
+                                                              .getData()[index]
+                                                              .entries
+                                                              .where((element) =>
+                                                                  element.key ==
+                                                                  e.name)
+                                                              .firstOrNull
+                                                              ?.value);
+                                                    } else if (e.runtimeType ==
+                                                        InputNumber) {
+                                                      inputValues[e.name]!
+                                                          .setNumber(widget
+                                                              .controller
+                                                              .getData()[index]
+                                                              .entries
+                                                              .where((element) =>
+                                                                  element.key ==
+                                                                  e.name)
+                                                              .firstOrNull
+                                                              ?.value);
+                                                    } else if (e.runtimeType ==
+                                                        InputOption) {
+                                                      inputValues[e.name]!
+                                                          .setListOptionValues(widget
+                                                                  .controller
+                                                                  .getData()[
+                                                                      index]
+                                                                  .entries
+                                                                  .where((element) =>
+                                                                      element
+                                                                          .key ==
+                                                                      e.name)
+                                                                  .firstOrNull
+                                                                  ?.value ??
+                                                              []);
+                                                    } else if (e.runtimeType ==
+                                                        InputForm) {
+                                                      inputValues[e.name]!
+                                                          .setFormValues(widget
+                                                                  .controller
+                                                                  .getData()[
+                                                                      index]
+                                                                  .entries
+                                                                  .where((element) =>
+                                                                      element
+                                                                          .key ==
+                                                                      e.name)
+                                                                  .firstOrNull
+                                                                  ?.value ??
+                                                              []);
+                                                    } else {}
+                                                  }
+                                                },
+                                              );
+                                            }),
                                           ),
                                         );
 
@@ -980,6 +1002,7 @@ class InputFieldFormPage extends StatefulWidget {
   final dynamic Function(
           BuildContext, Input, dynamic, dynamic, Map<String, InputValue>)?
       onFormValueChanged;
+  final void Function(void Function()) setFormState;
 
   const InputFieldFormPage({
     super.key,
@@ -991,6 +1014,7 @@ class InputFieldFormPage extends StatefulWidget {
     this.additionalButtons,
     this.isFormEditable,
     this.onFormValueChanged,
+    required this.setFormState,
   });
 
   @override
@@ -1031,6 +1055,10 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
             if (widget.onFormValueChanged != null) {
               widget.onFormValueChanged!
                   .call(context, field, prevValue, currentValue, inputValues);
+              Future.delayed(
+                const Duration(milliseconds: 500),
+                () => widget.setFormState(() {}),
+              );
             }
           },
           onSubmit: (context, inputValues) {

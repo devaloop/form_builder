@@ -671,7 +671,6 @@ class InputNumber extends Input {
 
 class InputOption extends Input {
   final Future<OptionData> optionData;
-  final Future<int> optionTotalData;
   final List<String>? dataHeaders;
   final bool? isMultiSelection;
   final OptionSearchForm? optionSearchForm;
@@ -682,7 +681,6 @@ class InputOption extends Input {
     super.helperText,
     super.isOptional,
     required this.optionData,
-    required this.optionTotalData,
     this.dataHeaders = const [],
     this.optionSearchForm,
     this.isMultiSelection = false,
