@@ -157,6 +157,10 @@ class _MyAppState extends State<MyApp> {
                 name: 'familyMembers',
                 label: 'Family Members',
                 isMultiInputForm: true,
+                onFormValueChanged:
+                    (context, field, previousValue, currentValue, inputValues) {
+                  //This is current form value change of InputForm
+                },
                 inputFields: [
                   const InputText(
                     name: 'name',

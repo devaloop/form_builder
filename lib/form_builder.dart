@@ -635,6 +635,9 @@ class InputForm extends Input {
       Map<String, String?> errorsMessages)? onAfterValidation;
   final List<AdditionalButton>? additionalButtons;
   final bool? isMultiInputForm;
+  final dynamic Function(
+          BuildContext, Input, dynamic, dynamic, Map<String, InputValue>)?
+      onFormValueChanged;
 
   const InputForm({
     required super.name,
@@ -648,6 +651,7 @@ class InputForm extends Input {
     this.onAfterValidation,
     this.onBeforeValidation,
     this.onInitial,
+    this.onFormValueChanged,
     super.onValueChanged,
   });
 }

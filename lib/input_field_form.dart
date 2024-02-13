@@ -120,6 +120,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                     onAfterValidation: widget.onAfterValidation,
                                     onBeforeValidation:
                                         widget.onBeforeValidation,
+                                    onFormValueChanged:
+                                        widget.input.onFormValueChanged,
                                     onInitial: widget.isMultiInputForm ?? false
                                         ? null
                                         : (context, inputValues) {
@@ -309,6 +311,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                           isFormEditable: widget.isEditable,
                           onAfterValidation: widget.onAfterValidation,
                           onBeforeValidation: widget.onBeforeValidation,
+                          onFormValueChanged: widget.input.onFormValueChanged,
                           onInitial: widget.isMultiInputForm ?? false
                               ? null
                               : (context, inputValues) {
@@ -713,6 +716,8 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                   widget.onAfterValidation,
                                               onBeforeValidation:
                                                   widget.onBeforeValidation,
+                                              onFormValueChanged: widget
+                                                  .input.onFormValueChanged,
                                               onInitial:
                                                   (context, inputValues) {
                                                 for (var e
@@ -972,6 +977,9 @@ class InputFieldFormPage extends StatefulWidget {
       Map<String, String?> errorsMessages)? onAfterValidation;
   final List<AdditionalButton>? additionalButtons;
   final bool? isFormEditable;
+  final dynamic Function(
+          BuildContext, Input, dynamic, dynamic, Map<String, InputValue>)?
+      onFormValueChanged;
 
   const InputFieldFormPage({
     super.key,
@@ -982,6 +990,7 @@ class InputFieldFormPage extends StatefulWidget {
     this.onAfterValidation,
     this.additionalButtons,
     this.isFormEditable,
+    this.onFormValueChanged,
   });
 
   @override
@@ -1017,6 +1026,13 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
         ),
         child: FormBuilder(
           inputFields: widget.inputFields,
+          onValueChanged:
+              (context, field, prevValue, currentValue, inputValues) {
+            if (widget.onFormValueChanged != null) {
+              widget.onFormValueChanged!
+                  .call(context, field, prevValue, currentValue, inputValues);
+            }
+          },
           onSubmit: (context, inputValues) {
             Map<String, dynamic> controller = {};
             for (var inputField in widget.inputFields) {
