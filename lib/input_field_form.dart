@@ -1015,7 +1015,7 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
           right: 15,
           bottom: 15,
         ),
-        child: FormBulder(
+        child: FormBuilder(
           inputFields: widget.inputFields,
           onSubmit: (context, inputValues) {
             Map<String, dynamic> controller = {};

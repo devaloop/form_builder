@@ -366,7 +366,7 @@ class _InputFieldOptionSearchFormPage
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (widget.searchFields != null)
-                FormBulder(
+                FormBuilder(
                   formName: 'Search',
                   inputFields: widget.searchFields!,
                   onSubmit: (context, inputValues) {

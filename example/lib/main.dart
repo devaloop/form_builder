@@ -47,7 +47,7 @@ class _MyAppState extends State<MyApp> {
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(15),
-          child: FormBulder(
+          child: FormBuilder(
             formName: 'Member',
             inputFields: [
               const InputText(

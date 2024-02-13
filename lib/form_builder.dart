@@ -10,8 +10,8 @@ import 'package:devaloop_form_builder/input_field_option.dart';
 import 'package:devaloop_form_builder/input_field_text.dart';
 import 'package:intl/intl.dart';
 
-class FormBulder extends StatefulWidget {
-  const FormBulder({
+class FormBuilder extends StatefulWidget {
+  const FormBuilder({
     super.key,
     this.formName,
     required this.inputFields,
@@ -50,10 +50,10 @@ class FormBulder extends StatefulWidget {
       Map<String, InputValue> inputValues)? onValueChanged;
 
   @override
-  State<FormBulder> createState() => _FormBulderState();
+  State<FormBuilder> createState() => _FormBuilderState();
 }
 
-class _FormBulderState extends State<FormBulder> {
+class _FormBuilderState extends State<FormBuilder> {
   final List<dynamic> _controllers = [];
   late Map<Input, String?> _errors = {};
   late Map<String, String?> _additionalErrorOnAfterValidation = {};
