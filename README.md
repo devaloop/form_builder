@@ -15,8 +15,29 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Future<OptionData> _futureTrainingProgramOptionData;
+  late Future<int> _futureTrainingProgramOptionTotalData;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureTrainingProgramOptionData = Future<OptionData>(
+      () {
+        List<OptionItem> data = [];
+        return OptionData(
+            displayedListOfOptions: data, totalOption: data.length);
+      },
+    );
+    _futureTrainingProgramOptionTotalData = Future(() => 0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +52,7 @@ class MyApp extends StatelessWidget {
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(15),
-          child: FormBulder(
+          child: FormBuilder(
             formName: 'Member',
             inputFields: [
               const InputText(
@@ -47,6 +68,17 @@ class MyApp extends StatelessWidget {
                 name: 'birthDate',
                 label: 'Birth Date',
                 inputDateTimeMode: InputDateTimeMode.date,
+              ),
+              const InputDateTime(
+                name: 'joinDate',
+                label: 'Join Date',
+                inputDateTimeMode: InputDateTimeMode.date,
+              ),
+              InputOption(
+                name: 'trainingProgram',
+                label: 'Training Program',
+                optionData: _futureTrainingProgramOptionData,
+                optionTotalData: _futureTrainingProgramOptionTotalData,
               ),
               InputOption(
                 name: 'gender',
@@ -245,6 +277,68 @@ class MyApp extends StatelessWidget {
                 },
               ),
             ],
+            onValueChanged:
+                (context, field, previousValue, currentValue, inputValues) {
+              if (field.name == 'joinDate') {
+                DateTime? joinDate = inputValues['joinDate']!.getDateTime();
+                if (previousValue != currentValue) {
+                  inputValues['trainingProgram']!.setListOptionValues([]);
+                  if (joinDate == null) {
+                    setState(() {
+                      _futureTrainingProgramOptionData = Future<OptionData>(
+                        () => const OptionData(
+                            displayedListOfOptions: [], totalOption: 0),
+                      );
+                      _futureTrainingProgramOptionTotalData = Future(() => 0);
+                    });
+                  } else {
+                    if (joinDate.isAfter(DateTime(2024))) {
+                      setState(() {
+                        _futureTrainingProgramOptionData = Future<OptionData>(
+                          () {
+                            List<OptionItem> data = [
+                              const OptionItem(
+                                hiddenValue: ['Flutter'],
+                                value: ['Flutter'],
+                              ),
+                              const OptionItem(
+                                hiddenValue: ['.NET MAUI'],
+                                value: ['.NET MAUI'],
+                              ),
+                            ];
+                            return OptionData(
+                                displayedListOfOptions: data,
+                                totalOption: data.length);
+                          },
+                        );
+                        _futureTrainingProgramOptionTotalData = Future(() => 2);
+                      });
+                    } else {
+                      setState(() {
+                        _futureTrainingProgramOptionData = Future<OptionData>(
+                          () {
+                            List<OptionItem> data = [
+                              const OptionItem(
+                                hiddenValue: ['HTML'],
+                                value: ['HTML'],
+                              ),
+                              const OptionItem(
+                                hiddenValue: ['ASP Classic'],
+                                value: ['ASP Classic'],
+                              ),
+                            ];
+                            return OptionData(
+                                displayedListOfOptions: data,
+                                totalOption: data.length);
+                          },
+                        );
+                        _futureTrainingProgramOptionTotalData = Future(() => 2);
+                      });
+                    }
+                  }
+                }
+              }
+            },
             onInitial: (context, inputValues) {
               inputValues['name']!.setString('Budi Saputra');
 
