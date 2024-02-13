@@ -1,5 +1,6 @@
 library devaloop_form_builder;
 
+import 'package:devaloop_form_builder/form_builder.dart';
 import 'package:flutter/material.dart';
 
 class InputFieldText extends StatelessWidget {
@@ -11,6 +12,10 @@ class InputFieldText extends StatelessWidget {
   final InputTextMode? inputTextMode;
   final String? Function(String? errorMessage)? onValidating;
   final bool? isEditable;
+  final dynamic Function(
+          BuildContext context, String previousValue, String currentValue)?
+      onValueChanged;
+  final InputText input;
 
   const InputFieldText({
     super.key,
@@ -22,10 +27,13 @@ class InputFieldText extends StatelessWidget {
     this.inputTextMode,
     this.onValidating,
     this.isEditable,
+    this.onValueChanged,
+    required this.input,
   });
 
   @override
   Widget build(BuildContext context) {
+    String prevValue = controller.text;
     return TextFormField(
       controller: controller,
       readOnly: !(isEditable ?? false),
@@ -39,6 +47,12 @@ class InputFieldText extends StatelessWidget {
         helperText: helperText,
         helperMaxLines: 100,
       ),
+      onChanged: (value) {
+        if (onValueChanged != null) {
+          onValueChanged!.call(context, prevValue, value);
+        }
+        prevValue = value;
+      },
       validator: (value) {
         validation() {
           if ((inputTextMode ?? InputTextMode.freeText) ==

@@ -1,5 +1,6 @@
 library devaloop_form_builder;
 
+import 'package:devaloop_form_builder/form_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,6 +12,10 @@ class InputFieldNumber extends StatelessWidget {
   final InputNumberMode? inputFieldNumberMode;
   final String? Function(String? errorMessage)? onValidating;
   final bool? isEditable;
+  final dynamic Function(
+          BuildContext context, double? previousValue, double? currentValue)?
+      onValueChanged;
+  final InputNumber input;
 
   const InputFieldNumber({
     super.key,
@@ -21,6 +26,8 @@ class InputFieldNumber extends StatelessWidget {
     this.inputFieldNumberMode,
     this.onValidating,
     this.isEditable,
+    this.onValueChanged,
+    required this.input,
   });
 
   @override
@@ -61,6 +68,10 @@ class InputFieldNumber extends StatelessWidget {
         },
       ),
     ];
+
+    double? prevValue =
+        controller.text == '' ? null : double.parse(controller.text);
+
     return TextFormField(
       controller: controller,
       readOnly: !(isEditable ?? true),
@@ -79,6 +90,13 @@ class InputFieldNumber extends StatelessWidget {
         helperMaxLines: 100,
         suffixIcon: const Icon(Icons.numbers),
       ),
+      onChanged: (value) {
+        double? currentValue = value == '' ? null : double.parse(value);
+        if (onValueChanged != null) {
+          onValueChanged!.call(context, prevValue, currentValue);
+        }
+        prevValue = currentValue;
+      },
       validator: (value) {
         validation() {
           if (isRequired && (value == null || value.isEmpty)) {

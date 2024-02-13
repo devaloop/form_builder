@@ -33,6 +33,11 @@ class InputFieldForm extends StatefulWidget {
       Map<String, String?> errorsMessages)? onAfterValidation;
   final List<AdditionalButton>? additionalButtons;
   final bool? isMultiInputForm;
+  final dynamic Function(
+      BuildContext context,
+      List<Map<String, dynamic>> previousValue,
+      List<Map<String, dynamic>> currentValue)? onValueChanged;
+  final InputForm input;
 
   const InputFieldForm({
     super.key,
@@ -48,6 +53,8 @@ class InputFieldForm extends StatefulWidget {
     this.onAfterValidation,
     this.additionalButtons,
     this.isMultiInputForm,
+    this.onValueChanged,
+    required this.input,
   });
 
   @override
@@ -95,6 +102,13 @@ class _InputFieldFormState extends State<InputFieldForm> {
                         ? () {
                             Future<void> navigateToInputFieldFormPage(
                                 BuildContext context) async {
+                              var inputValue = InputValue(
+                                  controller: widget.controller,
+                                  inputField: widget.input);
+
+                              final List<Map<String, dynamic>> prevValue =
+                                  List.from(inputValue.getFormValues());
+
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -202,6 +216,12 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                         '${widget.controller.getData().length} Data Filled';
                                   }
                                 });
+
+                                if (widget.onValueChanged != null) {
+                                  if (!mounted) return;
+                                  widget.onValueChanged!.call(context,
+                                      prevValue, inputValue.getFormValues());
+                                }
                               }
                             }
 
@@ -272,6 +292,13 @@ class _InputFieldFormState extends State<InputFieldForm> {
                 if (Platform.isAndroid || Platform.isIOS) {
                   Future<void> navigateToInputFieldFormPage(
                       BuildContext context) async {
+                    var inputValue = InputValue(
+                        controller: widget.controller,
+                        inputField: widget.input);
+
+                    final List<Map<String, dynamic>> prevValue =
+                        List.from(inputValue.getFormValues());
+
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -362,6 +389,12 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               '${widget.controller.getData().length} Data Filled';
                         }
                       });
+
+                      if (widget.onValueChanged != null) {
+                        if (!mounted) return;
+                        widget.onValueChanged!.call(
+                            context, prevValue, inputValue.getFormValues());
+                      }
                     }
                   }
 
@@ -631,12 +664,24 @@ class _InputFieldFormState extends State<InputFieldForm> {
                         icon: const Icon(Icons.remove),
                         onPressed: widget.isEditable ?? false
                             ? () {
+                                var inputValue = InputValue(
+                                    controller: widget.controller,
+                                    inputField: widget.input);
+
+                                final List<Map<String, dynamic>> prevValue =
+                                    List.from(inputValue.getFormValues());
                                 setState(() {
                                   widget.controller.clearAt(index);
                                   if (widget.controller.getData().isEmpty) {
                                     _controller.clear();
                                   }
                                 });
+
+                                if (widget.onValueChanged != null) {
+                                  if (!mounted) return;
+                                  widget.onValueChanged!.call(context,
+                                      prevValue, inputValue.getFormValues());
+                                }
                               }
                             : null,
                       ),
@@ -647,6 +692,13 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                   ? () {
                                       Future<void> navigateToInputFieldFormPage(
                                           BuildContext context) async {
+                                        var inputValue = InputValue(
+                                            controller: widget.controller,
+                                            inputField: widget.input);
+
+                                        final List<Map<String, dynamic>>
+                                            prevValue = List.from(
+                                                inputValue.getFormValues());
                                         final result = await Navigator.push(
                                           context,
                                           MaterialPageRoute(
@@ -754,6 +806,14 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                   '${widget.controller.getData().length} Data Filled';
                                             }
                                           });
+
+                                          if (widget.onValueChanged != null) {
+                                            if (!mounted) return;
+                                            widget.onValueChanged!.call(
+                                                context,
+                                                prevValue,
+                                                inputValue.getFormValues());
+                                          }
                                         }
                                       }
 

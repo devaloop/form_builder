@@ -334,6 +334,13 @@ class _FormBulderState extends State<FormBulder> {
           return (errorMessage ?? '') + additionalErrorMessage;
         },
         isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        onValueChanged: (context, previousValue, currentValue) {
+          if (widget.onValueChanged != null) {
+            widget.onValueChanged!
+                .call(context, e, previousValue, currentValue, _inputValues);
+          }
+        },
+        input: e,
       );
     } else if (e.runtimeType == InputOption) {
       e = (e as InputOption);
@@ -365,6 +372,13 @@ class _FormBulderState extends State<FormBulder> {
           return (errorMessage ?? '') + additionalErrorMessage;
         },
         isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        onValueChanged: (context, previousValue, currentValue) {
+          if (widget.onValueChanged != null) {
+            widget.onValueChanged!
+                .call(context, e, previousValue, currentValue, _inputValues);
+          }
+        },
+        input: e,
       );
     } else if (e.runtimeType == InputText) {
       e = (e as InputText);
@@ -393,6 +407,13 @@ class _FormBulderState extends State<FormBulder> {
           return (errorMessage ?? '') + additionalErrorMessage;
         },
         isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        onValueChanged: (context, previousValue, currentValue) {
+          if (widget.onValueChanged != null) {
+            widget.onValueChanged!
+                .call(context, e, previousValue, currentValue, _inputValues);
+          }
+        },
+        input: e,
       );
     } else if (e.runtimeType == InputForm) {
       e = (e as InputForm);
@@ -425,6 +446,13 @@ class _FormBulderState extends State<FormBulder> {
         onBeforeValidation: e.onBeforeValidation,
         onInitial: e.onInitial,
         isMultiInputForm: e.isMultiInputForm,
+        onValueChanged: (context, previousValue, currentValue) {
+          if (widget.onValueChanged != null) {
+            widget.onValueChanged!
+                .call(context, e, previousValue, currentValue, _inputValues);
+          }
+        },
+        input: e,
       );
     } else if (e.runtimeType == InputFile) {
       e = (e as InputFile);
@@ -454,6 +482,13 @@ class _FormBulderState extends State<FormBulder> {
         isMultiSelection: e.isAllowMultiple ?? false,
         fileType: e.fileType ?? FileType.any,
         onDownload: e.onDownload,
+        onValueChanged: (context, previousValue, currentValue) {
+          if (widget.onValueChanged != null) {
+            widget.onValueChanged!
+                .call(context, e, previousValue, currentValue, _inputValues);
+          }
+        },
+        input: e,
       );
     } else {
       throw Exception('Unsupported InputFieldType ${e.runtimeType}');
@@ -568,6 +603,7 @@ class InputText extends Input {
     super.isOptional,
     this.isMultilines = false,
     this.inputTextMode = InputTextMode.freeText,
+    super.onValueChanged,
   });
 }
 
@@ -612,6 +648,7 @@ class InputForm extends Input {
     this.onAfterValidation,
     this.onBeforeValidation,
     this.onInitial,
+    super.onValueChanged,
   });
 }
 
@@ -624,6 +661,7 @@ class InputNumber extends Input {
     super.helperText,
     super.isOptional,
     this.inputNumberMode = InputNumberMode.decimal,
+    super.onValueChanged,
   });
 }
 
@@ -644,6 +682,7 @@ class InputOption extends Input {
     this.dataHeaders = const [],
     this.optionSearchForm,
     this.isMultiSelection = false,
+    super.onValueChanged,
   });
 }
 
@@ -660,6 +699,7 @@ class InputFile extends Input {
     this.isAllowMultiple = false,
     this.fileType = FileType.any,
     this.onDownload,
+    super.onValueChanged,
   });
 }
 

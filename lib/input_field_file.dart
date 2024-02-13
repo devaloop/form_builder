@@ -2,6 +2,7 @@ library devaloop_form_builder;
 
 import 'dart:io';
 
+import 'package:devaloop_form_builder/form_builder.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,9 @@ class InputFieldFile extends StatefulWidget {
   final bool? isEditable;
   final FileType fileType;
   final void Function(PlatformFile file)? onDownload;
+  final dynamic Function(BuildContext context, List<PlatformFile> previousValue,
+      List<PlatformFile> currentValue)? onValueChanged;
+  final InputFile input;
 
   const InputFieldFile({
     super.key,
@@ -28,6 +32,8 @@ class InputFieldFile extends StatefulWidget {
     this.isEditable,
     required this.fileType,
     this.onDownload,
+    this.onValueChanged,
+    required this.input,
   });
 
   @override
@@ -74,6 +80,13 @@ class _InputFieldFileState extends State<InputFieldFile> {
                         : const Icon(Icons.navigate_next),
                     onPressed: widget.isEditable ?? false
                         ? () async {
+                            var inputValue = InputValue(
+                                controller: widget.controller,
+                                inputField: widget.input);
+
+                            final List<PlatformFile> prevValue =
+                                List.from(inputValue.getFiles());
+
                             final result = await FilePicker.platform.pickFiles(
                               withData: true,
                               type: widget.fileType,
@@ -98,6 +111,12 @@ class _InputFieldFileState extends State<InputFieldFile> {
                                 _controller.clear();
                               }
                             });
+
+                            if (widget.onValueChanged != null) {
+                              if (!mounted) return;
+                              widget.onValueChanged!.call(
+                                  context, prevValue, inputValue.getFiles());
+                            }
                           }
                         : null,
                   ),
@@ -123,6 +142,12 @@ class _InputFieldFileState extends State<InputFieldFile> {
             onTap: () async {
               if (!kIsWeb) {
                 if (Platform.isAndroid || Platform.isIOS) {
+                  var inputValue = InputValue(
+                      controller: widget.controller, inputField: widget.input);
+
+                  final List<PlatformFile> prevValue =
+                      List.from(inputValue.getFiles());
+
                   final result = await FilePicker.platform.pickFiles(
                     withData: true,
                     type: widget.fileType,
@@ -147,6 +172,12 @@ class _InputFieldFileState extends State<InputFieldFile> {
                       _controller.clear();
                     }
                   });
+
+                  if (widget.onValueChanged != null) {
+                    if (!mounted) return;
+                    widget.onValueChanged!
+                        .call(context, prevValue, inputValue.getFiles());
+                  }
                 }
               }
             },
@@ -190,6 +221,13 @@ class _InputFieldFileState extends State<InputFieldFile> {
                     return ListTile(
                       leading: IconButton(
                           onPressed: () {
+                            var inputValue = InputValue(
+                                controller: widget.controller,
+                                inputField: widget.input);
+
+                            final List<PlatformFile> prevValue =
+                                List.from(inputValue.getFiles());
+
                             setState(() {
                               widget.controller.getData().removeAt(index);
 
@@ -200,6 +238,12 @@ class _InputFieldFileState extends State<InputFieldFile> {
                                 _controller.clear();
                               }
                             });
+
+                            if (widget.onValueChanged != null) {
+                              if (!mounted) return;
+                              widget.onValueChanged!.call(
+                                  context, prevValue, inputValue.getFiles());
+                            }
                           },
                           icon: const Icon(Icons.remove)),
                       title: Text(widget.controller.getData()[index].name),

@@ -19,6 +19,9 @@ class InputFieldOption extends StatefulWidget {
   final bool? isMultiSelection;
   final String? Function(String? errorMessage)? onValidating;
   final bool? isEditable;
+  final dynamic Function(BuildContext context, List<OptionItem> previousValue,
+      List<OptionItem> currentValue)? onValueChanged;
+  final InputOption input;
 
   const InputFieldOption({
     super.key,
@@ -33,6 +36,8 @@ class InputFieldOption extends StatefulWidget {
     this.isMultiSelection,
     this.onValidating,
     this.isEditable,
+    this.onValueChanged,
+    required this.input,
   });
 
   @override
@@ -81,10 +86,17 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                         ? const Icon(Icons.add)
                         : const Icon(Icons.navigate_next),
                     onPressed: widget.isEditable ?? false
-                        ? () {
+                        ? () async {
                             Future<void>
                                 navigateToInputFieldOptionSearchFormPage(
                                     BuildContext context) async {
+                              var inputValue = InputValue(
+                                  controller: widget.controller,
+                                  inputField: widget.input);
+
+                              final List<OptionItem> prevValue =
+                                  List.from(inputValue.getListOptionValues());
+
                               final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -108,10 +120,18 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                                   }
                                   widget.controller.add(result);
                                 });
+                                if (widget.onValueChanged != null) {
+                                  if (!mounted) return;
+                                  widget.onValueChanged!.call(
+                                      context,
+                                      prevValue,
+                                      inputValue.getListOptionValues());
+                                }
                               }
                             }
 
-                            navigateToInputFieldOptionSearchFormPage(context);
+                            await navigateToInputFieldOptionSearchFormPage(
+                                context);
                           }
                         : null,
                   ),
@@ -134,11 +154,18 @@ class _InputFieldOptionState extends State<InputFieldOption> {
               return errorMessage;
             },
             readOnly: true,
-            onTap: () {
+            onTap: () async {
               if (!kIsWeb) {
                 if (Platform.isAndroid || Platform.isIOS) {
                   Future<void> navigateToInputFieldOptionSearchFormPage(
                       BuildContext context) async {
+                    var inputValue = InputValue(
+                        controller: widget.controller,
+                        inputField: widget.input);
+
+                    final List<OptionItem> prevValue =
+                        List.from(inputValue.getListOptionValues());
+
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -160,10 +187,16 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                         }
                         widget.controller.add(result);
                       });
+                      if (widget.onValueChanged != null) {
+                        if (!mounted) return;
+
+                        widget.onValueChanged!.call(context, prevValue,
+                            inputValue.getListOptionValues());
+                      }
                     }
                   }
 
-                  navigateToInputFieldOptionSearchFormPage(context);
+                  await navigateToInputFieldOptionSearchFormPage(context);
                 }
               }
             },
@@ -242,9 +275,23 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                     icon: const Icon(Icons.remove),
                     onPressed: widget.isEditable ?? false
                         ? () {
+                            var inputValue = InputValue(
+                                controller: widget.controller,
+                                inputField: widget.input);
+
+                            final List<OptionItem> prevValue =
+                                List.from(inputValue.getListOptionValues());
+
                             setState(() {
                               widget.controller.getData().removeAt(index);
                             });
+
+                            if (widget.onValueChanged != null) {
+                              if (!mounted) return;
+
+                              widget.onValueChanged!.call(context, prevValue,
+                                  inputValue.getListOptionValues());
+                            }
                           }
                         : null,
                   ),
