@@ -521,6 +521,14 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                 '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
 
                             listDataView.add(Card(
+                              color: Colors.white,
+                              elevation: 0,
+                              shape: StadiumBorder(
+                                side: BorderSide(
+                                  color: Colors.grey.shade200,
+                                  width: 1.0,
+                                ),
+                              ),
                               child: Padding(
                                 padding: const EdgeInsets.all(7.5),
                                 child: Text(value),
@@ -909,14 +917,16 @@ class _InputFieldFormState extends State<InputFieldForm> {
             if (formValue[inputFieldFormInputField.name] != null) {
               if (item.inputNumberMode == InputNumberMode.decimal) {
                 try {
-                  double.tryParse(formValue[inputFieldFormInputField.name]);
+                  double.tryParse(
+                      formValue[inputFieldFormInputField.name].toString());
                 } catch (ex) {
                   isValid = false;
                   break;
                 }
               } else {
                 try {
-                  int.tryParse(formValue[inputFieldFormInputField.name]);
+                  int.tryParse(
+                      formValue[inputFieldFormInputField.name].toString());
                 } catch (ex) {
                   isValid = false;
                   break;

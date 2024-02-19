@@ -62,6 +62,36 @@ class _MyAppState extends State<MyApp> {
           child: FormBuilder(
             formName: 'Member',
             inputFields: [
+              const InputForm(
+                name: 'jumlah',
+                label: 'Jumlah',
+                inputFields: [
+                  InputNumber(
+                    name: 'dari',
+                    label: 'Dari',
+                  ),
+                  InputNumber(
+                    name: 'sampai',
+                    label: 'Sampai',
+                  )
+                ],
+              ),
+              const InputForm(
+                name: 'tanggalPengeluaran',
+                label: 'Tanggal Pengeluaran',
+                inputFields: [
+                  InputDateTime(
+                    name: 'dari',
+                    label: 'Dari',
+                    inputDateTimeMode: InputDateTimeMode.date,
+                  ),
+                  InputDateTime(
+                    name: 'sampai',
+                    label: 'Sampai',
+                    inputDateTimeMode: InputDateTimeMode.date,
+                  ),
+                ],
+              ),
               const InputText(
                 name: 'name',
                 label: 'Name',
