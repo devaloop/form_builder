@@ -24,7 +24,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Future<OptionData> _futureTrainingProgramOptionData;
-  late Future<int> _futureTrainingProgramOptionTotalData;
+  late Future<OptionData> _genderFamilyMembers;
 
   @override
   void initState() {
@@ -36,7 +36,17 @@ class _MyAppState extends State<MyApp> {
             displayedListOfOptions: data, totalOption: data.length);
       },
     );
-    _futureTrainingProgramOptionTotalData = Future(() => 0);
+
+    _genderFamilyMembers = Future<OptionData>(
+      () async {
+        var data = [
+          const OptionItem(hiddenValue: ['Male'], value: ['Male']),
+          const OptionItem(hiddenValue: ['Female'], value: ['Female']),
+        ];
+        return OptionData(
+            displayedListOfOptions: data, totalOption: data.length);
+      },
+    );
   }
 
   @override
@@ -49,12 +59,41 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       home: Scaffold(
-        backgroundColor: Colors.white,
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(15),
           child: FormBuilder(
             formName: 'Member',
             inputFields: [
+              const InputForm(
+                name: 'jumlah',
+                label: 'Jumlah',
+                inputFields: [
+                  InputNumber(
+                    name: 'dari',
+                    label: 'Dari',
+                  ),
+                  InputNumber(
+                    name: 'sampai',
+                    label: 'Sampai',
+                  )
+                ],
+              ),
+              const InputForm(
+                name: 'tanggalPengeluaran',
+                label: 'Tanggal Pengeluaran',
+                inputFields: [
+                  InputDateTime(
+                    name: 'dari',
+                    label: 'Dari',
+                    inputDateTimeMode: InputDateTimeMode.date,
+                  ),
+                  InputDateTime(
+                    name: 'sampai',
+                    label: 'Sampai',
+                    inputDateTimeMode: InputDateTimeMode.date,
+                  ),
+                ],
+              ),
               const InputText(
                 name: 'name',
                 label: 'Name',
@@ -78,7 +117,6 @@ class _MyAppState extends State<MyApp> {
                 name: 'trainingProgram',
                 label: 'Training Program',
                 optionData: _futureTrainingProgramOptionData,
-                optionTotalData: _futureTrainingProgramOptionTotalData,
               ),
               InputOption(
                 name: 'gender',
@@ -94,7 +132,6 @@ class _MyAppState extends State<MyApp> {
                         displayedListOfOptions: data, totalOption: data.length);
                   },
                 ),
-                optionTotalData: Future(() => 2),
               ),
               InputOption(
                 name: 'hobbies',
@@ -114,15 +151,16 @@ class _MyAppState extends State<MyApp> {
                   },
                 ),
                 dataHeaders: ['Name', 'Detail'],
-                optionTotalData: Future(() => Db.hobbies.length),
                 optionSearchForm: OptionSearchForm(
                   searchFields: [
                     const InputText(
-                        name: 'name', label: 'Name', isOptional: true),
+                      name: 'name',
+                      label: 'Name',
+                    ),
                     const InputText(
                       name: 'detail',
                       label: 'Detail',
-                      isOptional: false,
+                      isOptional: true,
                     ),
                   ],
                   searchProcess: (params) {
@@ -136,6 +174,16 @@ class _MyAppState extends State<MyApp> {
                                 .contains(
                                     params['name']!.getString()!.toLowerCase()))
                             .toList();
+
+                        if (params['detail']!.getString() != null) {
+                          data = data
+                              .where((element) => element.value[0]
+                                  .toLowerCase()
+                                  .contains(params['detail']!
+                                      .getString()!
+                                      .toLowerCase()))
+                              .toList();
+                        }
                         return OptionData(
                           displayedListOfOptions: data,
                           totalOption: Db.hobbies.length,
@@ -162,6 +210,31 @@ class _MyAppState extends State<MyApp> {
                 name: 'familyMembers',
                 label: 'Family Members',
                 isMultiInputForm: true,
+                onFormValueChanged:
+                    (context, field, previousValue, currentValue, inputValues) {
+                  if (field.name == 'name') {
+                    if (currentValue == 'a') {
+                      setState(() {
+                        _genderFamilyMembers = Future<OptionData>(
+                          () async {
+                            await Future.delayed(const Duration(seconds: 10));
+                            var data = [
+                              const OptionItem(
+                                  hiddenValue: ['Male'], value: ['Male']),
+                              const OptionItem(
+                                  hiddenValue: ['Female'], value: ['Female']),
+                              const OptionItem(
+                                  hiddenValue: ['Other'], value: ['Other']),
+                            ];
+                            return OptionData(
+                                displayedListOfOptions: data,
+                                totalOption: data.length);
+                          },
+                        );
+                      });
+                    }
+                  }
+                },
                 inputFields: [
                   const InputText(
                     name: 'name',
@@ -181,20 +254,7 @@ class _MyAppState extends State<MyApp> {
                   InputOption(
                     name: 'gender',
                     label: 'Gender',
-                    optionData: Future<OptionData>(
-                      () {
-                        var data = [
-                          const OptionItem(
-                              hiddenValue: ['Male'], value: ['Male']),
-                          const OptionItem(
-                              hiddenValue: ['Female'], value: ['Female']),
-                        ];
-                        return OptionData(
-                            displayedListOfOptions: data,
-                            totalOption: data.length);
-                      },
-                    ),
-                    optionTotalData: Future(() => 2),
+                    optionData: _genderFamilyMembers,
                   ),
                   InputOption(
                     name: 'hobbies',
@@ -214,7 +274,6 @@ class _MyAppState extends State<MyApp> {
                       },
                     ),
                     //dataHeaders: ['Name', 'Detail'],
-                    optionTotalData: Future(() => Db.hobbies.length),
                     optionSearchForm: OptionSearchForm(
                       searchFields: [
                         const InputText(
@@ -289,7 +348,6 @@ class _MyAppState extends State<MyApp> {
                         () => const OptionData(
                             displayedListOfOptions: [], totalOption: 0),
                       );
-                      _futureTrainingProgramOptionTotalData = Future(() => 0);
                     });
                   } else {
                     if (joinDate.isAfter(DateTime(2024))) {
@@ -311,7 +369,6 @@ class _MyAppState extends State<MyApp> {
                                 totalOption: data.length);
                           },
                         );
-                        _futureTrainingProgramOptionTotalData = Future(() => 2);
                       });
                     } else {
                       setState(() {
@@ -332,7 +389,6 @@ class _MyAppState extends State<MyApp> {
                                 totalOption: data.length);
                           },
                         );
-                        _futureTrainingProgramOptionTotalData = Future(() => 2);
                       });
                     }
                   }

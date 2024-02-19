@@ -1,4 +1,4 @@
-## 0.0.5
+## 0.0.6
 
-* Add onValueChanged
-* Renamed FormBulder to FormBuilder
+* Some improvements
+* Style to default
