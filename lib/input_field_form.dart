@@ -502,7 +502,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                             value = '${e.label}: $strData';
 
                             listDataView.add(Card(
-                              color: Colors.white,
+                              color: Colors.transparent,
                               elevation: 0,
                               shape: StadiumBorder(
                                 side: BorderSide(
@@ -521,7 +521,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                 '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
 
                             listDataView.add(Card(
-                              color: Colors.white,
+                              color: Colors.transparent,
                               elevation: 0,
                               shape: StadiumBorder(
                                 side: BorderSide(
@@ -550,7 +550,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                     false) ==
                                 false) {
                               listDataView.add(Card(
-                                color: Colors.white,
+                                color: Colors.transparent,
                                 elevation: 0,
                                 shape: StadiumBorder(
                                   side: BorderSide(
@@ -587,7 +587,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                               ));
                             } else {
                               listDataView.add(Card(
-                                color: Colors.white,
+                                color: Colors.transparent,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   side: BorderSide(
@@ -645,7 +645,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                 '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
 
                             listDataView.add(Card(
-                              color: Colors.white,
+                              color: Colors.transparent,
                               elevation: 0,
                               shape: StadiumBorder(
                                 side: BorderSide(
@@ -669,7 +669,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                             value =
                                 '${e.label}: ${data == null ? '-' : '${widget.controller.getData().length} Data Filled'}';
                             listDataView.add(Card(
-                              color: Colors.white,
+                              color: Colors.transparent,
                               elevation: 0,
                               shape: StadiumBorder(
                                 side: BorderSide(
@@ -1040,17 +1040,8 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(widget.title),
-        systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
-          statusBarColor: Colors.white,
-          systemNavigationBarColor: Colors.white,
-          systemNavigationBarDividerColor: Colors.white,
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(

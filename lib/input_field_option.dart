@@ -252,7 +252,7 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                             return MapEntry(
                               key,
                               Card(
-                                color: Colors.white,
+                                color: Colors.transparent,
                                 elevation: 0,
                                 shape: RoundedRectangleBorder(
                                   side: BorderSide(
@@ -342,17 +342,8 @@ class _InputFieldOptionSearchFormPage
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(widget.title),
-        systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
-          statusBarColor: Colors.transparent,
-          systemNavigationBarColor: Colors.white,
-          systemNavigationBarDividerColor: Colors.white,
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
       ),
       body: Form(
         key: _formKey,
@@ -444,7 +435,7 @@ class _InputFieldOptionSearchFormPage
                                         return MapEntry(
                                           key,
                                           Card(
-                                            color: Colors.white,
+                                            color: Colors.transparent,
                                             elevation: 0,
                                             shape: RoundedRectangleBorder(
                                               side: BorderSide(
@@ -531,17 +522,8 @@ class _InputFieldOptionSearchResultPage
   Widget build(BuildContext context) {
     var screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(widget.title),
-        systemOverlayStyle: SystemUiOverlayStyle.dark.copyWith(
-          statusBarColor: Colors.transparent,
-          systemNavigationBarColor: Colors.white,
-          systemNavigationBarDividerColor: Colors.white,
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        scrolledUnderElevation: 0,
       ),
       body: FutureBuilder<OptionData>(
         future: widget.searchProcess!.call(widget.searchParameters),

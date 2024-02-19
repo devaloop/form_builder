@@ -19,7 +19,6 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Future<OptionData> _futureTrainingProgramOptionData;
-  late Future<int> _futureTrainingProgramOptionTotalData;
   late Future<OptionData> _genderFamilyMembers;
 
   @override
@@ -32,7 +31,6 @@ class _MyAppState extends State<MyApp> {
             displayedListOfOptions: data, totalOption: data.length);
       },
     );
-    _futureTrainingProgramOptionTotalData = Future(() => 0);
 
     _genderFamilyMembers = Future<OptionData>(
       () async {
@@ -56,7 +54,6 @@ class _MyAppState extends State<MyApp> {
         useMaterial3: true,
       ),
       home: Scaffold(
-        backgroundColor: Colors.white,
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(15),
           child: FormBuilder(
@@ -346,7 +343,6 @@ class _MyAppState extends State<MyApp> {
                         () => const OptionData(
                             displayedListOfOptions: [], totalOption: 0),
                       );
-                      _futureTrainingProgramOptionTotalData = Future(() => 0);
                     });
                   } else {
                     if (joinDate.isAfter(DateTime(2024))) {
@@ -368,7 +364,6 @@ class _MyAppState extends State<MyApp> {
                                 totalOption: data.length);
                           },
                         );
-                        _futureTrainingProgramOptionTotalData = Future(() => 2);
                       });
                     } else {
                       setState(() {
@@ -389,7 +384,6 @@ class _MyAppState extends State<MyApp> {
                                 totalOption: data.length);
                           },
                         );
-                        _futureTrainingProgramOptionTotalData = Future(() => 2);
                       });
                     }
                   }
