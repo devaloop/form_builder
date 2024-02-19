@@ -6,7 +6,6 @@ import 'package:devaloop_form_builder/input_field_date_time.dart';
 import 'package:devaloop_form_builder/input_field_option.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:devaloop_form_builder/form_builder.dart';
 import 'package:intl/intl.dart';
 
@@ -702,6 +701,9 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                   widget.controller.clearAt(index);
                                   if (widget.controller.getData().isEmpty) {
                                     _controller.clear();
+                                  } else {
+                                    _controller.text =
+                                        '${widget.controller.getData().length} Data Filled';
                                   }
                                 });
 
