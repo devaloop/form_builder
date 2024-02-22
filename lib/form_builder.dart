@@ -2,6 +2,7 @@ library devaloop_form_builder;
 
 import 'package:devaloop_form_builder/input_field_file.dart';
 import 'package:devaloop_form_builder/input_field_form.dart';
+import 'package:devaloop_form_builder/input_field_hidden.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:devaloop_form_builder/input_field_date_time.dart';
@@ -77,6 +78,8 @@ class _FormBuilderState extends State<FormBuilder> {
         _controllers.add(InputFieldFormController());
       } else if (e.runtimeType == InputFile) {
         _controllers.add(InputFieldFileController());
+      } else if (e.runtimeType == InputHidden) {
+        _controllers.add(InputFieldHiddenController());
       } else {
         throw Exception('Unsupported InputFieldType ${e.runtimeType}');
       }
@@ -179,9 +182,18 @@ class _FormBuilderState extends State<FormBuilder> {
       }
     }).toList();
 
+    var fieldHidden = widget.inputFields.where((e) {
+      if (e.runtimeType == InputHidden) {
+        return true;
+      } else {
+        return false;
+      }
+    }).toList();
+
     var fieldTextAndDate = widget.inputFields
         .where((e) => !fieldOptionFormAndFile.contains(e))
         .where((e) => !fieldTextMultiLine.contains(e))
+        .where((e) => !fieldHidden.contains(e))
         .toList();
 
     var fieldOdd = [];
@@ -221,6 +233,15 @@ class _FormBuilderState extends State<FormBuilder> {
                 .map(
                   (e) => SizedBox(
                     width: constraints.maxWidth,
+                    child: getField(e),
+                  ),
+                )
+                .toList());
+            widgets.addAll(fieldHidden
+                .map(
+                  (e) => SizedBox(
+                    width: 0,
+                    height: 0,
                     child: getField(e),
                   ),
                 )
@@ -490,6 +511,13 @@ class _FormBuilderState extends State<FormBuilder> {
         },
         input: e,
       );
+    } else if (e.runtimeType == InputHidden) {
+      e = (e as InputHidden);
+      return InputFieldHidden(
+        controller: _controllers[
+            widget.inputFields.indexWhere((element) => element == e)],
+        label: e.label,
+      );
     } else {
       throw Exception('Unsupported InputFieldType ${e.runtimeType}');
     }
@@ -604,6 +632,13 @@ class InputText extends Input {
     this.isMultilines = false,
     this.inputTextMode = InputTextMode.freeText,
     super.onValueChanged,
+  });
+}
+
+class InputHidden extends Input {
+  const InputHidden({
+    required super.name,
+    required super.label,
   });
 }
 
@@ -741,7 +776,7 @@ class InputValue {
       return (controller as InputFieldFileController).getData();
     } else {
       throw Exception(
-          'Unsupported getListOptionValues for this input type ${inputField.runtimeType}');
+          'Unsupported getFiles for this input type ${inputField.runtimeType}');
     }
   }
 
@@ -876,6 +911,24 @@ class InputValue {
     } else {
       throw Exception(
           'Unsupported setString for this input type ${inputField.runtimeType}');
+    }
+  }
+
+  void setHiddenValue(dynamic value) {
+    if (inputField.runtimeType == InputHidden) {
+      (controller as InputFieldHiddenController).setData(value);
+    } else {
+      throw Exception(
+          'Unsupported setHiddenValue for this input type ${inputField.runtimeType}');
+    }
+  }
+
+  dynamic getHiddenValue() {
+    if (inputField.runtimeType == InputHidden) {
+      return (controller as InputFieldHiddenController).getData();
+    } else {
+      throw Exception(
+          'Unsupported getHiddenValue for this input type ${inputField.runtimeType}');
     }
   }
 }

@@ -204,6 +204,18 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                                 .firstOrNull
                                                                 ?.value ??
                                                             []);
+                                                  } else if (e.runtimeType ==
+                                                      InputHidden) {
+                                                    inputValues[e.name]!
+                                                        .setHiddenValue(widget
+                                                            .controller
+                                                            .getData()[index]
+                                                            .entries
+                                                            .where((element) =>
+                                                                element.key ==
+                                                                e.name)
+                                                            .firstOrNull
+                                                            ?.value);
                                                   } else {}
                                                 }
                                               }
@@ -384,6 +396,17 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                       .firstOrNull
                                                       ?.value ??
                                                   []);
+                                        } else if (e.runtimeType ==
+                                            InputHidden) {
+                                          inputValues[e.name]!.setHiddenValue(
+                                              widget
+                                                  .controller
+                                                  .getData()[index]
+                                                  .entries
+                                                  .where((element) =>
+                                                      element.key == e.name)
+                                                  .firstOrNull
+                                                  ?.value);
                                         } else {}
                                       }
                                     }
@@ -819,6 +842,18 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                                                   .firstOrNull
                                                                   ?.value ??
                                                               []);
+                                                    } else if (e.runtimeType ==
+                                                        InputHidden) {
+                                                      inputValues[e.name]!
+                                                          .setHiddenValue(widget
+                                                              .controller
+                                                              .getData()[index]
+                                                              .entries
+                                                              .where((element) =>
+                                                                  element.key ==
+                                                                  e.name)
+                                                              .firstOrNull
+                                                              ?.value);
                                                     } else {}
                                                   }
                                                 },
@@ -1086,6 +1121,10 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
               if (inputField.runtimeType == InputForm) {
                 controller[inputField.name] =
                     inputValues[inputField.name]!.getFormValues();
+              }
+              if (inputField.runtimeType == InputHidden) {
+                controller[inputField.name] =
+                    inputValues[inputField.name]!.getHiddenValue();
               }
             }
             Navigator.pop(context, controller);

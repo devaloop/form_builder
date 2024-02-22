@@ -1,4 +1,3 @@
-## 0.0.6
+## 0.0.7
 
-* Some improvements
-* Style to default
+* Add InputHidden

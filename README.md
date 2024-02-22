@@ -64,10 +64,22 @@ class _MyAppState extends State<MyApp> {
           child: FormBuilder(
             formName: 'Member',
             inputFields: [
+              const InputHidden(
+                name: 'id',
+                label: 'ID',
+              ),
+              const InputText(
+                name: 'name',
+                label: 'Name',
+              ),
               const InputForm(
                 name: 'jumlah',
                 label: 'Jumlah',
                 inputFields: [
+                  InputHidden(
+                    name: 'jumlahId',
+                    label: 'Jumlah Id',
+                  ),
                   InputNumber(
                     name: 'dari',
                     label: 'Dari',
@@ -93,10 +105,6 @@ class _MyAppState extends State<MyApp> {
                     inputDateTimeMode: InputDateTimeMode.date,
                   ),
                 ],
-              ),
-              const InputText(
-                name: 'name',
-                label: 'Name',
               ),
               const InputText(
                 name: 'email',
@@ -396,6 +404,12 @@ class _MyAppState extends State<MyApp> {
               }
             },
             onInitial: (context, inputValues) {
+              inputValues['id']!.setHiddenValue(1001);
+              inputValues['jumlah']!.setFormValues([
+                {
+                  'jumlahId': 1002,
+                }
+              ]);
               inputValues['name']!.setString('Budi Saputra');
 
               inputValues['familyMembers']!.setFormValues([
