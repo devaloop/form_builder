@@ -148,7 +148,7 @@ class _FormBuilderState extends State<FormBuilder> {
                         _isSubmittings[i] = true;
                         _isEditable = false;
                       });
-                      await additionalButton.onTap.call();
+                      await additionalButton.onTap.call(context, _inputValues);
                       setState(() {
                         _isSubmittings[i] = false;
                         _isEditable = null;
@@ -936,7 +936,8 @@ class InputValue {
 class AdditionalButton {
   final String label;
   final Widget icon;
-  final Function() onTap;
+  final dynamic Function(
+      BuildContext context, Map<String, InputValue> inputValues) onTap;
 
   AdditionalButton({
     required this.label,

@@ -455,14 +455,22 @@ class _MyAppState extends State<MyApp> {
             ),
             additionalButtons: [
               AdditionalButton(
-                onTap: () async {
+                onTap: (context, inputValues) async {
+                  await Future.delayed(const Duration(seconds: 2));
+                  inputValues['name']!.setString(null);
+                },
+                label: 'Reset',
+                icon: const Icon(Icons.undo),
+              ),
+              AdditionalButton(
+                onTap: (context, inputValues) async {
                   await Future.delayed(const Duration(seconds: 2));
                 },
                 label: 'Cancel',
                 icon: const Icon(Icons.cancel),
               ),
               AdditionalButton(
-                onTap: () async {
+                onTap: (context, inputValues) async {
                   await Future.delayed(const Duration(seconds: 2));
                 },
                 label: 'Back',
