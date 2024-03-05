@@ -66,6 +66,7 @@ class _MyAppState extends State<MyApp> {
               const InputText(
                 name: 'name',
                 label: 'Name',
+                isEditable: false,
               ),
               const InputForm(
                 name: 'jumlah',

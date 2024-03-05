@@ -320,7 +320,8 @@ class _FormBuilderState extends State<FormBuilder> {
           }
           return (errorMessage ?? '') + additionalErrorMessage;
         },
-        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        isEditable:
+            _isEditable ?? widget.isFormEditable ?? e.isEditable ?? true,
         onValueChanged: (context, previousValue, currentValue) {
           if (widget.onValueChanged != null) {
             widget.onValueChanged!
@@ -354,7 +355,8 @@ class _FormBuilderState extends State<FormBuilder> {
           }
           return (errorMessage ?? '') + additionalErrorMessage;
         },
-        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        isEditable:
+            _isEditable ?? widget.isFormEditable ?? e.isEditable ?? true,
         onValueChanged: (context, previousValue, currentValue) {
           if (widget.onValueChanged != null) {
             widget.onValueChanged!
@@ -392,7 +394,8 @@ class _FormBuilderState extends State<FormBuilder> {
           }
           return (errorMessage ?? '') + additionalErrorMessage;
         },
-        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        isEditable:
+            _isEditable ?? widget.isFormEditable ?? e.isEditable ?? true,
         onValueChanged: (context, previousValue, currentValue) {
           if (widget.onValueChanged != null) {
             widget.onValueChanged!
@@ -427,7 +430,8 @@ class _FormBuilderState extends State<FormBuilder> {
           }
           return (errorMessage ?? '') + additionalErrorMessage;
         },
-        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        isEditable:
+            _isEditable ?? widget.isFormEditable ?? e.isEditable ?? true,
         onValueChanged: (context, previousValue, currentValue) {
           if (widget.onValueChanged != null) {
             widget.onValueChanged!
@@ -460,7 +464,8 @@ class _FormBuilderState extends State<FormBuilder> {
           }
           return (errorMessage ?? '') + additionalErrorMessage;
         },
-        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        isEditable:
+            _isEditable ?? widget.isFormEditable ?? e.isEditable ?? true,
         inputFields: e.inputFields,
         additionalButtons: e.additionalButtons,
         onAfterValidation: e.onAfterValidation,
@@ -499,7 +504,8 @@ class _FormBuilderState extends State<FormBuilder> {
           }
           return (errorMessage ?? '') + additionalErrorMessage;
         },
-        isEditable: _isEditable ?? widget.isFormEditable ?? true,
+        isEditable:
+            _isEditable ?? widget.isFormEditable ?? e.isEditable ?? true,
         isMultiSelection: e.isAllowMultiple ?? false,
         fileType: e.fileType ?? FileType.any,
         onDownload: e.onDownload,
@@ -609,6 +615,7 @@ abstract class Input {
   final String label;
   final String? helperText;
   final bool? isOptional;
+  final bool? isEditable;
   final dynamic Function(InputValue inputValue)? onValueChanged;
 
   const Input({
@@ -616,6 +623,7 @@ abstract class Input {
     required this.label,
     this.helperText,
     this.isOptional = false,
+    this.isEditable = true,
     this.onValueChanged,
   });
 }
@@ -630,6 +638,7 @@ class InputText extends Input {
     super.helperText,
     super.isOptional,
     this.isMultilines = false,
+    super.isEditable,
     this.inputTextMode = InputTextMode.freeText,
     super.onValueChanged,
   });
@@ -650,6 +659,7 @@ class InputDateTime extends Input {
     required super.label,
     super.helperText,
     super.isOptional,
+    super.isEditable,
     this.inputDateTimeMode = InputDateTimeMode.dateTime,
     super.onValueChanged,
   });
@@ -679,6 +689,7 @@ class InputForm extends Input {
     required super.label,
     super.helperText,
     super.isOptional,
+    super.isEditable,
     required this.inputFields,
     this.onValidating,
     this.additionalButtons = const [],
@@ -699,6 +710,7 @@ class InputNumber extends Input {
     required super.label,
     super.helperText,
     super.isOptional,
+    super.isEditable,
     this.inputNumberMode = InputNumberMode.decimal,
     super.onValueChanged,
   });
@@ -715,6 +727,7 @@ class InputOption extends Input {
     required super.label,
     super.helperText,
     super.isOptional,
+    super.isEditable,
     required this.optionData,
     this.dataHeaders = const [],
     this.optionSearchForm,
@@ -733,6 +746,7 @@ class InputFile extends Input {
     required super.label,
     super.helperText,
     super.isOptional,
+    super.isEditable,
     this.isAllowMultiple = false,
     this.fileType = FileType.any,
     this.onDownload,
