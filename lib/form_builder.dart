@@ -12,19 +12,19 @@ import 'package:devaloop_form_builder/input_field_text.dart';
 import 'package:intl/intl.dart';
 
 class FormBuilder extends StatefulWidget {
-  const FormBuilder({
-    super.key,
-    this.formName,
-    required this.inputFields,
-    this.onInitial,
-    this.onBeforeValidation,
-    this.onAfterValidation,
-    required this.onSubmit,
-    this.submitButtonSettings,
-    this.additionalButtons,
-    this.isFormEditable,
-    this.onValueChanged,
-  });
+  const FormBuilder(
+      {super.key,
+      this.formName,
+      required this.inputFields,
+      this.onInitial,
+      this.onBeforeValidation,
+      this.onAfterValidation,
+      required this.onSubmit,
+      this.submitButtonSettings,
+      this.additionalButtons,
+      this.isFormEditable,
+      this.onValueChanged,
+      this.resetToInitialAfterSubmit = false});
 
   final String? formName;
   final List<Input> inputFields;
@@ -49,6 +49,7 @@ class FormBuilder extends StatefulWidget {
       dynamic previousValue,
       dynamic currentValue,
       Map<String, InputValue> inputValues)? onValueChanged;
+  final bool? resetToInitialAfterSubmit;
 
   @override
   State<FormBuilder> createState() => _FormBuilderState();
@@ -567,6 +568,19 @@ class _FormBuilderState extends State<FormBuilder> {
     if (errorMessages.isEmpty) {
       if (!context.mounted) return;
       await widget.onSubmit.call(context, _inputValues);
+      if (widget.resetToInitialAfterSubmit == true) {
+        if (widget.onInitial != null) {
+          if (!context.mounted) return;
+          _inputValues = {
+            for (int i = 0; i < widget.inputFields.length; i++)
+              widget.inputFields[i].name: InputValue(
+                controller: _controllers[i],
+                inputField: widget.inputFields[i],
+              )
+          };
+          widget.onInitial!.call(context, _inputValues);
+        }
+      }
     } else {
       if (!context.mounted) return;
       await showDialog(
