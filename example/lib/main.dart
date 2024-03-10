@@ -57,287 +57,16 @@ class _MyAppState extends State<MyApp> {
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(15),
           child: FormBuilder(
+            resetToInitialAfterSubmit: true,
             formName: 'Member',
-            inputFields: [
-              const InputHidden(
+            inputFields: const [
+              InputHidden(
                 name: 'id',
                 label: 'ID',
               ),
-              const InputText(
+              InputText(
                 name: 'name',
                 label: 'Name',
-                isEditable: false,
-              ),
-              const InputForm(
-                name: 'jumlah',
-                label: 'Jumlah',
-                inputFields: [
-                  InputHidden(
-                    name: 'jumlahId',
-                    label: 'Jumlah Id',
-                  ),
-                  InputNumber(
-                    name: 'dari',
-                    label: 'Dari',
-                  ),
-                  InputNumber(
-                    name: 'sampai',
-                    label: 'Sampai',
-                  )
-                ],
-              ),
-              const InputForm(
-                name: 'tanggalPengeluaran',
-                label: 'Tanggal Pengeluaran',
-                inputFields: [
-                  InputDateTime(
-                    name: 'dari',
-                    label: 'Dari',
-                    inputDateTimeMode: InputDateTimeMode.date,
-                  ),
-                  InputDateTime(
-                    name: 'sampai',
-                    label: 'Sampai',
-                    inputDateTimeMode: InputDateTimeMode.date,
-                  ),
-                ],
-              ),
-              const InputText(
-                name: 'email',
-                label: 'Email',
-                inputTextMode: InputTextMode.email,
-              ),
-              const InputDateTime(
-                name: 'birthDate',
-                label: 'Birth Date',
-                inputDateTimeMode: InputDateTimeMode.date,
-              ),
-              const InputDateTime(
-                name: 'joinDate',
-                label: 'Join Date',
-                inputDateTimeMode: InputDateTimeMode.date,
-              ),
-              InputOption(
-                name: 'trainingProgram',
-                label: 'Training Program',
-                optionData: _futureTrainingProgramOptionData,
-              ),
-              InputOption(
-                name: 'gender',
-                label: 'Gender',
-                optionData: Future<OptionData>(
-                  () {
-                    var data = [
-                      const OptionItem(hiddenValue: ['Male'], value: ['Male']),
-                      const OptionItem(
-                          hiddenValue: ['Female'], value: ['Female']),
-                    ];
-                    return OptionData(
-                        displayedListOfOptions: data, totalOption: data.length);
-                  },
-                ),
-              ),
-              InputOption(
-                name: 'hobbies',
-                label: 'Hobbies',
-                isMultiSelection: true,
-                optionData: Future<OptionData>(
-                  () {
-                    var data = Db.hobbies
-                        .take(10)
-                        .map((e) => OptionItem(
-                            hiddenValue: [e.id], value: [e.name, e.detail]))
-                        .toList();
-                    return OptionData(
-                      displayedListOfOptions: data,
-                      totalOption: Db.hobbies.length,
-                    );
-                  },
-                ),
-                dataHeaders: ['Name', 'Detail'],
-                optionSearchForm: OptionSearchForm(
-                  searchFields: [
-                    const InputText(
-                      name: 'name',
-                      label: 'Name',
-                    ),
-                    const InputText(
-                      name: 'detail',
-                      label: 'Detail',
-                      isOptional: true,
-                    ),
-                  ],
-                  searchProcess: (params) {
-                    return Future<OptionData>(
-                      () {
-                        var data = Db.hobbies
-                            .map((e) => OptionItem(
-                                hiddenValue: [e.id], value: [e.name, e.detail]))
-                            .where((element) => element.value[0]
-                                .toLowerCase()
-                                .contains(
-                                    params['name']!.getString()!.toLowerCase()))
-                            .toList();
-
-                        if (params['detail']!.getString() != null) {
-                          data = data
-                              .where((element) => element.value[0]
-                                  .toLowerCase()
-                                  .contains(params['detail']!
-                                      .getString()!
-                                      .toLowerCase()))
-                              .toList();
-                        }
-                        return OptionData(
-                          displayedListOfOptions: data,
-                          totalOption: Db.hobbies.length,
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-              const InputNumber(
-                name: 'rate',
-                label: 'Rate',
-                isOptional: true,
-                inputNumberMode: InputNumberMode.decimal,
-              ),
-              const InputText(
-                name: 'rateInfo',
-                label: 'Rate Info',
-                helperText: 'Must be filled when rate is filled.',
-                isOptional: true,
-                isMultilines: true,
-              ),
-              InputForm(
-                name: 'familyMembers',
-                label: 'Family Members',
-                isMultiInputForm: true,
-                onFormValueChanged:
-                    (context, field, previousValue, currentValue, inputValues) {
-                  if (field.name == 'name') {
-                    if (currentValue == 'a') {
-                      setState(() {
-                        _genderFamilyMembers = Future<OptionData>(
-                          () async {
-                            await Future.delayed(const Duration(seconds: 10));
-                            var data = [
-                              const OptionItem(
-                                  hiddenValue: ['Male'], value: ['Male']),
-                              const OptionItem(
-                                  hiddenValue: ['Female'], value: ['Female']),
-                              const OptionItem(
-                                  hiddenValue: ['Other'], value: ['Other']),
-                            ];
-                            return OptionData(
-                                displayedListOfOptions: data,
-                                totalOption: data.length);
-                          },
-                        );
-                      });
-                    }
-                  }
-                },
-                inputFields: [
-                  const InputText(
-                    name: 'name',
-                    label: 'Name',
-                  ),
-                  const InputText(
-                    name: 'email',
-                    label: 'Email',
-                    inputTextMode: InputTextMode.email,
-                    isOptional: true,
-                  ),
-                  const InputDateTime(
-                    name: 'birthDate',
-                    label: 'Birth Date',
-                    inputDateTimeMode: InputDateTimeMode.date,
-                  ),
-                  InputOption(
-                    name: 'gender',
-                    label: 'Gender',
-                    optionData: _genderFamilyMembers,
-                  ),
-                  InputOption(
-                    name: 'hobbies',
-                    label: 'Hobbies',
-                    isMultiSelection: true,
-                    optionData: Future<OptionData>(
-                      () {
-                        var data = Db.hobbies
-                            .take(10)
-                            .map((e) => OptionItem(
-                                hiddenValue: [e.id], value: [e.name, e.detail]))
-                            .toList();
-                        return OptionData(
-                          displayedListOfOptions: data,
-                          totalOption: Db.hobbies.length,
-                        );
-                      },
-                    ),
-                    //dataHeaders: ['Name', 'Detail'],
-                    optionSearchForm: OptionSearchForm(
-                      searchFields: [
-                        const InputText(
-                            name: 'name', label: 'Name', isOptional: true),
-                        const InputText(
-                          name: 'detail',
-                          label: 'Detail',
-                          isOptional: false,
-                        ),
-                      ],
-                      searchProcess: (params) {
-                        return Future<OptionData>(
-                          () {
-                            var data = Db.hobbies
-                                .map((e) => OptionItem(
-                                    hiddenValue: [e.id],
-                                    value: [e.name, e.detail]))
-                                .where((element) => element.value[0]
-                                    .toLowerCase()
-                                    .contains(params['name']!
-                                        .getString()!
-                                        .toLowerCase()))
-                                .toList();
-                            return OptionData(
-                              displayedListOfOptions: data,
-                              totalOption: Db.hobbies.length,
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  const InputForm(
-                    name: 'additinalInformations',
-                    label: 'Additional Informations',
-                    isMultiInputForm: true,
-                    isOptional: false,
-                    inputFields: [
-                      InputText(
-                        name: 'title',
-                        label: 'Tittle',
-                      ),
-                      InputText(
-                        name: 'information',
-                        label: 'Informations',
-                        isMultilines: true,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              InputFile(
-                name: 'documents',
-                label: 'Documents',
-                isOptional: true,
-                isAllowMultiple: true,
-                onDownload: (file) {
-                  // ignore: avoid_print
-                  print(file.name);
-                },
               ),
             ],
             onValueChanged:
@@ -401,48 +130,17 @@ class _MyAppState extends State<MyApp> {
             },
             onInitial: (context, inputValues) {
               inputValues['id']!.setHiddenValue(1001);
-              inputValues['jumlah']!.setFormValues([
-                {
-                  'jumlahId': 1002,
-                }
-              ]);
               inputValues['name']!.setString('Budi Saputra');
-
-              inputValues['familyMembers']!.setFormValues([
-                {
-                  'name': 'Ani',
-                  'birthDate': DateTime(2000, 09, 09),
-                  'additinalInformations': [
-                    {
-                      'title': 'Favorite Song',
-                      'information': 'Happy',
-                    },
-                    {
-                      'title': 'Favorite Food',
-                    },
-                    {
-                      'title': 'Favorite Movie',
-                    },
-                  ],
-                }
-              ]);
             },
             onBeforeValidation: (context, inputValues) {
               inputValues['name']!
                   .setString(inputValues['name']!.getString()?.toUpperCase());
             },
-            onAfterValidation: (context, inputValues, isValid, errorMessages) {
-              if (inputValues['rate']!.getNumber() != null &&
-                  inputValues['rateInfo']!.getString() == null) {
-                errorMessages['rateInfo'] =
-                    'Must be filled because rate is filled';
-              }
-            },
+            onAfterValidation:
+                (context, inputValues, isValid, errorMessages) {},
             onSubmit: (context, inputValues) {
-              var result =
-                  inputValues['familyMembers']!.getFormValues().first['name']!;
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Processing Data $result')),
+                const SnackBar(content: Text('Processing Data')),
               );
             },
             submitButtonSettings: const SubmitButtonSettings(

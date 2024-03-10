@@ -63,6 +63,8 @@ class _FormBuilderState extends State<FormBuilder> {
   late Map<String, InputValue> _inputValues;
   late List<bool> _isSubmittings;
   bool? _isEditable;
+  late void Function(BuildContext context, Map<String, InputValue> inputValues)?
+      _clearValues;
 
   @override
   void initState() {
@@ -99,6 +101,20 @@ class _FormBuilderState extends State<FormBuilder> {
 
     _isSubmittings = List.generate(
         (widget.additionalButtons?.length ?? 0) + 1, (index) => false);
+
+    _clearValues = (context, inputValues) {
+      inputValues = {
+        for (int i = 0; i < widget.inputFields.length; i++)
+          widget.inputFields[i].name: InputValue(
+            controller: _controllers[i],
+            inputField: widget.inputFields[i],
+          )
+      };
+
+      for (int i = 0; i < widget.inputFields.length; i++) {
+        inputValues[widget.inputFields[i].name]!.clear();
+      }
+    };
     super.initState();
   }
 
@@ -569,8 +585,7 @@ class _FormBuilderState extends State<FormBuilder> {
       if (!context.mounted) return;
       await widget.onSubmit.call(context, _inputValues);
       if (widget.resetToInitialAfterSubmit == true) {
-        if (widget.onInitial != null) {
-          if (!context.mounted) return;
+        setState(() {
           _inputValues = {
             for (int i = 0; i < widget.inputFields.length; i++)
               widget.inputFields[i].name: InputValue(
@@ -578,7 +593,17 @@ class _FormBuilderState extends State<FormBuilder> {
                 inputField: widget.inputFields[i],
               )
           };
-          widget.onInitial!.call(context, _inputValues);
+        });
+        if (widget.onInitial != null) {
+          if (!context.mounted) return;
+          setState(() {
+            widget.onInitial!.call(context, _inputValues);
+          });
+        } else {
+          if (!context.mounted) return;
+          setState(() {
+            _clearValues!.call(context, _inputValues);
+          });
         }
       }
     } else {
@@ -786,6 +811,30 @@ class InputValue {
 
   final dynamic controller;
   final Input inputField;
+
+  void clear() {
+    if (inputField.runtimeType == InputFile) {
+      (controller as InputFieldFileController).clear();
+    }
+    if (inputField.runtimeType == InputForm) {
+      (controller as InputFieldFormController).clear();
+    }
+    if (inputField.runtimeType == InputText) {
+      (controller as TextEditingController).text = '';
+    }
+    if (inputField.runtimeType == InputDateTime) {
+      (controller as TextEditingController).text = '';
+    }
+    if (inputField.runtimeType == InputOption) {
+      (controller as InputFieldOptionController).clear();
+    }
+    if (inputField.runtimeType == InputNumber) {
+      (controller as TextEditingController).text = '';
+    }
+    if (inputField.runtimeType == InputHidden) {
+      (controller as InputFieldHiddenController).clear();
+    }
+  }
 
   void setFiles(List<PlatformFile> value) {
     if (inputField.runtimeType == InputFile) {
