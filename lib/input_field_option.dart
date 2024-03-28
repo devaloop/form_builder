@@ -120,7 +120,7 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                                   widget.controller.add(result);
                                 });
                                 if (widget.onValueChanged != null) {
-                                  if (!mounted) return;
+                                  if (!context.mounted) return;
                                   widget.onValueChanged!.call(
                                       context,
                                       prevValue,
@@ -187,7 +187,7 @@ class _InputFieldOptionState extends State<InputFieldOption> {
                         widget.controller.add(result);
                       });
                       if (widget.onValueChanged != null) {
-                        if (!mounted) return;
+                        if (!context.mounted) return;
 
                         widget.onValueChanged!.call(context, prevValue,
                             inputValue.getListOptionValues());
@@ -374,7 +374,7 @@ class _InputFieldOptionSearchFormPage
                         ),
                       );
 
-                      if (!mounted) return;
+                      if (!context.mounted) return;
 
                       if (result != null) {
                         Navigator.pop(

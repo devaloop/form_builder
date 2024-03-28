@@ -176,7 +176,7 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
                           }
                         }
                         if (widget.onValueChanged != null) {
-                          if (!mounted) return;
+                          if (!context.mounted) return;
                           await widget.onValueChanged!.call(
                               context, prevValue, inputValue.getDateTime());
                         }
@@ -302,7 +302,7 @@ class _InputFieldDateTimeState extends State<InputFieldDateTime> {
             }
 
             if (widget.onValueChanged != null) {
-              if (!mounted) return;
+              if (!context.mounted) return;
               await widget.onValueChanged!
                   .call(context, prevValue, inputValue.getDateTime());
             }

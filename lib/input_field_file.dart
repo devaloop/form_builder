@@ -113,7 +113,7 @@ class _InputFieldFileState extends State<InputFieldFile> {
                             });
 
                             if (widget.onValueChanged != null) {
-                              if (!mounted) return;
+                              if (!context.mounted) return;
                               widget.onValueChanged!.call(
                                   context, prevValue, inputValue.getFiles());
                             }
@@ -174,7 +174,7 @@ class _InputFieldFileState extends State<InputFieldFile> {
                   });
 
                   if (widget.onValueChanged != null) {
-                    if (!mounted) return;
+                    if (!context.mounted) return;
                     widget.onValueChanged!
                         .call(context, prevValue, inputValue.getFiles());
                   }

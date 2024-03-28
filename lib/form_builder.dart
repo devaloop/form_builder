@@ -451,8 +451,10 @@ class _FormBuilderState extends State<FormBuilder> {
             _isEditable ?? widget.isFormEditable ?? e.isEditable ?? true,
         onValueChanged: (context, previousValue, currentValue) {
           if (widget.onValueChanged != null) {
-            widget.onValueChanged!
-                .call(context, e, previousValue, currentValue, _inputValues);
+            setState(() {
+              widget.onValueChanged!
+                  .call(context, e, previousValue, currentValue, _inputValues);
+            });
           }
         },
         input: e,

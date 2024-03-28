@@ -62,17 +62,11 @@ class InputFieldForm extends StatefulWidget {
 
 class _InputFieldFormState extends State<InputFieldForm> {
   bool _textFieldIsFocused = false;
-  final TextEditingController _controller = TextEditingController();
 
   @override
   void initState() {
-    _textFieldIsFocused = false;
-    if (widget.controller.getData().isNotEmpty) {
-      _controller.text = '${widget.controller.getData().length} Data Filled';
-    } else {
-      _controller.clear();
-    }
     super.initState();
+    _textFieldIsFocused = false;
   }
 
   @override
@@ -81,7 +75,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
       children: [
         Focus(
           child: TextFormField(
-            controller: _controller,
+            controller: widget.controller.getSummary(),
             autovalidateMode: AutovalidateMode.onUserInteraction,
             maxLines: null,
             decoration: InputDecoration(
@@ -233,16 +227,10 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                     widget.controller.clear();
                                   }
                                   widget.controller.add(result);
-                                  if (widget.controller.getData().isEmpty) {
-                                    _controller.clear();
-                                  } else {
-                                    _controller.text =
-                                        '${widget.controller.getData().length} Data Filled';
-                                  }
                                 });
 
                                 if (widget.onValueChanged != null) {
-                                  if (!mounted) return;
+                                  if (!context.mounted) return;
                                   widget.onValueChanged!.call(context,
                                       prevValue, inputValue.getFormValues());
                                 }
@@ -250,14 +238,6 @@ class _InputFieldFormState extends State<InputFieldForm> {
                             }
 
                             navigateToInputFieldFormPage(context);
-                            setState(() {
-                              if (widget.controller.getData().isEmpty) {
-                                _controller.clear();
-                              } else {
-                                _controller.text =
-                                    '${widget.controller.getData().length} Data Filled';
-                              }
-                            });
                           }
                         : null,
                   ),
@@ -420,20 +400,11 @@ class _InputFieldFormState extends State<InputFieldForm> {
 
                     if (result != null) {
                       setState(() {
-                        if (!(widget.isMultiInputForm ?? false)) {
-                          widget.controller.clear();
-                        }
                         widget.controller.add(result);
-                        if (widget.controller.getData().isEmpty) {
-                          _controller.clear();
-                        } else {
-                          _controller.text =
-                              '${widget.controller.getData().length} Data Filled';
-                        }
                       });
 
                       if (widget.onValueChanged != null) {
-                        if (!mounted) return;
+                        if (!context.mounted) return;
                         widget.onValueChanged!.call(
                             context, prevValue, inputValue.getFormValues());
                       }
@@ -441,14 +412,6 @@ class _InputFieldFormState extends State<InputFieldForm> {
                   }
 
                   navigateToInputFieldFormPage(context);
-                  setState(() {
-                    if (widget.controller.getData().isEmpty) {
-                      _controller.clear();
-                    } else {
-                      _controller.text =
-                          '${widget.controller.getData().length} Data Filled';
-                    }
-                  });
                 }
               }
             },
@@ -722,12 +685,6 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                     List.from(inputValue.getFormValues());
                                 setState(() {
                                   widget.controller.clearAt(index);
-                                  if (widget.controller.getData().isEmpty) {
-                                    _controller.clear();
-                                  } else {
-                                    _controller.text =
-                                        '${widget.controller.getData().length} Data Filled';
-                                  }
                                 });
 
                                 if (widget.onValueChanged != null) {
@@ -868,19 +825,10 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                           setState(() {
                                             widget.controller
                                                 .set(index, result);
-                                            _controller.clear();
-                                            if (widget.controller
-                                                .getData()
-                                                .isEmpty) {
-                                              _controller.clear();
-                                            } else {
-                                              _controller.text =
-                                                  '${widget.controller.getData().length} Data Filled';
-                                            }
                                           });
 
                                           if (widget.onValueChanged != null) {
-                                            if (!mounted) return;
+                                            if (!context.mounted) return;
                                             widget.onValueChanged!.call(
                                                 context,
                                                 prevValue,
@@ -890,17 +838,6 @@ class _InputFieldFormState extends State<InputFieldForm> {
                                       }
 
                                       navigateToInputFieldFormPage(context);
-                                      setState(() {
-                                        _controller.clear();
-                                        if (widget.controller
-                                            .getData()
-                                            .isEmpty) {
-                                          _controller.clear();
-                                        } else {
-                                          _controller.text =
-                                              '${widget.controller.getData().length} Data Filled';
-                                        }
-                                      });
                                     }
                                   : null,
                             )
@@ -1146,19 +1083,35 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
 
 class InputFieldFormController extends ChangeNotifier {
   List<Map<String, dynamic>> _data = [];
+  TextEditingController _controller = TextEditingController();
 
   void add(Map<String, dynamic> item) {
     _data.add(item);
+    if (_data.isEmpty) {
+      _controller = TextEditingController();
+    } else {
+      _controller.text = '${_data.length} Data Filled';
+    }
     notifyListeners();
   }
 
   void set(int index, Map<String, dynamic> item) {
     _data[index] = item;
+    if (_data.isEmpty) {
+      _controller = TextEditingController();
+    } else {
+      _controller.text = '${_data.length} Data Filled';
+    }
     notifyListeners();
   }
 
   void clearAt(int index) {
     _data.removeAt(index);
+    if (_data.isEmpty) {
+      _controller = TextEditingController();
+    } else {
+      _controller.text = '${_data.length} Data Filled';
+    }
     notifyListeners();
   }
 
@@ -1166,8 +1119,13 @@ class InputFieldFormController extends ChangeNotifier {
     return _data;
   }
 
+  TextEditingController getSummary() {
+    return _controller;
+  }
+
   void clear() {
     _data = [];
+    _controller = TextEditingController();
     notifyListeners();
   }
 }
