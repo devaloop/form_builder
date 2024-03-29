@@ -58,374 +58,105 @@ class _MyAppState extends State<MyApp> {
           padding: const EdgeInsets.all(15),
           child: FormBuilder(
             formName: 'Member',
-            inputFields: [
-              const InputHidden(
-                name: 'id',
-                label: 'ID',
-              ),
-              const InputText(
+            inputFields: const [
+              InputText(
                 name: 'name',
                 label: 'Name',
-                isEditable: false,
-              ),
-              const InputForm(
-                name: 'jumlah',
-                label: 'Jumlah',
-                inputFields: [
-                  InputHidden(
-                    name: 'jumlahId',
-                    label: 'Jumlah Id',
-                  ),
-                  InputNumber(
-                    name: 'dari',
-                    label: 'Dari',
-                  ),
-                  InputNumber(
-                    name: 'sampai',
-                    label: 'Sampai',
-                  )
-                ],
-              ),
-              const InputForm(
-                name: 'tanggalPengeluaran',
-                label: 'Tanggal Pengeluaran',
-                inputFields: [
-                  InputDateTime(
-                    name: 'dari',
-                    label: 'Dari',
-                    inputDateTimeMode: InputDateTimeMode.date,
-                  ),
-                  InputDateTime(
-                    name: 'sampai',
-                    label: 'Sampai',
-                    inputDateTimeMode: InputDateTimeMode.date,
-                  ),
-                ],
-              ),
-              const InputText(
-                name: 'email',
-                label: 'Email',
-                inputTextMode: InputTextMode.email,
-              ),
-              const InputDateTime(
-                name: 'birthDate',
-                label: 'Birth Date',
-                inputDateTimeMode: InputDateTimeMode.date,
-              ),
-              const InputDateTime(
-                name: 'joinDate',
-                label: 'Join Date',
-                inputDateTimeMode: InputDateTimeMode.date,
-              ),
-              InputOption(
-                name: 'trainingProgram',
-                label: 'Training Program',
-                optionData: _futureTrainingProgramOptionData,
-              ),
-              InputOption(
-                name: 'gender',
-                label: 'Gender',
-                optionData: Future<OptionData>(
-                  () {
-                    var data = [
-                      const OptionItem(hiddenValue: ['Male'], value: ['Male']),
-                      const OptionItem(
-                          hiddenValue: ['Female'], value: ['Female']),
-                    ];
-                    return OptionData(
-                        displayedListOfOptions: data, totalOption: data.length);
-                  },
-                ),
-              ),
-              InputOption(
-                name: 'hobbies',
-                label: 'Hobbies',
-                isMultiSelection: true,
-                optionData: Future<OptionData>(
-                  () {
-                    var data = Db.hobbies
-                        .take(10)
-                        .map((e) => OptionItem(
-                            hiddenValue: [e.id], value: [e.name, e.detail]))
-                        .toList();
-                    return OptionData(
-                      displayedListOfOptions: data,
-                      totalOption: Db.hobbies.length,
-                    );
-                  },
-                ),
-                dataHeaders: ['Name', 'Detail'],
-                optionSearchForm: OptionSearchForm(
-                  searchFields: [
-                    const InputText(
-                      name: 'name',
-                      label: 'Name',
-                    ),
-                    const InputText(
-                      name: 'detail',
-                      label: 'Detail',
-                      isOptional: true,
-                    ),
-                  ],
-                  searchProcess: (params) {
-                    return Future<OptionData>(
-                      () {
-                        var data = Db.hobbies
-                            .map((e) => OptionItem(
-                                hiddenValue: [e.id], value: [e.name, e.detail]))
-                            .where((element) => element.value[0]
-                                .toLowerCase()
-                                .contains(
-                                    params['name']!.getString()!.toLowerCase()))
-                            .toList();
-
-                        if (params['detail']!.getString() != null) {
-                          data = data
-                              .where((element) => element.value[0]
-                                  .toLowerCase()
-                                  .contains(params['detail']!
-                                      .getString()!
-                                      .toLowerCase()))
-                              .toList();
-                        }
-                        return OptionData(
-                          displayedListOfOptions: data,
-                          totalOption: Db.hobbies.length,
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-              const InputNumber(
-                name: 'rate',
-                label: 'Rate',
-                isOptional: true,
-                inputNumberMode: InputNumberMode.decimal,
-              ),
-              const InputText(
-                name: 'rateInfo',
-                label: 'Rate Info',
-                helperText: 'Must be filled when rate is filled.',
-                isOptional: true,
-                isMultilines: true,
               ),
               InputForm(
-                name: 'familyMembers',
-                label: 'Family Members',
-                isMultiInputForm: true,
-                onFormValueChanged:
-                    (context, field, previousValue, currentValue, inputValues) {
-                  if (field.name == 'name') {
-                    if (currentValue == 'a') {
-                      setState(() {
-                        _genderFamilyMembers = Future<OptionData>(
-                          () async {
-                            await Future.delayed(const Duration(seconds: 10));
-                            var data = [
-                              const OptionItem(
-                                  hiddenValue: ['Male'], value: ['Male']),
-                              const OptionItem(
-                                  hiddenValue: ['Female'], value: ['Female']),
-                              const OptionItem(
-                                  hiddenValue: ['Other'], value: ['Other']),
-                            ];
-                            return OptionData(
-                                displayedListOfOptions: data,
-                                totalOption: data.length);
-                          },
-                        );
-                      });
-                    }
-                  }
-                },
+                name: 'detailProduct',
+                label: 'Detail Product',
                 inputFields: [
-                  const InputText(
-                    name: 'name',
-                    label: 'Name',
+                  InputNumber(
+                    name: 'quantity',
+                    label: 'Quantity',
                   ),
-                  const InputText(
-                    name: 'email',
-                    label: 'Email',
-                    inputTextMode: InputTextMode.email,
-                    isOptional: true,
+                  InputText(
+                    name: 'unit',
+                    label: 'Unit',
                   ),
-                  const InputDateTime(
-                    name: 'birthDate',
-                    label: 'Birth Date',
-                    inputDateTimeMode: InputDateTimeMode.date,
+                  InputNumber(
+                    name: 'purchasePrice',
+                    label: 'Purchase Price',
                   ),
-                  InputOption(
-                    name: 'gender',
-                    label: 'Gender',
-                    optionData: _genderFamilyMembers,
+                  InputNumber(
+                    name: 'sellingPrice',
+                    label: 'Selling Price',
                   ),
-                  InputOption(
-                    name: 'hobbies',
-                    label: 'Hobbies',
-                    isMultiSelection: true,
-                    optionData: Future<OptionData>(
-                      () {
-                        var data = Db.hobbies
-                            .take(10)
-                            .map((e) => OptionItem(
-                                hiddenValue: [e.id], value: [e.name, e.detail]))
-                            .toList();
-                        return OptionData(
-                          displayedListOfOptions: data,
-                          totalOption: Db.hobbies.length,
-                        );
-                      },
-                    ),
-                    //dataHeaders: ['Name', 'Detail'],
-                    optionSearchForm: OptionSearchForm(
-                      searchFields: [
-                        const InputText(
-                            name: 'name', label: 'Name', isOptional: true),
-                        const InputText(
-                          name: 'detail',
-                          label: 'Detail',
-                          isOptional: false,
-                        ),
-                      ],
-                      searchProcess: (params) {
-                        return Future<OptionData>(
-                          () {
-                            var data = Db.hobbies
-                                .map((e) => OptionItem(
-                                    hiddenValue: [e.id],
-                                    value: [e.name, e.detail]))
-                                .where((element) => element.value[0]
-                                    .toLowerCase()
-                                    .contains(params['name']!
-                                        .getString()!
-                                        .toLowerCase()))
-                                .toList();
-                            return OptionData(
-                              displayedListOfOptions: data,
-                              totalOption: Db.hobbies.length,
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
-                  const InputForm(
-                    name: 'additinalInformations',
-                    label: 'Additional Informations',
-                    isMultiInputForm: true,
-                    isOptional: false,
-                    inputFields: [
-                      InputText(
-                        name: 'title',
-                        label: 'Tittle',
-                      ),
-                      InputText(
-                        name: 'information',
-                        label: 'Informations',
-                        isMultilines: true,
-                      ),
-                    ],
+                  InputNumber(
+                    name: 'tax',
+                    label: 'Tax',
                   ),
                 ],
               ),
-              InputFile(
-                name: 'documents',
-                label: 'Documents',
+              InputForm(
+                name: 'unitConversion',
+                label: 'Unit Conversion',
+                isMultiInputForm: true,
                 isOptional: true,
-                isAllowMultiple: true,
-                onDownload: (file) {
-                  // ignore: avoid_print
-                  print(file.name);
-                },
+                inputFields: [
+                  InputNumber(
+                    name: 'quantity',
+                    label: 'Quantity',
+                  ),
+                  InputText(
+                    name: 'unit',
+                    label: 'Unit',
+                  ),
+                ],
+              ),
+              InputForm(
+                name: 'priceConversion',
+                label: 'Price Conversion',
+                isMultiInputForm: true,
+                isOptional: true,
+                inputFields: [
+                  InputText(
+                    name: 'unit',
+                    label: 'Unit',
+                    isEditable: false,
+                  ),
+                  InputNumber(
+                    name: 'purchasePricePerUnit',
+                    label: 'Purchase Price Per Unit',
+                  ),
+                  InputNumber(
+                    name: 'sellingPricePerUnit',
+                    label: 'Selling Price Per Unit',
+                  ),
+                  InputNumber(
+                    name: 'taxPerUnit',
+                    label: 'Tax Per Unit',
+                  ),
+                ],
               ),
             ],
-            onValueChanged:
-                (context, input, previousValue, currentValue, inputValues) {
-              if (input.name == 'joinDate') {
-                DateTime? joinDate = inputValues['joinDate']!.getDateTime();
-                if (previousValue != currentValue) {
-                  inputValues['trainingProgram']!.setListOptionValues([]);
-                  if (joinDate == null) {
-                    setState(() {
-                      _futureTrainingProgramOptionData = Future<OptionData>(
-                        () => const OptionData(
-                            displayedListOfOptions: [], totalOption: 0),
-                      );
-                    });
-                  } else {
-                    if (joinDate.isAfter(DateTime(2024))) {
-                      setState(() {
-                        _futureTrainingProgramOptionData = Future<OptionData>(
-                          () {
-                            List<OptionItem> data = [
-                              const OptionItem(
-                                hiddenValue: ['Flutter'],
-                                value: ['Flutter'],
-                              ),
-                              const OptionItem(
-                                hiddenValue: ['.NET MAUI'],
-                                value: ['.NET MAUI'],
-                              ),
-                            ];
-                            return OptionData(
-                                displayedListOfOptions: data,
-                                totalOption: data.length);
-                          },
-                        );
-                      });
-                    } else {
-                      setState(() {
-                        _futureTrainingProgramOptionData = Future<OptionData>(
-                          () {
-                            List<OptionItem> data = [
-                              const OptionItem(
-                                hiddenValue: ['HTML'],
-                                value: ['HTML'],
-                              ),
-                              const OptionItem(
-                                hiddenValue: ['ASP Classic'],
-                                value: ['ASP Classic'],
-                              ),
-                            ];
-                            return OptionData(
-                                displayedListOfOptions: data,
-                                totalOption: data.length);
-                          },
-                        );
-                      });
-                    }
-                  }
-                }
-              }
-            },
-            onInitial: (context, inputValues) {
-              inputValues['id']!.setHiddenValue(1001);
-              inputValues['jumlah']!.setFormValues([
+            onInitial: (context, inputValues) async {
+              inputValues['name']!.setString('A');
+              inputValues['detailProduct']!.setFormValues([
                 {
-                  'jumlahId': 1002,
-                }
+                  'unit': 'Karton',
+                  'quantity': 1,
+                  'purchasePrice': 100000,
+                  'sellingPrice': 200000,
+                  'tax': 20000,
+                },
               ]);
-              inputValues['name']!.setString('Budi Saputra');
-
-              inputValues['familyMembers']!.setFormValues([
-                {
-                  'name': 'Ani',
-                  'birthDate': DateTime(2000, 09, 09),
-                  'additinalInformations': [
-                    {
-                      'title': 'Favorite Song',
-                      'information': 'Happy',
-                    },
-                    {
-                      'title': 'Favorite Food',
-                    },
-                    {
-                      'title': 'Favorite Movie',
-                    },
-                  ],
-                }
-              ]);
+              await Future.delayed(const Duration(seconds: 15));
+              List<Map<String, dynamic>> unitConversion = [];
+              List<Map<String, dynamic>> priceConversion = [];
+              unitConversion.add({
+                'quantity': 1,
+                'unit': 'Karton',
+              });
+              priceConversion.add({
+                'unit': 'Karton',
+                'purchasePricePerUnit': 100000,
+                'sellingPricePerUnit': 200000,
+                'taxPerUnit': 200000,
+              });
+              inputValues['unitConversion']!.setFormValues(unitConversion);
+              inputValues['priceConversion']!.setFormValues(priceConversion);
             },
             onBeforeValidation: (context, inputValues) {
               inputValues['name']!

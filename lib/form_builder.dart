@@ -28,7 +28,7 @@ class FormBuilder extends StatefulWidget {
 
   final String? formName;
   final List<Input> inputFields;
-  final void Function(
+  final dynamic Function(
       BuildContext context, Map<String, InputValue> inputValues)? onInitial;
   final dynamic Function(
           BuildContext context, Map<String, InputValue> inputValues)?
@@ -94,10 +94,6 @@ class _FormBuilderState extends State<FormBuilder> {
           inputField: widget.inputFields[i],
         )
     };
-
-    if (widget.onInitial != null) {
-      widget.onInitial!.call(context, _inputValues);
-    }
 
     _isSubmittings = List.generate(
         (widget.additionalButtons?.length ?? 0) + 1, (index) => false);
@@ -220,7 +216,7 @@ class _FormBuilderState extends State<FormBuilder> {
       fieldTextAndDate.removeAt(fieldTextAndDate.length - 1);
     }
 
-    return Form(
+    var form = Form(
       key: _formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,6 +305,20 @@ class _FormBuilderState extends State<FormBuilder> {
         ],
       ),
     );
+
+    return widget.onInitial != null
+        ? FutureBuilder(
+            future: Future(() async =>
+                await widget.onInitial!.call(context, _inputValues)),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const LinearProgressIndicator();
+              } else {
+                return form;
+              }
+            },
+          )
+        : form;
   }
 
   Widget getField(Input e) {

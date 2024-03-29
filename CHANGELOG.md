@@ -1,3 +1,3 @@
-## 0.1.4
+## 0.1.5
 
-* BugFix SetValue onValueChange not working
+* BugFix onInitial not working when using future
