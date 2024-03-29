@@ -1083,35 +1083,28 @@ class _InputFieldFormPage extends State<InputFieldFormPage> {
 
 class InputFieldFormController extends ChangeNotifier {
   List<Map<String, dynamic>> _data = [];
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
 
   void add(Map<String, dynamic> item) {
     _data.add(item);
-    if (_data.isEmpty) {
-      _controller = TextEditingController();
-    } else {
-      _controller.text = '${_data.length} Data Filled';
-    }
+    _controller.text = '${_data.length} Data Filled';
     notifyListeners();
   }
 
   void set(int index, Map<String, dynamic> item) {
     _data[index] = item;
-    if (_data.isEmpty) {
-      _controller = TextEditingController();
-    } else {
-      _controller.text = '${_data.length} Data Filled';
-    }
+    _controller.text = '${_data.length} Data Filled';
     notifyListeners();
   }
 
   void clearAt(int index) {
     _data.removeAt(index);
     if (_data.isEmpty) {
-      _controller = TextEditingController();
+      _controller.clear();
     } else {
       _controller.text = '${_data.length} Data Filled';
     }
+
     notifyListeners();
   }
 
@@ -1125,7 +1118,7 @@ class InputFieldFormController extends ChangeNotifier {
 
   void clear() {
     _data = [];
-    _controller = TextEditingController();
+    _controller.clear();
     notifyListeners();
   }
 }

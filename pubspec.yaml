@@ -1,6 +1,6 @@
 name: devaloop_form_builder
 description: "Form Builder : Create forms easily and neatly."
-version: 0.1.3
+version: 0.1.4
 homepage: https://github.com/devaloop/form_builder
 
 environment:
