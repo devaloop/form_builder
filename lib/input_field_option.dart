@@ -1,8 +1,5 @@
 library devaloop_form_builder;
 
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:devaloop_form_builder/form_builder.dart';
 
@@ -153,52 +150,6 @@ class _InputFieldOptionState extends State<InputFieldOption> {
               return errorMessage;
             },
             readOnly: true,
-            onTap: () async {
-              if (!kIsWeb) {
-                if (Platform.isAndroid || Platform.isIOS) {
-                  Future<void> navigateToInputFieldOptionSearchFormPage(
-                      BuildContext context) async {
-                    var inputValue = InputValue(
-                        controller: widget.controller,
-                        inputField: widget.input);
-
-                    final List<OptionItem> prevValue =
-                        List.from(inputValue.getListOptionValues());
-
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => InputFiledOptionSearchFormPage(
-                          title: widget.label,
-                          optionData: widget.optionData,
-                          searchFields: widget.searchFields,
-                          searchProcess: widget.searchProcess,
-                        ),
-                      ),
-                    );
-
-                    if (!mounted) return;
-
-                    if (result != null) {
-                      setState(() {
-                        if (!_isMultiSelection) {
-                          widget.controller.clear();
-                        }
-                        widget.controller.add(result);
-                      });
-                      if (widget.onValueChanged != null) {
-                        if (!context.mounted) return;
-
-                        widget.onValueChanged!.call(context, prevValue,
-                            inputValue.getListOptionValues());
-                      }
-                    }
-                  }
-
-                  await navigateToInputFieldOptionSearchFormPage(context);
-                }
-              }
-            },
           ),
           onFocusChange: (isFocused) {
             setState(() {

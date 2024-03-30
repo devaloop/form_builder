@@ -516,6 +516,7 @@ class _FormBuilderState extends State<FormBuilder> {
           }
         },
         input: e,
+        isItemCanAdded: e.isItemCanAdded,
       );
     } else if (e.runtimeType == InputFile) {
       e = (e as InputFile);
@@ -740,25 +741,29 @@ class InputForm extends Input {
   final List<AdditionalButton>? additionalButtons;
   final bool? isMultiInputForm;
   final dynamic Function(
-          BuildContext, Input, dynamic, dynamic, Map<String, InputValue>)?
-      onFormValueChanged;
+      BuildContext context,
+      Input input,
+      dynamic previousValue,
+      dynamic currentValue,
+      Map<String, InputValue> inputValues)? onFormValueChanged;
+  final bool isItemCanAdded;
 
-  const InputForm({
-    required super.name,
-    required super.label,
-    super.helperText,
-    super.isOptional,
-    super.isEditable,
-    required this.inputFields,
-    this.onValidating,
-    this.additionalButtons = const [],
-    this.isMultiInputForm = false,
-    this.onAfterValidation,
-    this.onBeforeValidation,
-    this.onInitial,
-    this.onFormValueChanged,
-    super.onValueChanged,
-  });
+  const InputForm(
+      {required super.name,
+      required super.label,
+      super.helperText,
+      super.isOptional,
+      super.isEditable,
+      required this.inputFields,
+      this.onValidating,
+      this.additionalButtons = const [],
+      this.isMultiInputForm = false,
+      this.onAfterValidation,
+      this.onBeforeValidation,
+      this.onInitial,
+      this.onFormValueChanged,
+      super.onValueChanged,
+      this.isItemCanAdded = true});
 }
 
 class InputNumber extends Input {
