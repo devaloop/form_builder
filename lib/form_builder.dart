@@ -65,6 +65,7 @@ class _FormBuilderState extends State<FormBuilder> {
   bool? _isEditable;
   late void Function(BuildContext context, Map<String, InputValue> inputValues)?
       _clearValues;
+  late bool _isInitial;
 
   @override
   void initState() {
@@ -111,6 +112,7 @@ class _FormBuilderState extends State<FormBuilder> {
         inputValues[widget.inputFields[i].name]!.clear();
       }
     };
+    _isInitial = true;
     super.initState();
   }
 
@@ -306,10 +308,14 @@ class _FormBuilderState extends State<FormBuilder> {
       ),
     );
 
-    return widget.onInitial != null
+    return widget.onInitial != null && _isInitial == true
         ? FutureBuilder(
-            future: Future(() async =>
-                await widget.onInitial!.call(context, _inputValues)),
+            future: Future(() async {
+              await widget.onInitial!.call(context, _inputValues);
+              setState(() {
+                _isInitial = false;
+              });
+            }),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const LinearProgressIndicator();

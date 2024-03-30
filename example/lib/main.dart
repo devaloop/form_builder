@@ -142,7 +142,7 @@ class _MyAppState extends State<MyApp> {
                   'tax': 20000,
                 },
               ]);
-              await Future.delayed(const Duration(seconds: 15));
+              await Future.delayed(const Duration(seconds: 2));
               List<Map<String, dynamic>> unitConversion = [];
               List<Map<String, dynamic>> priceConversion = [];
               unitConversion.add({
