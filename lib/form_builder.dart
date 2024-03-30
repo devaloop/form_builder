@@ -516,7 +516,7 @@ class _FormBuilderState extends State<FormBuilder> {
           }
         },
         input: e,
-        isItemCanAdded: e.isItemCanAdded,
+        isItemCanAddedOrRemoved: e.isItemCanAddedOeRemoved,
       );
     } else if (e.runtimeType == InputFile) {
       e = (e as InputFile);
@@ -746,7 +746,7 @@ class InputForm extends Input {
       dynamic previousValue,
       dynamic currentValue,
       Map<String, InputValue> inputValues)? onFormValueChanged;
-  final bool isItemCanAdded;
+  final bool isItemCanAddedOeRemoved;
 
   const InputForm(
       {required super.name,
@@ -763,7 +763,7 @@ class InputForm extends Input {
       this.onInitial,
       this.onFormValueChanged,
       super.onValueChanged,
-      this.isItemCanAdded = true});
+      this.isItemCanAddedOeRemoved = true});
 }
 
 class InputNumber extends Input {

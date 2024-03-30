@@ -34,7 +34,7 @@ class InputFieldForm extends StatefulWidget {
       List<Map<String, dynamic>> previousValue,
       List<Map<String, dynamic>> currentValue)? onValueChanged;
   final InputForm input;
-  final bool isItemCanAdded;
+  final bool isItemCanAddedOrRemoved;
 
   const InputFieldForm(
       {super.key,
@@ -52,7 +52,7 @@ class InputFieldForm extends StatefulWidget {
       this.isMultiInputForm = false,
       this.onValueChanged,
       required this.input,
-      required this.isItemCanAdded});
+      required this.isItemCanAddedOrRemoved});
 
   @override
   State<InputFieldForm> createState() => _InputFieldFormState();
@@ -81,7 +81,7 @@ class _InputFieldFormState extends State<InputFieldForm> {
                   widget.label + (widget.isRequired ? '' : ' - Optional'),
               helperText: widget.helperText,
               helperMaxLines: 100,
-              suffixIcon: widget.isItemCanAdded == false
+              suffixIcon: widget.isItemCanAddedOrRemoved == false
                   ? null
                   : (widget.isMultiInputForm == false &&
                           widget.controller.getData().isNotEmpty)
@@ -563,28 +563,33 @@ class _InputFieldFormState extends State<InputFieldForm> {
                           );
                         }).toList(),
                       ),
-                      leading: IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed: widget.isEditable ?? false
-                            ? () {
-                                var inputValue = InputValue(
-                                    controller: widget.controller,
-                                    inputField: widget.input);
+                      leading: !widget.isItemCanAddedOrRemoved
+                          ? null
+                          : IconButton(
+                              icon: const Icon(Icons.remove),
+                              onPressed: widget.isEditable ?? false
+                                  ? () {
+                                      var inputValue = InputValue(
+                                          controller: widget.controller,
+                                          inputField: widget.input);
 
-                                final List<Map<String, dynamic>> prevValue =
-                                    List.from(inputValue.getFormValues());
-                                setState(() {
-                                  widget.controller.clearAt(index);
-                                });
+                                      final List<Map<String, dynamic>>
+                                          prevValue =
+                                          List.from(inputValue.getFormValues());
+                                      setState(() {
+                                        widget.controller.clearAt(index);
+                                      });
 
-                                if (widget.onValueChanged != null) {
-                                  if (!mounted) return;
-                                  widget.onValueChanged!.call(context,
-                                      prevValue, inputValue.getFormValues());
-                                }
-                              }
-                            : null,
-                      ),
+                                      if (widget.onValueChanged != null) {
+                                        if (!mounted) return;
+                                        widget.onValueChanged!.call(
+                                            context,
+                                            prevValue,
+                                            inputValue.getFormValues());
+                                      }
+                                    }
+                                  : null,
+                            ),
                       trailing: IconButton(
                         icon: const Icon(Icons.navigate_next),
                         onPressed: widget.isEditable ?? false
