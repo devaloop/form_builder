@@ -392,8 +392,22 @@ class _InputFieldFormState extends State<InputFieldForm> {
                             ));
                           }
                           if (e.runtimeType == InputNumber) {
-                            value =
-                                '${e.label}: ${widget.controller.getData()[index].entries.where((element) => element.key == e.name).firstOrNull?.value ?? '-'} ';
+                            var currentValue = widget.controller
+                                .getData()[index]
+                                .entries
+                                .where((element) => element.key == e.name)
+                                .firstOrNull
+                                ?.value;
+                            if ((e as InputNumber).isCurrency) {
+                              if (currentValue == null) {
+                                value = '${e.label}: - ';
+                              } else {
+                                value =
+                                    '${e.label}: ${NumberFormat("#.##0,00").format(double.parse(currentValue))} ';
+                              }
+                            } else {
+                              value = '${e.label}: ${currentValue ?? '-'} ';
+                            }
 
                             listDataView.add(Card(
                               color: Colors.transparent,

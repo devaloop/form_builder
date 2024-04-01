@@ -397,6 +397,7 @@ class _FormBuilderState extends State<FormBuilder> {
           }
         },
         input: e,
+        isCurrency: e.isCurrency,
       );
     } else if (e.runtimeType == InputOption) {
       e = (e as InputOption);
@@ -768,6 +769,7 @@ class InputForm extends Input {
 
 class InputNumber extends Input {
   final InputNumberMode? inputNumberMode;
+  final bool isCurrency;
 
   const InputNumber({
     required super.name,
@@ -776,6 +778,7 @@ class InputNumber extends Input {
     super.isOptional,
     super.isEditable,
     this.inputNumberMode = InputNumberMode.decimal,
+    this.isCurrency = false,
     super.onValueChanged,
   });
 }

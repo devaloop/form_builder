@@ -1,3 +1,3 @@
-## 0.1.8
+## 0.1.9
 
-* Add isItemCanAddedOrRemoved property at InputForm
+* add isCurrency property on InputNumber

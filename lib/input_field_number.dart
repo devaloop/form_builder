@@ -3,6 +3,7 @@ library devaloop_form_builder;
 import 'package:devaloop_form_builder/form_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class InputFieldNumber extends StatelessWidget {
   final TextEditingController controller;
@@ -16,6 +17,7 @@ class InputFieldNumber extends StatelessWidget {
           BuildContext context, double? previousValue, double? currentValue)?
       onValueChanged;
   final InputNumber input;
+  final bool isCurrency;
 
   const InputFieldNumber({
     super.key,
@@ -28,6 +30,7 @@ class InputFieldNumber extends StatelessWidget {
     this.isEditable,
     this.onValueChanged,
     required this.input,
+    required this.isCurrency,
   });
 
   @override
@@ -86,7 +89,11 @@ class InputFieldNumber extends StatelessWidget {
       onEditingComplete: () => FocusScope.of(context).nextFocus(),
       decoration: InputDecoration(
         labelText: label + (isRequired ? '' : ' - Optional'),
-        helperText: helperText,
+        helperText: isCurrency
+            ? controller.text != ''
+                ? NumberFormat("#.##0,00").format(double.parse(controller.text))
+                : helperText
+            : helperText,
         helperMaxLines: 100,
         suffixIcon: const Icon(Icons.numbers),
       ),
